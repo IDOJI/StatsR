@@ -5,6 +5,16 @@ Export___xlsx___Highlighting = function(data.df,
                                         save.path, # save.path = "C:/Users/IDO/OneDrive/github/Rpkgs/StatAnalysis"
                                         file_name,  # file_name = "test"
                                         sheet.name){
+
+  #===========================================================================
+  # length of colors
+  #===========================================================================
+  if(length(colors.list)==1 && !is.list(colors.list) && is.vector(colors.list)){
+    colors.list = rep(colors.list, length(which_cols.list)) %>% as.list
+  }
+
+
+
   #===========================================================================
   # cols as num
   #===========================================================================
@@ -42,9 +52,12 @@ Export___xlsx___Highlighting = function(data.df,
 
     ### log2FoldChange
     y = which_cols.list[[i]]
-    x = coloring_index.list[[i]]
-    openxlsx::addStyle(wb, sheet=sheet.name, style=style, rows=x+1, cols=y, gridExpand=TRUE)
-    # +1 for header line
+    for(j in 1:length(coloring_index.list)){
+      x = coloring_index.list[[j]]
+      # +1 for header line
+      openxlsx::addStyle(wb, sheet=sheet.name, style=style, rows=x+1, cols=y, gridExpand=TRUE)
+    }
+    print(i)
   }
 
 

@@ -1,4 +1,4 @@
-summary_prop = function(data.df, demo.col){
+Summary___Prop = function(data.df, demo.col){
   # demo.col = "Sex"
   results.df = matrix(NA, 1, length(demo.col)) %>% as.data.frame
   names(results.df) = demo.col

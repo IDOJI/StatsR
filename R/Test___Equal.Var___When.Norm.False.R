@@ -11,7 +11,7 @@ Test___Equal.Var___When.Norm.False = function(df, var_response, var_group, is.no
   #===========================================================================
   have_outliers = sapply(data.list, FUN=function(ith_df, ...){
     #ith_df = data.list[[1]]
-    SUB___Have.Outlier(ith_df[,var_response] %>% unlist, by="IQR") %>% return
+    SUB___Have.Outlier(ith_df[,var_response] %>% unlist, method="IQR") %>% return
   })
   have_outliers = sum(have_outliers)==length(data.list)
 

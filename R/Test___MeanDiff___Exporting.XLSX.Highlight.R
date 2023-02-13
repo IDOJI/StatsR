@@ -16,17 +16,19 @@ Test___MeanDiff___Exporting.XLSX.Highlight = function(Final.df,
   # #==============================================================================================
   # # Selecting cols : Final df
   # #==============================================================================================
-  # names_Norm     = filter_by(names(Final.df), including.words = "norm", excluding.words = "test")
-  # names_Eq.Var   = filter_by(names(Final.df), including.words = "Equal.Var", excluding.words = "test")
-  # names_Mean     = filter_by(names(Final.df), including.words = c("MeanDiff", "p.val"))
-  #
-  # names_Response = filter_by(names(Final.df), including.words = c("Response"))
-  #
-  # # post hoc
-  # names_PostHoc  = filter_by(names(Final.df), including.words = c("post", "p.val"))
-  # names_Groups   = filter_by(names(Final.df), including.words = "group")
+  names_Norm     = filter_by(names(Final.df), including.words = "norm", excluding.words = "test")
+  names_Eq.Var   = filter_by(names(Final.df), including.words = "Equal.Var", excluding.words = "test")
+  names_Mean     = filter_by(names(Final.df), including.words = c("MeanDiff", "p.val"))
 
-  # paste0(filename, "_Statistics")
+  names_Response = filter_by(names(Final.df), including.words = c("Response"))
+
+  # post hoc
+  names_PostHoc  = filter_by(names(Final.df), including.words = c("post", "p.val"))
+  names_Groups   = filter_by(names(Final.df), including.words = "group")
+
+  paste0(filename, "_Statistics")
+
+
 
   #==============================================================================================
   # Selecting cols : Reporting df
