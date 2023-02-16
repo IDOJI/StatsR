@@ -63,7 +63,7 @@ Test___MeanDiff___Multi.Reponses = function(##############################
                                              alpha_ANOVA = alpha_ANOVA,
                                              alpha_PostHoc = alpha_PostHoc,
                                              save.path = save.path,
-                                             filename = filename = paste0("[ANOVA] Results_", "`", var_group_filename, "`"))
+                                             filename = paste0("[ANOVA] Results_", "`", var_group_filename, "`"))
   return(list(Combined_Final.df, Combined_Reporting.df))
 }
 
