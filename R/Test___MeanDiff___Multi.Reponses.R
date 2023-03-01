@@ -27,7 +27,7 @@ Test___MeanDiff___Multi.Reponses = function(##############################
   MeanDiff_Multi_Responses.list = lapply(var_responses, FUN=function(y, ...){
     # y = var_responses[2]
     ind = which(var_responses==y)
-    Test___MeanDiff___Single.Reponse(df,
+    Test___MeanDiff___Single.Response(df,
                                      var_group,
                                      var_response = y,
                                      alpha_Norm, alpha_Equal.Var, alpha_ANOVA, alpha_PostHoc,
@@ -179,4 +179,5 @@ Test___MeanDiff___Multi.Reponses = function(##############################
 #
 #   return(MeanDiff.df)
 # }
+
 

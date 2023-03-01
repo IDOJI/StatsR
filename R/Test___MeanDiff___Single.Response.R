@@ -1,4 +1,4 @@
-Test___MeanDiff___Single.Reponse = function(##############################
+Test___MeanDiff___Single.Response = function(##############################
                                           # data & variables
                                           ##############################
                                           df, var_group, var_response,
@@ -9,7 +9,7 @@ Test___MeanDiff___Single.Reponse = function(##############################
                                           alpha_Equal.Var  = 0.05,
                                           alpha_ANOVA = 0.05,
                                           alpha_PostHoc = 0.05,
-                                          p.adjust.method = c("bonferroni", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
+                                          p.adjust.method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
                                           ##############################
                                           # Figure
                                           ##############################
@@ -18,8 +18,8 @@ Test___MeanDiff___Single.Reponse = function(##############################
                                           ##############################
                                           # exporting
                                           ##############################
-                                          save.path,
-                                          filename,
+                                          save.path = NULL,
+                                          filename = NULL,
                                           export.xlsx = F){
   #============================================================================
   # Exclude NA
@@ -85,8 +85,10 @@ Test___MeanDiff___Single.Reponse = function(##############################
   }else{
     if(sum(unlist(Mean.Diff.Results[[2]]$PostHoc_p.value_adj) <= alpha_PostHoc) != 0){
       p = Test___MeanDiff___Single.Response___Box.Plot(df, var_group, var_response, Mean.Diff.Results, alpha_PostHoc=alpha_PostHoc, palette = "jco")
-      ggsave(filename = paste0(filename, ".png"), plot = p, path = save.path)
-      cat("\n", crayon::red(paste0(filename, ".png")),  crayon::blue("is saved !"),"\n")
+      if(!is.null(filename) && !is.null(save.path)){
+        ggsave(filename = paste0(filename, ".png"), plot = p, path = save.path)
+        cat("\n", crayon::red(paste0(filename, ".png")),  crayon::blue("is saved !"),"\n")
+      }
     }
   }
 
