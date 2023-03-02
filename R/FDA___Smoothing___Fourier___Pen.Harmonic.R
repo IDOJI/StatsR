@@ -49,7 +49,7 @@ FDA___Smoothing___Fourier___Pen.Harmonic = function(y, x=NULL, nbasis=NULL, lamb
   OCV = mean( (y-eval.fd(x, FD_Smooth$fd))^2 / (1-diag(Hat.mat))^2 )
 
   # results
-  list(lambda = lambda, DF=FD_Smooth$df, GCV=FD_Smooth$gcv, SSE=FD_Smooth$SSE, OCV=OCV, y.hat = Hat.mat %*% y, FD_Smooth=FD_Smooth) %>% return
+  list(lambda = lambda, DF=FD_Smooth$df, GCV=FD_Smooth$gcv, SSE=FD_Smooth$SSE, OCV=OCV, y.hat = Hat.mat %*% y, y = y, FD_Smooth=FD_Smooth) %>% return
 }
 
 

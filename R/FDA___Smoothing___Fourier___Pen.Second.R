@@ -42,5 +42,5 @@ FDA___Smoothing___Fourier___Pen.Second = function(y, x=NULL, nbasis=NULL, lambda
 
   # results
   # results
-  list(lambda = lambda, DF=FD_Smooth$df, GCV=FD_Smooth$gcv, SSE=FD_Smooth$SSE, OCV=OCV, y.hat = Hat.mat %*% y, FD_Smooth=FD_Smooth) %>% return
+  list(lambda = lambda, DF=FD_Smooth$df, GCV=FD_Smooth$gcv, SSE=FD_Smooth$SSE, OCV=OCV, y.hat = Hat.mat %*% y, y = y, FD_Smooth=FD_Smooth) %>% return
 }

@@ -2,7 +2,7 @@ FDA___Smoothing___Fourier = function(y, n_basis=NULL, lambdas, penalty.type = c(
   ##############################################################################
   if(penalty.type == "harmonic" || penalty.type == "Harmonic"){
     results.list = lapply(lambdas, FUN=function(ith_lambda){
-      FDA___Smoothing___Fourier___Pen.Harmonic(y = y, nbasis = n_basis, lambda = ith_lambda)
+      FDA___Smoothing___Fourier___Pen.Harmonic(y = y, nbasis = n_basis, lambda = ith_lambda) %>% suppressWarnings()
     })
   }else if(penalty.type == "Second" || penalty.type == "second"){
     results.list = lapply(lambdas, FUN=function(ith_lambda){
@@ -13,12 +13,12 @@ FDA___Smoothing___Fourier = function(y, n_basis=NULL, lambdas, penalty.type = c(
   GCV = sapply(results.list, FUN=function(ith){
     ith$GCV
   })
+  # plot(GCV)
   ##############################################################################
   OCV = sapply(results.list, FUN=function(ith){
     ith$OCV
   })
-  ##############################################################################
-
+  # plot(OCV)
   ##############################################################################
   if(which.min(GCV)==which.min(OCV)){
     results.list[[which.min(OCV)]] %>% return
