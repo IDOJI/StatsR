@@ -1,6 +1,6 @@
-FDA___Smoothing___Plotting = function(y, knots, smoothed, main_prefix=NULL, file.name=NULL, save.path=NULL){
+FDA___Smoothing___Plotting = function(y, knots, smoothed, main="", file.name=NULL, save.path=NULL){
   if(is.null(file.name) || is.null(save.path)){
-    plot(x = 1:length(y), y = y, col = 2, main = paste0())
+    plot(x = 1:length(y), y = y, col = 2, main = main)
     abline(v = knots, lty = 2, lwd = 1)
     lines(smoothed, col = 4, lwd = 2)
   }else{
@@ -11,3 +11,4 @@ FDA___Smoothing___Plotting = function(y, knots, smoothed, main_prefix=NULL, file
     dev.off()
   }
 }
+
