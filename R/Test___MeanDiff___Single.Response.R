@@ -20,7 +20,25 @@ Test___MeanDiff___Single.Response = function(##############################
                                           ##############################
                                           save.path = NULL,
                                           filename = NULL,
-                                          export.xlsx = F){
+                                          export.xlsx = F,
+                                          Boxplot_label.as.p.val=F){
+  #============================================================================
+  # Having only one subject in the group?
+  #============================================================================
+  group_tab = table(df[,var_group])
+  groups_with_1_subjects = names(group_tab)[group_tab == 1]
+  if(length(groups_with_1_subjects) > 0){
+    df = df %>% filter(.data[[var_group]] != groups_with_1_subjects)
+    excluded_group = names(group_tab)[group_tab == 1]
+  }else{
+    excluded_group = NULL
+  }
+
+
+
+
+
+
   #============================================================================
   # Exclude NA
   #============================================================================
@@ -31,10 +49,12 @@ Test___MeanDiff___Single.Response = function(##############################
 
 
 
+
+
   #============================================================================
   # Normality
   #============================================================================
-  Norm.Test_results.list  = Test___Normality___Each.Group(df, var_group, var_response, alpha_Norm)
+  Norm.Test_results.list  = Test___Normality___Each.Group(df, var_group  , var_response, alpha_Norm)
   Norm.Test_combined.list = Test___Normality___Each.Group___Extract.Results(Norm.Test_results.list)
   Norm.Test_combined.df   = Norm.Test_combined.list[[1]]
   is.Normal               = Norm.Test_combined.list[[2]]
@@ -78,13 +98,13 @@ Test___MeanDiff___Single.Response = function(##############################
   #============================================================================
   if(is.null(Mean.Diff.Results$Post.Hoc)){
     if(Mean.Diff.Results[[1]]$MeanDiff_p.value <= alpha_ANOVA){
-      p = Test___MeanDiff___Single.Response___Box.Plot(df, var_group, var_response, Mean.Diff.Results, alpha_ANOVA=alpha_ANOVA, palette = "jco")
+      p = Test___MeanDiff___Single.Response___Box.Plot(df, var_group, var_response, Mean.Diff.Results, alpha_ANOVA=alpha_ANOVA, palette = "jco", label.as.p.val=Boxplot_label.as.p.val)
       ggsave(filename = paste0(filename, ".png"), plot = p, path = save.path)
       cat("\n", crayon::red(paste0(filename, ".png")),  crayon::blue("is saved !"),"\n")
     }
   }else{
     if(sum(unlist(Mean.Diff.Results[[2]]$PostHoc_p.value_adj) <= alpha_PostHoc) != 0){
-      p = Test___MeanDiff___Single.Response___Box.Plot(df, var_group, var_response, Mean.Diff.Results, alpha_PostHoc=alpha_PostHoc, palette = "jco")
+      p = Test___MeanDiff___Single.Response___Box.Plot(df, var_group, var_response, Mean.Diff.Results, alpha_PostHoc=alpha_PostHoc, palette = "jco", label.as.p.val = Boxplot_label.as.p.val)
       if(!is.null(filename) && !is.null(save.path)){
         ggsave(filename = paste0(filename, ".png"), plot = p, path = save.path)
         cat("\n", crayon::red(paste0(filename, ".png")),  crayon::blue("is saved !"),"\n")
@@ -102,6 +122,25 @@ Test___MeanDiff___Single.Response = function(##############################
                                                                  Norm.Test_combined.df,
                                                                  Equal.Var.Test_combined.df,
                                                                  Mean.Diff.Results)
+
+
+
+
+
+  #============================================================================
+  # Excluded group?
+  #============================================================================
+  if(length(excluded_group)>0){
+    Final.list = c(Final.list, excluded_group)
+    names(Final.list)[3] = "Excluded_Group (only having one subject)"
+  }
+
+
+
+
+
+
+
 
   #============================================================================
   # export final results

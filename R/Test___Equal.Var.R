@@ -1,10 +1,11 @@
-Test___Equal.Var = function(df, var_group, var_response, is.normal, alpha=0.05){
+Test___Equal.Var = function(df, var_group, var_response, is.Normal, alpha=0.05){
   ### Normality : TRUE
-  homo_reslts.list = Test___Equal.Var___When.Norm.True(df, var_response, var_group, is.normal, alpha)
-
-  ### Normality : FALSE
-  homo_reslts.list = Test___Equal.Var___When.Norm.False(df, var_response, var_group, is.normal, alpha)
-
+  if(is.Normal){
+    homo_reslts.list = Test___Equal.Var___When.Norm.True(df, var_response, var_group, is.Normal, alpha)
+  }else{
+    ### Normality : FALSE
+    homo_reslts.list = Test___Equal.Var___When.Norm.False(df, var_response, var_group, is.Normal, alpha)
+  }
   return(homo_reslts.list)
 }
 

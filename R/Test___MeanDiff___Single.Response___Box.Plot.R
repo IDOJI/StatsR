@@ -1,4 +1,17 @@
-Test___MeanDiff___Single.Response___Box.Plot = function(df, var_group, var_response, Mean.Diff.Results, alpha_ANOVA=NULL, alpha_PostHoc=NULL, palette="lancet"){
+Test___MeanDiff___Single.Response___Box.Plot = function(df,
+                                                        var_group,
+                                                        var_response,
+                                                        Mean.Diff.Results,
+                                                        alpha_ANOVA=NULL,
+                                                        alpha_PostHoc=NULL,
+                                                        palette="lancet",
+                                                        label.as.p.val = F){
+  ############################################################################
+  # install.package
+  ############################################################################
+  install_packages(c("EnvStats", "ggpubr")) %>% invisible
+
+
   ############################################################################
   # Finding significant comparing groups
   ############################################################################
@@ -12,7 +25,6 @@ Test___MeanDiff___Single.Response___Box.Plot = function(df, var_group, var_respo
     Post.Hoc_Signif = Post.Hoc[Post.Hoc$PostHoc_p.value_adj <= alpha_PostHoc, ]
     Post.Hoc_Signif_tibble = Post.Hoc_Signif %>% dplyr::select(group1, group2, PostHoc_p.value_adj, PostHoc_p.value.signif)
   }
-
 
 
 
@@ -32,12 +44,27 @@ Test___MeanDiff___Single.Response___Box.Plot = function(df, var_group, var_respo
                          add.params = list(size=0.5))
 
 
+  ############################################################################
+  # Legend text size
+  ############################################################################
+  p1 = p1 + theme(legend.text = element_text(size = 5))
+
+
+
+
+  ############################################################################
+  # Label angle
+  ############################################################################
+  p1 = p1 + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 6))
+
+
+
 
 
   ############################################################################
   # Label bold
   ############################################################################
-  p2 = p1 + ggpubr::font("xlab", size = 18, face = "bold") + ggpubr::font("ylab", size = 18, face = "bold")
+  p2 = p1 + ggpubr::font("xlab", size = 8, face = "bold") + ggpubr::font("ylab", size = 8, face = "bold")
 
 
 
@@ -51,19 +78,40 @@ Test___MeanDiff___Single.Response___Box.Plot = function(df, var_group, var_respo
     Mean.Diff_Signif$group1 = group[1]
     Mean.Diff_Signif$group2 = group[2]
 
+
+    if(label.as.p.val){
+      labeling = "MeanDiff_p.value"
+      label.size = 2
+    }else{
+      labeling = "MeanDiff_p.value.signif"
+      label.size = 5
+    }
+
     p3 = p2 + ggpubr::stat_pvalue_manual(Mean.Diff_Signif,
                                          y.position = 1.1*max(df[,var_response] %>% unlist %>% as.numeric),
                                          step.increase = 0.1,
-                                         label = "MeanDiff_p.value.signif",
+                                         label = labeling,
                                          label.size = 5,
                                          bracket.size = 0.8)
+
   }else{
+
+    if(label.as.p.val){
+      labeling = "PostHoc_p.value_adj"
+      label.size = 2
+      Post.Hoc_Signif_tibble$PostHoc_p.value_adj = Post.Hoc_Signif_tibble$PostHoc_p.value_adj %>% format(scientific = F)
+    }else{
+      labeling = "PostHoc_p.value.signif"
+      label.size = 5
+    }
     p3 = p2 + ggpubr::stat_pvalue_manual(Post.Hoc_Signif_tibble,
                                          y.position = 1.1*max(df[,var_response] %>% unlist %>% as.numeric),
                                          step.increase = 0.1,
-                                         label = "PostHoc_p.value.signif",
-                                         label.size = 5,
+                                         label = labeling,
+                                         label.size = label.size,
                                          bracket.size = 0.8)
+
+
   }
 
 

@@ -18,5 +18,5 @@ Test___MeanDiff___Single.Response___Final.Results = function(save.path, filename
   Reporting.df = Test___MeanDiff___Single.Response___Final.Results___Reporting(Final.df)
 
 
-  return(list(Final.df, Reporting.df))
+  return(list(Results = Final.df, Results_for_Reporting = Reporting.df))
 }

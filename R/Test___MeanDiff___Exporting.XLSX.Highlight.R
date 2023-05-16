@@ -1,33 +1,10 @@
-Test___MeanDiff___Exporting.XLSX.Highlight = function(Final.df,
-                                                      Reporting.df,
+Test___MeanDiff___Exporting.XLSX.Highlight = function(Reporting.df,
                                                       alpha_ANOVA,
                                                       alpha_PostHoc,
                                                       save.path,
                                                       filename){
   ### create directory
   dir.create(save.path, showWarnings = F)
-
-
-  ### untibble
-  Final.df = as.data.frame(Final.df)
-  Reporting.df = as.data.frame(Reporting.df)
-
-
-  # #==============================================================================================
-  # # Selecting cols : Final df
-  # #==============================================================================================
-  names_Norm     = filter_by(names(Final.df), including.words = "norm", excluding.words = "test")
-  names_Eq.Var   = filter_by(names(Final.df), including.words = "Equal.Var", excluding.words = "test")
-  names_Mean     = filter_by(names(Final.df), including.words = c("MeanDiff", "p.val"))
-
-  names_Response = filter_by(names(Final.df), including.words = c("Response"))
-
-  # post hoc
-  names_PostHoc  = filter_by(names(Final.df), including.words = c("post", "p.val"))
-  names_Groups   = filter_by(names(Final.df), including.words = "group")
-
-  paste0(filename, "_Statistics")
-
 
 
   #==============================================================================================
@@ -66,7 +43,7 @@ Test___MeanDiff___Exporting.XLSX.Highlight = function(Final.df,
                                which_cols.list     = c(names_MeanDiff, names_PostHoc),
                                coloring_index.list = c(rows_MeanDiff.list, rows_PostHoc.list),
                                save.path           = save.path ,
-                               file_name           = paste0(filename, "_Reporting"),
+                               file_name           = filename,
                                sheet.name          = "ANOVA Results")
 
 
