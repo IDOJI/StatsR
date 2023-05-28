@@ -54,7 +54,7 @@ Test___MeanDiff___Single.Response = function(##############################
   #============================================================================
   # Normality
   #============================================================================
-  Norm.Test_results.list  = Test___Normality___Each.Group(df, var_group  , var_response, alpha_Norm)
+  Norm.Test_results.list  = Test___Normality___Each.Group(df, var_group, var_response, alpha_Norm)
   Norm.Test_combined.list = Test___Normality___Each.Group___Extract.Results(Norm.Test_results.list)
   Norm.Test_combined.df   = Norm.Test_combined.list[[1]]
   is.Normal               = Norm.Test_combined.list[[2]]
@@ -103,7 +103,9 @@ Test___MeanDiff___Single.Response = function(##############################
       cat("\n", crayon::red(paste0(filename, ".png")),  crayon::blue("is saved !"),"\n")
     }
   }else{
-    if(sum(unlist(Mean.Diff.Results[[2]]$PostHoc_p.value_adj) <= alpha_PostHoc) != 0){
+    is.significant_ANOVA = Mean.Diff.Results[[1]]$MeanDiff_p.value <= alpha_ANOVA
+    is.significant_PostHoc = sum(unlist(Mean.Diff.Results[[2]]$PostHoc_p.value_adj) <= alpha_PostHoc) != 0
+    if(is.significant_ANOVA & is.significant_PostHoc){
       p = Test___MeanDiff___Single.Response___Box.Plot(df, var_group, var_response, Mean.Diff.Results, alpha_PostHoc=alpha_PostHoc, palette = "jco", label.as.p.val = Boxplot_label.as.p.val)
       if(!is.null(filename) && !is.null(save.path)){
         ggsave(filename = paste0(filename, ".png"), plot = p, path = save.path)

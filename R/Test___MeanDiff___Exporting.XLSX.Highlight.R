@@ -12,14 +12,14 @@ Test___MeanDiff___Exporting.XLSX.Highlight = function(Reporting.df,
   #==============================================================================================
   ### which cols
   names_MeanDiff = list()
-  names_MeanDiff[[1]] = filter_by(names(Reporting.df), including.words = c("Group", "Trt"), ignore.case = F)
-  names_MeanDiff[[2]] = filter_by(names(Reporting.df), including.words = c("Response"), ignore.case = F)
-  names_MeanDiff[[3]] = filter_by(names(Reporting.df), including.words = c("MeanDiff", "p.val"))
+  names_MeanDiff[[1]] = filter_by(names(Reporting.df), include = c("Group", "Trt"), exact_include = F,ignore.case = F)
+  names_MeanDiff[[2]] = filter_by(names(Reporting.df), include = c("Response"), exact_include = F, ignore.case = F)
+  names_MeanDiff[[3]] = filter_by(names(Reporting.df), include = c("MeanDiff", "p.val"), exact_include = F, ignore.case=F)
   names_MeanDiff = names_MeanDiff %>% unlist %>% as.list
 
   names_PostHoc = list()
-  names_PostHoc[[1]] = filter_by(names(Reporting.df), including.words = c("group"), ignore.case=F)
-  names_PostHoc[[2]] = filter_by(names(Reporting.df), including.words = c("PostHoc"))
+  names_PostHoc[[1]] = filter_by(names(Reporting.df), include = c("group"), exact_include = F, ignore.case=F)
+  names_PostHoc[[2]] = filter_by(names(Reporting.df), include = c("PostHoc"), exact_include = F, ignore.case=F)
   names_PostHoc = names_PostHoc %>% unlist %>% as.list
 
 
