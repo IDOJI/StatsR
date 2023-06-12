@@ -42,7 +42,6 @@ Test___MeanDiff___Multi.Reponses = function(##############################
   # ANOVA results for each groups
   #==================================================================================
   MeanDiff_Multi_Responses.list = lapply(seq_along(var_responses), FUN=function(k, ...){
-    # k = 1
     ith_results = Test___MeanDiff___Single.Response(df,
                                                     var_group,
                                                     var_response = var_responses[k],
@@ -52,7 +51,7 @@ Test___MeanDiff___Multi.Reponses = function(##############################
                                                     filename = paste0("[ANOVA_Boxplot] ", '`', var_responses_filename[k],"`"," by `", var_group_filename, "`"),
                                                     export.xlsx = F,
                                                     Boxplot_label.as.p.val = Boxplot_label.as.p.val)
-    cat("\n",  crayon::blue("The response variable"), crayon::red(y), crayon::blue("is done!"), "\n")
+    cat("\n",  crayon::blue("The response variable"), crayon::red(var_responses[k]), crayon::blue("is done!"), "\n")
     return(ith_results)
   })
 
