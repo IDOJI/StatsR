@@ -1,9 +1,9 @@
-FDA___Smoothing___Bspline___RS.fMRI.Signals = function(Signals.list, initial_lambdas = exp(seq(-3,3,1)), save.path){
-  save.path = save.path %>% path_tail_slash()
+FDA___Smoothing___Bspline___RS.fMRI.Signals = function(Signals.list, initial_lambdas = exp(seq(-3,3,1)), path_Export){
+  path_Export = path_Export %>% path_tail_slash()
   #=============================================================================
   # Initial lambdas
   #=============================================================================
-  smoothed_1.list = lapply(Signals.list, FUN=function(ith_ROI){
+  smoothed_1.list = lapply(Signals.list, FUN=function(ith_ROI, ...){
     # gcv와 튜닝 파라미터를 이용해서 추정
     FDA___Smoothing___Bspline___Multi(data.df = ith_ROI,
                                       rangeval = c(1, nrow(ith_ROI)),
@@ -60,7 +60,7 @@ FDA___Smoothing___Bspline___RS.fMRI.Signals = function(Signals.list, initial_lam
   # Exporting png
   #=============================================================================
   for(i in 1:length(smoothed_3.list)){
-    png(filename = paste0(save.path, "ROI_", fit_length(i, 3), "_log_lambda=", log(smoothed_3.list[[i]][[2]]), ".png"))
+    png(filename = paste0(path_Export, "ROI_", fit_length(i, 3), "_log_lambda=", log(smoothed_3.list[[i]][[2]]), ".png"))
     plot(smoothed_3.list[[i]][[1]])
     dev.off()
   }
