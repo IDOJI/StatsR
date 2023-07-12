@@ -67,5 +67,11 @@ FDA___Smoothing___Bspline___RS.fMRI.Signals = function(Signals.list, initial_lam
 
 
 
+  #=============================================================================
+  # Exporting Smoothed Data
+  #=============================================================================
+  saveRDS(object = smoothed_3.list, file = paste0(path_Export, "Bspline_Smoothed.rds"))
+
+
   return(smoothed_3.list)
 }

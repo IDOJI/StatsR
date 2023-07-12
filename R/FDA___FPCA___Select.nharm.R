@@ -1,4 +1,4 @@
-FDA___FPCA___Select.nharm = function(pca.fd.obj, threshold = 0.9, save.path, file.name){
+FDA___FPCA___Select.nharm = function(pca.fd.obj, threshold = 0.9, path_Export, file.name){
   # pca.fd.obj = FPCA_AD.list[[1]]
   #=============================================================================
   # Finding optimum by threshold
@@ -11,9 +11,9 @@ FDA___FPCA___Select.nharm = function(pca.fd.obj, threshold = 0.9, save.path, fil
   #=============================================================================
   # Save plotting cumulative variance plot
   #=============================================================================
-  save.path = save.path %>% path_tail_slash()
-  dir.create(save.path, showWarnings = F)
-  png(filename = paste0(save.path, file.name, "_selected_nharm=", selected_nharm, ".png"))
+  path_Export = path_Export %>% path_tail_slash()
+  dir.create(path_Export, showWarnings = F)
+  png(filename = paste0(path_Export, file.name, "_selected_nharm=", selected_nharm, ".png"))
   plot(cum_proportion,
        xlab='component',
        ylab='cumulative variance explained',
