@@ -4,10 +4,18 @@ FDA___Smoothing___Bspline___Pen.Second = function(y, lambda, length.out_seq, nor
   smoothed_norders.list = lapply(norders, FUN=function(ith_norder, ...){
     ### knots
     smoothed_knots.list = lapply(length.out_seq, FUN=function(jth_length.out, ...){
+      # 1) Knots의 개수를 정함
       knots = seq(1, length(y), length.out = jth_length.out)
+
+      # 2) 정의한 domain에서의 기저함수를 구함
       B_basis = create.bspline.basis(rangeval = c(1,length(y)), norder = ith_norder, breaks = knots)
+
+      #
       penalty_Par = fdPar(B_basis, int2Lfd(2), lambda)
-      smoothed = tryCatch(smooth.basis(argvals = 1:length(y), y = y, fdParobj = penalty_Par),
+
+      smoothed = tryCatch(smooth.basis(argvals = 1:length(y),
+                                       y = y,
+                                       fdParobj = penalty_Par),
                           error = function(e){NULL},
                           warning = function(w){NULL},
                           finally = NULL)

@@ -1,4 +1,4 @@
-FDA___Smoothing___Bspline = function(y, knots_length.out = 2:floor((length(y)/4)), norders = 4:20,lambdas, penalty.type = "second", file.name_prefix = "", save.path = NULL){
+FDA___Smoothing___Bspline = function(y, knots_length.out = 2:floor((length(y)/4)), norders = 4, lambdas, penalty.type = "second", file.name_prefix = "", save.path = NULL){
   ##############################################################################
   if(penalty.type == "harmonic" || penalty.type == "Harmonic"){
     # results.list = lapply(lambdas, FUN=function(ith_lambda, ...){

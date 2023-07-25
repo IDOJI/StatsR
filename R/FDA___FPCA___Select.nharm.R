@@ -3,7 +3,7 @@ FDA___FPCA___Select.nharm = function(pca.fd.obj, threshold = 0.9, path_Export, f
   #=============================================================================
   # Finding optimum by threshold
   #=============================================================================
-  cum_proportion = cumsum(pca.fd.obj$values)/sum(pca.fd.obj $values)
+  cum_proportion = cumsum(pca.fd.obj$values)/sum(pca.fd.obj$values)
   selected_nharm = which_cut_by_threshold = which(cum_proportion >= threshold)[1]
 
 
@@ -13,6 +13,7 @@ FDA___FPCA___Select.nharm = function(pca.fd.obj, threshold = 0.9, path_Export, f
   #=============================================================================
   path_Export = path_Export %>% path_tail_slash()
   dir.create(path_Export, showWarnings = F)
+
   png(filename = paste0(path_Export, file.name, "_selected_nharm=", selected_nharm, ".png"))
   plot(cum_proportion,
        xlab='component',

@@ -1,4 +1,4 @@
-FDA___FPCA___Extract.Scores.as.DF = function(FPCA.list, suffix.for.each.score){
+FDA___FPCA___Extract.Scores.as.DF = function(FPCA.list, suffix.for.each.score, path_Export=NULL, file.name){
   # FPCA.list = New_FPCA_AD.list
   # suffix.for.each.score = paste0("ROI_", fit_length(1:length(FPCA.list), 3))
 
@@ -29,6 +29,30 @@ FDA___FPCA___Extract.Scores.as.DF = function(FPCA.list, suffix.for.each.score){
   names(Scores.df) = Variables_Names
 
 
+  #=============================================================================
+  # Exporting
+  #=============================================================================
+  Combined_Data = list(PC.Scores = Scores.df, Coef_Group_Indicator = Coef_Group_Indicator)
+  if(!is.null(path_Export)){
+    dir.create(path_Export, F)
+    saveRDS(Combined_Data, file = paste0(path_Export, "/", file.name, ".rds"))
+  }
+
+
   ### return
-  return(list(Scores = Scores.df, Coef_Group_Indicator = Coef_Group_Indicator))
+  return(Combined_Data)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
