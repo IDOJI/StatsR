@@ -19,9 +19,32 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   # folds = Train_Fold_Index
   # alpha_seq =
   #=============================================================================
+  # path
+  #=============================================================================
+  if(!is.null(path_Export)){
+    dir.create(path_Export, FALSE)
+  }
+
+
+
+
+  #=============================================================================
+  # Compare input
+  #=============================================================================
+  if(!is.null(X_Test) && ncol(X_Train)!=ncol(X_Test)){
+    stop("Check input X_Test and X_Train. Its dimensions are different!")
+  }
+
+
+
+
+
+  #=============================================================================
   # install.packages
   #=============================================================================
   install_packages(packages = "ordinalNet", load = T)
+
+
 
 
 
@@ -35,8 +58,8 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   Fit_CV.list = lapply(alpha_seq, function(ith_alpha, ...){
     tictoc::tic()
     # Fitting CV for ith_alpha
-    ith_Fit_CV = ordinalNetCV(x = x,
-                              y = y,
+    ith_Fit_CV = ordinalNetCV(x = X_Train,
+                              y = y_Train,
                               standardize = standardize,
                               family = family,
                               link = link,
@@ -46,6 +69,7 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
                               folds = folds,
                               printProgress = printProgress,
                               warn = warn)
+    saveRDS(ith_Fit_CV, file = paste0(path_Export, "/", "Fit_CV", "___", ith_alpha, ".rds"))
     tictoc::toc()
 
     # Averaging
@@ -62,8 +86,7 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   #=============================================================================
   # Select best parameters
   #=============================================================================
-  best.model.criterion = match.arg(best.model.criterion)
-
+  # best.model.criterion = match.arg(best.model.criterion)
   if(best.model.criterion %in% c("misclass", "brier")){
     which_best = which.min
   }else{
@@ -86,11 +109,13 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
 
 
 
+
+
   #=============================================================================
   # Fit again with best parameters
   #=============================================================================
-  Best_Fit = ordinalNet(x = x,
-                        y = y,
+  Best_Fit = ordinalNet(x = X_Train,
+                        y = y_Train,
                         alpha = best_alpha,
                         standardize = standardize,
                         family = family,
@@ -101,13 +126,20 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
 
 
 
+
+
+
+
+
+
   #=============================================================================
   # Extract results and prediction
   #=============================================================================
-  Resulst.list = Classification___Multinomial___Results(Best_Fit, X_Test, y_Test, AUC_in_Legend, path_Export)
+  Results.list = Classification___Multinomial___Results(Best_Fit, X_Test, y_Test, AUC_in_Legend, path_Export)
   if(!is.null(path_Export)){
-    saveRDS(Resulst.list, files=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
+    saveRDS(Results.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
   }
+
   return(Results.list)
 }
 
