@@ -1,5 +1,5 @@
-Split.Data___CV.Fold___Stratified___One.Var = function(Data, ...){
-  # var의 prop을 유지한 채 n-fold
+Split.Data___CV.Fold___Stratified___One.Var_1 = function(Data_2, Var_1, n_fold, seed){
+  # Var_1의 prop을 유지한 채 n-fold
   #=============================================================================
   # packages
   #=============================================================================
@@ -24,7 +24,7 @@ Split.Data___CV.Fold___Stratified___One.Var = function(Data, ...){
   # Use the `createFolds` function to generate stratified n-fold partitions:
   #=============================================================================
   set.seed(seed)
-  Folds_Index = createFolds(Data[,Var] %>% unlist, k = n_fold_new, list = TRUE, returnTrain = FALSE)
+  Folds_Index = createFolds(Data[,Var_1] %>% unlist, k = n_fold_new, list = TRUE, returnTrain = FALSE)
 
 
 
@@ -43,7 +43,7 @@ Split.Data___CV.Fold___Stratified___One.Var = function(Data, ...){
   # Split Train again
   #=============================================================================
   set.seed(seed)
-  Train_Folds_Index = createFolds(Train[,Var] %>% unlist, k = n_fold, list = TRUE, returnTrain = FALSE)
+  Train_Folds_Index = createFolds(Train[,Var_1] %>% unlist, k = n_fold, list = TRUE, returnTrain = FALSE)
 
 
 
@@ -63,7 +63,7 @@ Split.Data___CV.Fold___Stratified___One.Var = function(Data, ...){
 
 
   #=============================================================================
-  # New Var
+  # New Var_1
   #=============================================================================
   Which_Fold = rep(NA, times = nrow(Train))
   for(k in 1:length(Train_Folds_Index)){

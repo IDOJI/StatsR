@@ -9,7 +9,7 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
                                                                   tuneMethod = c("cvMisclass", "cvLoglik", "cvBrier", "cvDevPct", "aic", "bic"),
                                                                   best.model.criterion = c("misclass", "brier", "loglik", "devPct"),
                                                                   folds = NULL,
-                                                                  alpha_seq = seq(0, 1, 0.01),
+                                                                  alpha_seq = seq(0, 1, 0.1),
                                                                   lambdaVals = NULL,
                                                                   printProgress = TRUE,
                                                                   warn = TRUE,
@@ -105,12 +105,10 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   # Extract results and prediction
   #=============================================================================
   Resulst.list = Classification___Multinomial___Results(Best_Fit, X_Test, y_Test, AUC_in_Legend, path_Export)
-
-
-
-
-
-
+  if(!is.null(path_Export)){
+    saveRDS(Resulst.list, files=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
+  }
+  return(Results.list)
 }
 
 
