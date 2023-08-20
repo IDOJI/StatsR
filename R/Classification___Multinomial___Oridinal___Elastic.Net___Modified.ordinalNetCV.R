@@ -15,6 +15,7 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
                                                                   warn = TRUE,
                                                                   #=============================== Prediction & AUC
                                                                   AUC_in_Legend = FALSE,
+                                                                  title = NULL,
                                                                   path_Export = NULL){
   # folds = Train_Fold_Index
   # alpha_seq =
@@ -77,6 +78,11 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
     return(ith_Fit_CV_Mean)
   })
 
+  # Fit_CV.list = lapply(list.files(path_Export, full.names=T), function(y){
+  #   readRDS(y) %>% summary %>% colMeans
+  # })
+
+
 
 
 
@@ -98,12 +104,8 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
     ith_Fit_CV[names(ith_Fit_CV)==best.model.criterion]
   })
   best_ind = which_best(Combined_Criteria)
-
   best_alpha = alpha_seq[best_ind]
-  best_lambda = Fit_CV.list[[best_ind]][1]
-
-
-
+  # best_lambda = Fit_CV.list[[best_ind]][1]
 
 
 
@@ -119,10 +121,23 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
                         alpha = best_alpha,
                         standardize = standardize,
                         family = family,
-                        link = link,
-                        lambdaVals = best_lambda)
+                        link = link)
+
+  Best_Fit_Summary = summary(Best_Fit)
+  if(which.min(Best_Fit_Summary$aic) == which.min(Best_Fit_Summary$bic)){
+    best_lambda = Best_Fit$lambdaVals[which.min(Best_Fit_Summary$aic)]
+  }else{
+    stop("Best indice of AIC and BIC are different!")
+  }
 
 
+  Best_Fit_Final = ordinalNet(x = X_Train,
+                              y = y_Train,
+                              alpha = best_alpha,
+                              lambdaVals = best_lambda,
+                              standardize = standardize,
+                              family = family,
+                              link = link)
 
 
 
@@ -135,18 +150,13 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   #=============================================================================
   # Extract results and prediction
   #=============================================================================
-  Results.list = Classification___Multinomial___Results(Best_Fit, X_Test, y_Test, AUC_in_Legend, path_Export)
+  Results.list = Classification___Multinomial___Results(Best_Fit_Final, X_Test, y_Test, AUC_in_Legend, title, path_Export)
   if(!is.null(path_Export)){
     saveRDS(Results.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
   }
 
-  return(Results.list)
+  return(c(list(Best_Fit = Best_Fit_Final), Results.list))
 }
-
-
-
-
-
 
 
 

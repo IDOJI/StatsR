@@ -1,4 +1,4 @@
-Classification__Multinomial___Results___Predict = function(fit, X_Test, y_Test, AUC_in_Legend, path_Export){
+Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test, AUC_in_Legend, title, path_Export){
   #===========================================================================
   # Prediction
   #===========================================================================
@@ -6,7 +6,7 @@ Classification__Multinomial___Results___Predict = function(fit, X_Test, y_Test, 
   Predicted_Prob = predict(Best_Fit, newx = X_Test, type = "response")
 
   # Convert predicted probabilities to predicted classes
-  Predicted_classes = apply(predicted_values, 1, which.max)
+  Predicted_classes = apply(Predicted_Prob, 1, which.max)
 
 
 
@@ -37,10 +37,12 @@ Classification__Multinomial___Results___Predict = function(fit, X_Test, y_Test, 
 
 
 
+
+
   #===========================================================================
   # ROAUC
   #===========================================================================
-  ROAUC.list = Classification__Multinomial___Results___Predict___ROAUC(fit, X_Test, y_Test, AUC_in_Legend, path_Export)
+  ROAUC.list = Classification___Multinomial___Results___Predict___AUROC(fit, X_Test, y_Test, AUC_in_Legend, title, path_Export)
 
 
 

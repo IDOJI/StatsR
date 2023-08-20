@@ -1,4 +1,4 @@
-Classification__Multinomial___Results___Predict___ROAUC = function(fit, X_Test, y_Test, AUC_in_Legend = FALSE, path_Export=NULL){
+Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test, y_Test, AUC_in_Legend = FALSE, title, path_Export=NULL){
   #=============================================================================
   # pacakges
   #=============================================================================
@@ -69,6 +69,13 @@ Classification__Multinomial___Results___Predict___ROAUC = function(fit, X_Test, 
   #=============================================================================
   # plotting ROC
   #=============================================================================
+  if(is.null(title)){
+    title = "ROC Curves with AUC values"
+  }
+
+
+
+
   if(AUC_in_Legend){
 
 
@@ -78,7 +85,7 @@ Classification__Multinomial___Results___Predict___ROAUC = function(fit, X_Test, 
     p = ggplot(DF, aes(x = `FPR`, y = TPR, color = factor(Category, levels = Categories))) +
       geom_line() +
       scale_color_manual(name = "Category", values = c("blue", "red", "green", "purple"), labels = Categories_with_auc) +
-      labs(title = "ROC Curves with AUC values", x = "1 - Specificity", y = "Sensitivity") +
+      labs(title = title, x = "1 - Specificity", y = "Sensitivity") +
       theme_minimal()
 
 
@@ -91,10 +98,13 @@ Classification__Multinomial___Results___Predict___ROAUC = function(fit, X_Test, 
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
       geom_text(data = data.frame(AUC = unlist(AUC), Category = Categories, x = 0.2, y = c(0.9, 0.8, 0.7, 0.6)),
                 aes(x = x, y = y, label = sprintf("AUC: %.3f", AUC), color = Category), hjust = 0) +
-      labs(title = "ROC Curves with AUC Values", x = "False Positive Rate", y = "True Positive Rate") +
+      labs(title = title, x = "False Positive Rate", y = "True Positive Rate") +
       theme_minimal() +
       theme(legend.title = element_blank(),
-            plot.title = element_text(size = 20, face = "bold", hjust = 0.5))  # Adjusting the title properties here
+            plot.title = element_text(size = 20, face = "bold", hjust = 0.5),  # Adjusting the title properties
+            legend.text = element_text(size = 14),  # Adjusting the legend text size
+            axis.title.x = element_text(size = 14, face = "bold"),  # Adjusting the x-axis label size and making it bold
+            axis.title.y = element_text(size = 14, face = "bold"))  # Adjusting the y-axis label size and making it bold
 
 
 

@@ -1,4 +1,4 @@
-Classification___Multinomial___Results = function(Best_Fit, X_Test=NULL, y_Test=NULL, AUC_in_Legend=FALSE, path_Export=NULL){
+Classification___Multinomial___Results = function(Best_Fit, Best_alpha, X_Test=NULL, y_Test=NULL, AUC_in_Legend=FALSE, title=NULL, path_Export=NULL){
   #=============================================================================
   # Extracting Results
   #=============================================================================
@@ -17,7 +17,7 @@ Classification___Multinomial___Results = function(Best_Fit, X_Test=NULL, y_Test=
   # Prediction
   #=============================================================================
   if(!is.null(X_Test) && !is.null(y_Test)){
-    Prediction = Classification__Multinomial___Results___Predict(fit = Best_Fit, X_Test, y_Test, AUC_in_Legend, path_Export)
+    Prediction = Classification___Multinomial___Results___Predict(fit = Best_Fit, X_Test, y_Test, AUC_in_Legend, title, path_Export)
   }else{
     Prediction = NULL
   }
@@ -28,7 +28,7 @@ Classification___Multinomial___Results = function(Best_Fit, X_Test=NULL, y_Test=
   #=============================================================================
   # Combined Results
   #=============================================================================
-  Combined.list = c(list(Fit_Summary = Fit_Summary, Fit_Coef = Fit_Coef), Prediction)
+  Combined.list = c(list(Fit_Summary = Fit_Summary, Best_alpha = Best_alpha, Fit_Coef = Fit_Coef), Prediction)
 
 
 
