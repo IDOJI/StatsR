@@ -51,13 +51,15 @@ Split.Data___Grouping.By___Continuous = function(Data, Var_Name, Cut_Points, Eq 
   }else if(Eq == "<"){
     The_Last_Label = paste0("x", ">=", tail(Cut_Points, 1))
   }
+  Labels = c(The_First_Label, The_Middle_Labels, The_Last_Label)
+
 
   # Combine
   if(!is.null(groups) && length(groups) == length(Labels)){
     # If groups are provided, replace the default labels
     Labels = groups
-  }else{
-    Labels = c(The_First_Label, The_Middle_Labels, The_Last_Label)
+  }else if(!is.null(groups) && length(groups) != length(Labels)){
+    stop("The length of labels and groups are different!")
   }
   Labels = factor(Labels, levels=Labels)
 

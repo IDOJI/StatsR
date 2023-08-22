@@ -78,7 +78,7 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
     return(ith_Fit_CV_Mean)
   })
 
-  # Fit_CV.list = lapply(list.files(path_Export, full.names=T), function(y){
+  # Fit_CV.list = lapply(list.files(path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
   #   readRDS(y) %>% summary %>% colMeans
   # })
 
@@ -150,12 +150,22 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   #=============================================================================
   # Extract results and prediction
   #=============================================================================
-  Results.list = Classification___Multinomial___Results(Best_Fit_Final, X_Test, y_Test, AUC_in_Legend, title, path_Export)
+  Results.list = Classification___Multinomial___Results(Best_Fit = Best_Fit_Final,
+                                                        Best_alpha = best_alpha,
+                                                        X_Test = X_Test %>% as.matrix,
+                                                        y_Test = y_Test,
+                                                        AUC_in_Legend = AUC_in_Legend,
+                                                        title = title,
+                                                        path_Export = path_Export)
+
+  Final_Results.list = c(list(Best_Fit = Best_Fit_Final), Results.list)
   if(!is.null(path_Export)){
-    saveRDS(Results.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
+    saveRDS(Final_Results.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
   }
 
-  return(c(list(Best_Fit = Best_Fit_Final), Results.list))
+
+  cat("\n", crayon::green("Congratulation! The fitting is done!"),"\n")
+  return(Final_Results.list)
 }
 
 

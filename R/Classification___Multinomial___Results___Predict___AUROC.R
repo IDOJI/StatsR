@@ -7,10 +7,20 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
 
 
 
+
+
+
+
   #=============================================================================
   # Prediction
   #=============================================================================
   Predicted_values = predict(fit, newx = X_Test)
+
+
+
+
+
+
 
 
 
@@ -28,9 +38,13 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
     binary_labels = ifelse(y_Test == Categories[i], 1, 0)
 
 
-    # Compute ROC and AUC
+    # Compute ROC
     ith_ROC = roc(binary_labels, Predicted_values[,i])
+
+
+    # AUC & its CI
     ith_AUC = auc(ith_ROC)
+    ith_AUC_CI = ci.auc(ith_ROC)
 
 
 
@@ -39,7 +53,7 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
                         FPR = 1 - ith_ROC$specificities,
                         Category = Categories[i])
 
-    list(ROC = ith_ROC, AUC = ith_AUC, DF = ith_DF) %>% return()
+    list(ROC = ith_ROC, AUC = ith_AUC, AUC_CI = ith_AUC_CI, DF = ith_DF) %>% return()
   })
 
 
@@ -54,9 +68,13 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
   #=============================================================================
   ROC = lapply(Extracted_ROC.list, function(y){y[[1]]})
   AUC = lapply(Extracted_ROC.list, function(y){y[[2]]})
-  DF = lapply(Extracted_ROC.list, function(y){y[[3]]})
+  AUC_CI = lapply(Extracted_ROC.list, function(y){y[[3]]})
+  DF = lapply(Extracted_ROC.list, function(y){y[[4]]})
   DF = do.call(rbind, DF)
-  DF$Category = factor(DF$Category, levels = c("Normal", "Mild OSA", "Moderate OSA", "Severe OSA"))
+
+  groups = DF$Category %>% unique
+  DF$Category = factor(DF$Category, levels = groups)
+  # DF$Category = factor(DF$Category, levels = c("Normal", "Mild OSA", "Moderate OSA", "Severe OSA"))
 
 
 
@@ -80,13 +98,18 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
 
 
     # Add AUC values to the category names for the legend
-    Categories_with_auc <- paste(Categories, sprintf("(AUC = %.2f)", unlist(AUC)))
+    Categories_with_auc = paste(Categories, sprintf("(%.2f)", unlist(AUC)))
 
-    p = ggplot(DF, aes(x = `FPR`, y = TPR, color = factor(Category, levels = Categories))) +
+    p = ggplot(DF, aes(x = FPR, y = TPR, color = factor(Category, levels = Categories))) +
       geom_line() +
       scale_color_manual(name = "Category", values = c("blue", "red", "green", "purple"), labels = Categories_with_auc) +
       labs(title = title, x = "1 - Specificity", y = "Sensitivity") +
-      theme_minimal()
+      theme_minimal() +
+      theme(legend.title = element_blank(),
+            plot.title = element_text(size = 30, face = "bold", hjust = 0.5),  # Adjusting the title properties
+            legend.text = element_text(size = 20),  # Adjusting the legend text size
+            axis.title.x = element_text(size = 20, face = "bold"),  # Adjusting the x-axis label size and making it bold
+            axis.title.y = element_text(size = 20, face = "bold"))  # Adjusting the y-axis label size and making it bold
 
 
   }else{
@@ -101,10 +124,10 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
       labs(title = title, x = "False Positive Rate", y = "True Positive Rate") +
       theme_minimal() +
       theme(legend.title = element_blank(),
-            plot.title = element_text(size = 20, face = "bold", hjust = 0.5),  # Adjusting the title properties
-            legend.text = element_text(size = 14),  # Adjusting the legend text size
-            axis.title.x = element_text(size = 14, face = "bold"),  # Adjusting the x-axis label size and making it bold
-            axis.title.y = element_text(size = 14, face = "bold"))  # Adjusting the y-axis label size and making it bold
+            plot.title = element_text(size = 30, face = "bold", hjust = 0.5),  # Adjusting the title properties
+            legend.text = element_text(size = 20),  # Adjusting the legend text size
+            axis.title.x = element_text(size = 20, face = "bold"),  # Adjusting the x-axis label size and making it bold
+            axis.title.y = element_text(size = 20, face = "bold"))  # Adjusting the y-axis label size and making it bold
 
 
 
@@ -131,8 +154,32 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
   #=============================================================================
   # Returning results
   #=============================================================================
-  list(ROC = ROC, AUC = AUC, Predicted_Probabilities = DF, Plot = p) %>% return()
+  list(ROC = ROC, AUC = AUC, AUC_CI = AUC_CI, Predicted_Probabilities = DF, Plot = p) %>% return()
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
