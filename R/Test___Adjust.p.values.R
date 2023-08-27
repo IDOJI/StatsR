@@ -1,25 +1,25 @@
-Test___Adjust.p.values = function(rawp,
+Test___Adjust.p.values = function(raw_p.vals,
                                   proc = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                   alpha = 0.05,
                                   na.rm = FALSE){
     #===========================================================================
     # Defined function
     #===========================================================================
-    m <- length(rawp)
+    m <- length(raw_p.vals)
     if (na.rm) {
-      mgood <- sum(!is.na(rawp))
+      mgood <- sum(!is.na(raw_p.vals))
     }
     else {
       mgood <- m
     }
     n <- length(proc)
     a <- length(alpha)
-    index <- order(rawp)
+    index <- order(raw_p.vals)
     h0.ABH <- NULL
     h0.TSBH <- NULL
-    spval <- rawp[index]
+    spval <- raw_p.vals[index]
     adjp <- matrix(0, m, n + 1)
-    dimnames(adjp) <- list(NULL, c("rawp", proc))
+    dimnames(adjp) <- list(NULL, c("raw_p.vals", proc))
     adjp[, 1] <- spval
 
 
@@ -35,7 +35,7 @@ Test___Adjust.p.values = function(rawp,
       newprocs <- append(proc, TSBHs, after = TS.spot)
       newprocs <- newprocs[newprocs != "TSBH"]
       adjp <- matrix(0, m, n + a)
-      dimnames(adjp) <- list(NULL, c("rawp", newprocs))
+      dimnames(adjp) <- list(NULL, c("raw_p.vals", newprocs))
       adjp[, 1] <- spval
       tmp <- spval
       for (i in (m - 1):1) {
@@ -178,7 +178,7 @@ Test___Adjust.p.values = function(rawp,
 #===========================================================================
 # mt.raw2adjp
 #===========================================================================
-# mt.rawp2adjp(rawp, proc=c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD",
+# mt.raw_p.vals2adjp(raw_p.vals, proc=c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD",
 #                           "BH", "BY","ABH","TSBH"), alpha = 0.05, na.rm = FALSE)
 
 
@@ -231,7 +231,7 @@ Test___Adjust.p.values = function(rawp,
 # A matrix of adjusted p-values, with rows corresponding to hypotheses and columns to multiple testing procedures. Hypotheses are sorted in increasing order of their raw (unadjusted) p-values.
 #
 # index
-# A vector of row indices, between 1 and length(rawp), where rows are sorted according to their raw (unadjusted) p-values. To obtain the adjusted p-values in the original data order, use adjp[order(index),].
+# A vector of row indices, between 1 and length(raw_p.vals), where rows are sorted according to their raw (unadjusted) p-values. To obtain the adjusted p-values in the original data order, use adjp[order(index),].
 #
 # h0.ABH
 # The estimate of the number of true null hypotheses as proposed by Benjamini & Hochberg (2000) used when computing adjusted p-values for the "ABH" procedure (see Dudoit et al., 2007).

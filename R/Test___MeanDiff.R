@@ -62,7 +62,6 @@ Test___MeanDiff = function(##############################
   # 3) ANOVA
   #==================================================================================
   Group_Var_Type = match.arg(Group_Var_Type)
-
   if(Group_Var_Type == "Nominal"){
     Results = Test___MeanDiff___Nominal.Group.Var(Data, Response_Vars, Group_Var)
   }else if(Group_Var_Type == "Ordinal"){
@@ -172,17 +171,6 @@ Test___MeanDiff___Exporting.XLSX.Highlight(Reporting.df = Combined_Reporting.df,
                                            save.path = save.path,
                                            filename = paste0("[ANOVA_Reporting] Results_", "`", var_group_filename, "`"))
 
-
-
-
-# Example p-values
-set.seed(123)
-pvals <- runif(20)  # Generate 20 random p-values between 0 and 1
-
-
-adjusted_pvals <- p.adjust(pvals, method = "BH")
-print(adjusted_pvals)
-?p.adjust
 
 
 
