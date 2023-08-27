@@ -54,10 +54,11 @@ Test___MeanDiff___Single.Response = function(##############################
   #============================================================================
   # Normality
   #============================================================================
-  Norm.Test_results.list  = Test___Normality___Each.Group(df, var_group, var_response, alpha_Norm)
-  Norm.Test_combined.list = Test___Normality___Each.Group___Extract.Results(Norm.Test_results.list)
+  Norm.Test_combined.list  = Test___Normality(df, var_group, var_response, alpha_Norm)
   Norm.Test_combined.df   = Norm.Test_combined.list[[1]]
   is.Normal               = Norm.Test_combined.list[[2]]
+
+
 
 
 

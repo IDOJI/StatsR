@@ -28,6 +28,15 @@ Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test,
   #===========================================================================
   # Create a confusion matrix
   Confusion_matrix = table(Predicted = Predicted_classes, Actual = y_Test)
+  if(nrow(Confusion_matrix) != levels(y_Test) %>% length){
+    rows_not_defined = unique(as.integer(y_Test))[! y_Test %>% as.integer %>% unique %in% rownames(Confusion_matrix)] %>% sort
+    New_matrix = matrix(0, nrow = rows_not_defined %>% length, ncol = y_Test %>% unique %>% length)
+    rownames(New_matrix) = rows_not_defined
+    Combined_Matrix = rbind(New_matrix, Confusion_matrix)
+
+    row_names = rownames(Combined_Matrix)
+    Confusion_matrix = Combined_Matrix[row_names %>% as.numeric %>% order,]
+  }
   rownames(Confusion_matrix) = levels(y_Test)
 
   # Calculate the number of correct predictions (diagonal of the confusion matrix)

@@ -1,25 +1,25 @@
-Test___MeanDiff = function(##############################
-                           # data & variables
-                           ##############################
-                           df, var_group, var_responses,
-                           ##############################
-                           # Significance level
-                           ##############################
-                           alpha_Norm  = 0.05,
-                           alpha_Equal.Var  = 0.05,
-                           alpha_ANOVA = 0.05,
-                           alpha_PostHoc = 0.05,
-                           p.adjust.method = c("bonferroni", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
-                           ##############################
-                           # Figure
-                           ##############################
-                           Boxplot_label.as.p.val=F,
-                           # title="",
-                           # results.subtitle=T,
-                           ##############################
-                           # exporting
-                           ##############################
-                           save.path){
+Test___MeanDiff___Multi.Reponses = function(##############################
+                                            # data & variables
+                                            ##############################
+                                            df, var_group, var_responses,
+                                            ##############################
+                                            # Significance level
+                                            ##############################
+                                            alpha_Norm  = 0.05,
+                                            alpha_Equal.Var  = 0.05,
+                                            alpha_ANOVA = 0.05,
+                                            alpha_PostHoc = 0.05,
+                                            p.adjust.method = c("bonferroni", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
+                                            ##############################
+                                            # Figure
+                                            ##############################
+                                            Boxplot_label.as.p.val=F,
+                                            # title="",
+                                            # results.subtitle=T,
+                                            ##############################
+                                            # exporting
+                                            ##############################
+                                            save.path){
   #==================================================================================
   # path
   #==================================================================================
@@ -31,7 +31,7 @@ Test___MeanDiff = function(##############################
 
 
   #==================================================================================
-  # file names
+  # fine names
   #==================================================================================
   var_group_filename = gsub(pattern = "/", replacement = ".", x = var_group)
   var_responses_filename = gsub(pattern = "/", replacement = ".", x = var_responses)

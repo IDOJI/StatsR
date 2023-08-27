@@ -78,9 +78,10 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
     return(ith_Fit_CV_Mean)
   })
 
-  # Fit_CV.list = lapply(list.files(path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
-  #   readRDS(y) %>% summary %>% colMeans
-  # })
+#
+#   Fit_CV.list = lapply(list.files(path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
+#     readRDS(y) %>% summary %>% colMeans
+#   })
 
 
 
@@ -152,7 +153,7 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   #=============================================================================
   Results.list = Classification___Multinomial___Results(Best_Fit = Best_Fit_Final,
                                                         Best_alpha = best_alpha,
-                                                        X_Test = X_Test %>% as.matrix,
+                                                        X_Test = X_Test,
                                                         y_Test = y_Test,
                                                         AUC_in_Legend = AUC_in_Legend,
                                                         title = title,

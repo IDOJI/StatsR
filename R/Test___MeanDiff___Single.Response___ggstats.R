@@ -9,14 +9,17 @@ Test___MeanDiff___Single.Response___ggstats = function(# data & variables
                                                     # plotting options
                                                     results.subtitle=F,
                                                     pairwise.comparisons=T,
-                                                    p.adjust.method,
+                                                    p.adjust.method = c("holm", "hochberg", "hommel", 'bonferroni', "BH", "fdr", "BY", "none"),
                                                     title=""){
+
+  p.adjust.method = match.arg(p.adjust.method)
+
   if(is.Normal){
     type = "parametric"
   }else{
     type = "nonparametric"
   }
-
+  p$layers
 
   p = ggstatsplot::ggbetweenstats(
     data = df,

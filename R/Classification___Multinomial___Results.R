@@ -11,6 +11,13 @@ Classification___Multinomial___Results = function(Best_Fit, Best_alpha, X_Test=N
 
 
 
+  #=============================================================================
+  # Cumulative Probability plot for most effective variable
+  #=============================================================================
+  Cum_p = Classification___Multinomial___Results___Cumulative.Probability.Plot(Best_Fit, X_Test, y_Test)
+
+
+
 
 
   #=============================================================================
@@ -21,6 +28,8 @@ Classification___Multinomial___Results = function(Best_Fit, Best_alpha, X_Test=N
   }else{
     Prediction = NULL
   }
+
+
 
 
 

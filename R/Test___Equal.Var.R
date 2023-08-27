@@ -1,12 +1,29 @@
-Test___Equal.Var = function(df, var_group, var_response, is.Normal, alpha=0.05){
-  ### Normality : TRUE
-  if(is.Normal){
-    homo_reslts.list = Test___Equal.Var___When.Norm.True(df, var_response, var_group, is.Normal, alpha)
-  }else{
-    ### Normality : FALSE
-    homo_reslts.list = Test___Equal.Var___When.Norm.False(df, var_response, var_group, is.Normal, alpha)
+Test___Equal.Var = function(Data, Group_Var, Response_Vars, is.Normal, alpha=0.05){
+  if(length(Response_Vars) != length(is.Normal)){
+    stop("The length of Response_Vars and is.Normal is different!")
   }
-  return(homo_reslts.list)
+
+
+
+  Results.list = lapply(seq_along(Response_Vars), function(i){
+    ith_Response_Var = Response_Vars[i]
+    ith_is.Normal = is.Normal[i]
+
+    ### Normality : TRUE
+    if(ith_is.Normal){
+      Test___Equal.Var___When.Norm.True(Data, Group_Var, ith_Response_Var, ith_is.Normal, alpha)
+    }else{
+    ### Normality : FALSE
+      Test___Equal.Var___When.Norm.False(Data, Group_Var, ith_Response_Var, ith_is.Normal, alpha)
+    }
+  })
+
+
+  names(Results.list) = Response_Vars
+
+
+  cat("\n", crayon::green("Testing") ,crayon::red("Homogeneity"), crayon::green("is done!"),"\n")
+  return(Results.list)
 }
 
 

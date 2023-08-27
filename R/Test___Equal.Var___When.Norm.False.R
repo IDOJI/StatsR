@@ -1,19 +1,17 @@
-Test___Equal.Var___When.Norm.False = function(df, var_response, var_group, is.normal, alpha){
-  #===========================================================================
-  # as list
-  #===========================================================================
-  data.list = as_list_by(df, var_group)
-
-
-
+Test___Equal.Var___When.Norm.False = function(Data, Group_Var, Response_Var, is.normal, alpha, outlier_method = c("IQR")){
   #===========================================================================
   # Check outliers
   #===========================================================================
-  have_outliers = sapply(data.list, FUN=function(ith_df, ...){
-    #ith_df = data.list[[1]]
-    SUB___Which.Outliers(ith_df[,var_response] %>% unlist, method="IQR") %>% length > 0
-  })
-  have_outliers = sum(have_outliers)>0 # 하나라도 이상치가 있는 경우
+  Have_Outliers = tapply(
+    Data %>% select(!!Response_Var) %>% unlist(),
+    Data %>% select(!!Group_Var) %>% unlist(),
+    function(x){
+      ith_Outliers = SUB___Which.Outliers(x, method = outlier_method)
+      ith_Have_Outliers = is.numeric(ith_Outliers)
+      return(ith_Have_Outliers)
+    }
+  ) %>% sum %>% as.logical
+
 
 
 
@@ -25,12 +23,12 @@ Test___Equal.Var___When.Norm.False = function(df, var_response, var_group, is.no
   names(results.list) = c("Equal.Var_results", "Equal.Var_What.Test", "Equal.Var_p.val", "is.Equal.Var")
 
 
-  if(have_outliers){
-    results.list[[1]] = fligner.test(SUB___as.formula(y=var_response, x=var_group), data=df)
+  if(Have_Outliers){
+    results.list[[1]] = fligner.test(SUB___as.formula(y=Response_Var, x=Group_Var), data=Data)
     results.list[[2]] = "Fligner-Killeen"
     results.list[[3]] = results.list[[1]]$p.value %>% as.numeric
   }else{
-    results.list[[1]] =car::leveneTest(y=df[,var_response] %>% unlist,  group=df[,var_group] %>% unlist) %>% suppressWarnings()
+    results.list[[1]] =car::leveneTest(y=Data[,Response_Var] %>% unlist,  group=Data[,Group_Var] %>% unlist) %>% suppressWarnings()
     results.list[[2]] = "Levene"
     results.list[[3]] = results.list[[1]]$`Pr(>F)`[1] %>% as.numeric
   }
