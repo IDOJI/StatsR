@@ -1,4 +1,4 @@
-Test___MeanDiff___Single.Response___Final.Results___Reporting = function(Final.df){
+Test___MeanDiff___Single.Responses___Nominal.Group.Var___Final.Results___Reporting = function(Final.df){
   if(!"group1" %in% names(Final.df)){
     selected.df = Final.df %>% dplyr::select(c(!!"Group(Trt)", !!"Each.Group",!!"n_obs",
                                                # !!"is.normal", !!"is.Equal.Var",

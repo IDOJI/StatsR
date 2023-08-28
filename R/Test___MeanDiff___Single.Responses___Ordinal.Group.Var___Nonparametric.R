@@ -1,4 +1,4 @@
-Test___MeanDiff___Ordinal.Group.Var___Nonparametric = function(Data,
+Test___MeanDiff___Single.Responses___Ordinal.Group.Var___Nonparametric = function(Data,
                                                                Group_Var,
                                                                Response_Var){
   #=============================================================================

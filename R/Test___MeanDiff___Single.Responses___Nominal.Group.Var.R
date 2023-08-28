@@ -1,45 +1,25 @@
-Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
-  #==================================================================================
-  # path
-  #==================================================================================
-  dir.create(save.path, showWarnings = F)
-
-
-
-
-
-
+Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
+                                                                  Response_Vars,
+                                                                  Group_Var,
+                                                                  alpha_ANOVA = 0.05,
+                                                                  alpha_PostHoc = 0.05,
+                                                                  p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
+                                                                  is.Normal,
+                                                                  is.Equal.Var){
   #==================================================================================
   # file names
   #==================================================================================
-  var_group_filename = gsub(pattern = "/", replacement = ".", x = var_group)
-  var_responses_filename = gsub(pattern = "/", replacement = ".", x = var_responses)
+  # var_group_filename = gsub(pattern = "/", replacement = ".", x = var_group)
+  # var_responses_filename = gsub(pattern = "/", replacement = ".", x = var_responses)
 
 
 
 
+  Test___MeanDiff___Single.Responses___Nominal.Group.Var
 
 
 
-  #==================================================================================
-  # ANOVA results for each groups
-  #==================================================================================
-  MeanDiff_Multi_Responses.list = lapply(seq_along(var_responses), FUN=function(k, ...){
-    ith_results = Test___MeanDiff___Single.Response(df,
-                                                    var_group,
-                                                    var_response = var_responses[k],
-                                                    alpha_Norm,
-                                                    alpha_Equal.Var,
-                                                    alpha_ANOVA,
-                                                    alpha_PostHoc,
-                                                    p.adjust.method,
-                                                    save.path,
-                                                    filename = paste0("[ANOVA_Boxplot] ", '`', var_responses_filename[k],"`"," by `", var_group_filename, "`"),
-                                                    export.xlsx = T,
-                                                    Boxplot_label.as.p.val = Boxplot_label.as.p.val)
-    cat("\n",  crayon::blue("The response variable"), crayon::red(var_responses[k]), crayon::blue("is done!"), "\n")
-    return(ith_results)
-  })
+  return(list(Combined_Final.Data, Combined_Reporting.Data))
 
 
 
@@ -52,16 +32,33 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 
 
 
+#==================================================================================
+# ANOVA results for each groups
+#==================================================================================
+# MeanDiff_Multi_Responses.list = lapply(seq_along(var_responses), FUN=function(k, ...){
+#   ith_results = Test___MeanDiff___Single.Responses___Nominal.Group.Var(Data,
+#                                                                        var_group,
+#                                                                        var_response = var_responses[k],
+#                                                                        alpha_Norm,
+#                                                                        alpha_Equal.Var,
+#                                                                        alpha_ANOVA,
+#                                                                        alpha_PostHoc,
+#                                                                        p.adjust.method,
+#                                                                        save.path,
+#                                                                        filename = paste0("[ANOVA_Boxplot] ", '`', var_responses_filename[k],"`"," by `", var_group_filename, "`"),
+#                                                                        export.xlsx = T,
+#                                                                        Boxplot_label.as.p.val = Boxplot_label.as.p.val)
+#   cat("\n",  crayon::blue("The response variable"), crayon::red(var_responses[k]), crayon::blue("is done!"), "\n")
+#   return(ith_results)
+# })
 
-  return(list(Combined_Final.df, Combined_Reporting.df))
-}
 
 #
 #
 # Test___MeanDiff_Multi = function(#################################################
 #                                  # data & variabels
 #                                  #################################################
-#                                  dataset.df,
+#                                  dataset.Data,
 #                                  variables,
 #                                  group_variables,
 #                                  #################################################
@@ -94,7 +91,7 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 #       Test___MeanDiff(#################################################
 #                       # dataset
 #                       #################################################
-#                       X                 =    dataset.df,
+#                       X                 =    dataset.Data,
 #                       group             =    ith_group_variable,
 #                       variable          =    v,
 #                       #################################################
@@ -114,7 +111,7 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 #
 #
 #
-#     return(Final_results.df)
+#     return(Final_results.Data)
 #   })
 #
 #
@@ -125,9 +122,9 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 #   #################################################
 #   for(i in 1:length(Final.list)){
 #     if(i==1){
-#       Final_results.df = Final.list[[i]]
+#       Final_results.Data = Final.list[[i]]
 #     }else{
-#       Final_results.df = rrbind(Final_results.df, Final.list[[i]])
+#       Final_results.Data = rrbind(Final_results.Data, Final.list[[i]])
 #     }
 #   }
 #
@@ -135,9 +132,9 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 #   ### combining
 #   for(i in 1:length(MeanDiff_results.list)){
 #     if(i==1){
-#       MeanDiff.df = MeanDiff_results.list[[i]]
+#       MeanDiff.Data = MeanDiff_results.list[[i]]
 #     }else{
-#       MeanDiff.df = rrbind(MeanDiff.df, MeanDiff_results.list[[i]])
+#       MeanDiff.Data = rrbind(MeanDiff.Data, MeanDiff_results.list[[i]])
 #     }
 #   }
 #
@@ -149,15 +146,15 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 #   # Highlighting results & Exporting
 #   #==============================================================================
 #   ### highlighting
-#   which_meandiff_sig = which(MeanDiff.df$MeanDiff_p.val <= anova_alpha)
-#   which_posthoc_sig = which(MeanDiff.df$PostHoc_p.val <= posthoc_alpha)
+#   which_meandiff_sig = which(MeanDiff.Data$MeanDiff_p.val <= anova_alpha)
+#   which_posthoc_sig = which(MeanDiff.Data$PostHoc_p.val <= posthoc_alpha)
 #   coloring_index.list = c(rep(list(which_meandiff_sig),3),
 #                           rep(list(which_posthoc_sig),3))
 #   colors.list = c(rep(list("#F4FA58"), 3),
 #                   rep(list("#FE9A2E"), 3))
-#   which_cols.list = which_cols(MeanDiff.df, c("Group Name","Response", "MeanDiff_p.val",
+#   which_cols.list = which_cols(MeanDiff.Data, c("Group Name","Response", "MeanDiff_p.val",
 #                                               "Group_1","Group_2","PostHoc_p.val")) %>% as.list
-#   coloring_xlsx_cells(data.df = MeanDiff.df,
+#   coloring_xlsx_cells(data.Data = MeanDiff.Data,
 #                       colors.list = colors.list,
 #                       which_cols.list = which_cols.list,
 #                       coloring_index.list = coloring_index.list,
@@ -166,7 +163,7 @@ Test___MeanDiff___Nominal.Group.Var = function(Data, Response_Vars, Group_Var){
 #
 #
 #
-#   return(MeanDiff.df)
+#   return(MeanDiff.Data)
 # }
 
 

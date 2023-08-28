@@ -1,4 +1,4 @@
-Test___MeanDiff___Single.Response___Box.Plot = function(df,
+Test___MeanDiff___Single.Responses___Nominal.Group.Var___Box.Plot = function(df,
                                                         var_group,
                                                         var_response,
                                                         Mean.Diff.Results,

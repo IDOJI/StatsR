@@ -1,4 +1,4 @@
-Test___MeanDiff___Single.Response___Results.Extractor = function(p, var_group, var_response){
+Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor = function(p, var_group, var_response){
   Mean.Diff_results.list = ggstatsplot::extract_stats(p)
 
   #===========================================================================

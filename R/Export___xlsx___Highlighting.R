@@ -3,7 +3,7 @@ Export___xlsx___Highlighting = function(data.df,
                                         which_cols.list, # which_cols.list = 컬럼 위치
                                         coloring_index.list, # coloring_index.list : i번째 열에서 어떤 행에 coloring을 할 것인가
                                         save.path, # save.path = "C:/Users/IDO/OneDrive/github/Rpkgs/StatAnalysis"
-                                        file_name,  # file_name = "test"
+                                        file.name,  # file.name = "test"
                                         sheet.name){
 
   #===========================================================================
@@ -63,7 +63,7 @@ Export___xlsx___Highlighting = function(data.df,
 
   ### Save Results
   save.path = path_tail_slash(save.path)
-  openxlsx::saveWorkbook(wb, paste0(save.path, file_name, ".xlsx"), overwrite=TRUE)
+  openxlsx::saveWorkbook(wb, paste0(save.path, file.name, ".xlsx"), overwrite=TRUE)
   cat("\n", crayon::blue("Writing an xlsx is done!"),"\n")
 }
 

@@ -1,4 +1,4 @@
-Test___MeanDiff___Single.Response___Final.Results = function(save.path, filename, Norm.Test_combined.df, Equal.Var.Test_combined.df, Mean.Diff.Results){
+Test___MeanDiff___Single.Responses___Nominal.Group.Var___Final.Results = function(save.path, filename, Norm.Test_combined.df, Equal.Var.Test_combined.df, Mean.Diff.Results){
   ### Mean Diff results for Statistician
   Norm.EqVar.df = ccbind(Norm.Test_combined.df, Equal.Var.Test_combined.df)
 
@@ -15,7 +15,7 @@ Test___MeanDiff___Single.Response___Final.Results = function(save.path, filename
 
 
   ### Results for reporting
-  Reporting.df = Test___MeanDiff___Single.Response___Final.Results___Reporting(Final.df)
+  Reporting.df = Test___MeanDiff___Single.Responses___Nominal.Group.Var___Final.Results___Reporting(Final.df)
 
 
   return(list(Results = Final.df, Results_for_Reporting = Reporting.df))

@@ -1,16 +1,6 @@
 SUB___P.vals.Signif.Stars = function(p.vals){
-  p.vals.signif = sapply(p.vals, FUN=function(p){
-    if(p <= 0.0001){
-      return("****")
-    }else if(p <= 0.001){
-      return("***")
-    }else if(p <= 0.01){
-      return("**")
-    }else if(p <= 0.05){
-      return("*")
-    }else{
-      return("NS")
-    }
-  })
-  return(p.vals.signif)
+  ifelse(p.vals < 0.001, "***",
+         ifelse(p.vals <= 0.01, "**",
+                ifelse(p.vals <= 0.05, "*",
+                       ifelse(p.vals > 0.1, "HNS", "NS")))) # HNS = Highly Not Significant
 }

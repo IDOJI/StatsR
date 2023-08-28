@@ -1,4 +1,4 @@
-test___MeanDiff___Single.Response___Final.Results = function(Norm.test_combined.df, Equal.Var.test_combined.df, Mean.Diff.Results){
+Test___MeanDiff___Single.Responses___Nominal.Group.Var___Final.Results = function(Norm.test_combined.df, Equal.Var.test_combined.df, Mean.Diff.Results){
   Norm.EqVar.df = ccbind(Norm.test_combined.df, Equal.Var.test_combined.df)
 
 
@@ -10,6 +10,6 @@ test___MeanDiff___Single.Response___Final.Results = function(Norm.test_combined.
 
 
   ##############################################################################
-  Reporting.df = test___MeanDiff___Single.Response___Final.Results___Reporting(Final.df)
+  Reporting.df = Test___MeanDiff___Single.Responses___Nominal.Group.Var___Final.Results___Reporting(Final.df)
   return(list(Final.df, Reporting.df))
 }
