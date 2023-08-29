@@ -5,7 +5,42 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                   alpha_PostHoc = 0.05,
                                                                   p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                                                   is.Normal,
-                                                                  is.Equal.Var){
+                                                                  is.Equal.Var,
+                                                                  type = c("parametric", "nonparametric", "robust", "bayes"),
+                                                                  outlier.tagging = FALSE,
+                                                                  tr=0.2){
+  #==================================================================================
+  # ggstats
+  #==================================================================================
+  type = match.arg(type)
+  ggstats.list = lapply(seq_along(Response_Vars), function(i){
+    Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats(Data,
+                                                                     Response_Var = Response_Vars[i],
+                                                                     Group_Var,
+                                                                     alpha_ANOVA,
+                                                                     is.Normal = is.Normal[i],
+                                                                     is.Equal.Var = is.Equal.Var[i],
+                                                                     type,
+                                                                     outlier.tagging,
+                                                                     tr)
+  })
+
+
+
+
+
+  #==================================================================================
+  # Extraact Results
+  #==================================================================================
+  Extracted_Results.list = lapply(seq_along(ggstats.list), function(i){
+    Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(ggstats.list[[i]], Data, Group_Var, Response_Vars[i])
+  })
+
+
+
+
+
+
   #==================================================================================
   # file names
   #==================================================================================
@@ -15,7 +50,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
-  Test___MeanDiff___Single.Responses___Nominal.Group.Var
+  Test___MeanDiff___Single.Responses___Nominal.Group.Var()
 
 
 

@@ -3,9 +3,9 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var = function(Data,
                                                                   Group_Var,
                                                                   alpha_ANOVA = 0.05,
                                                                   alpha_PostHoc = 0.05,
-                                                                  p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
-                                                                  is.Normal,
-                                                                  is.Equal.Var){
+                                                                  p.adjust.method = c("TSBH", "Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH"),
+                                                                  is.Normal=NULL,
+                                                                  is.Equal.Var=NULL){
   #==================================================================================
   # Test for each response
   #==================================================================================

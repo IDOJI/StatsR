@@ -1,11 +1,11 @@
 Test___MeanDiff___Single.Responses___Nominal.Group.Var___Box.Plot = function(df,
-                                                        var_group,
-                                                        var_response,
-                                                        Mean.Diff.Results,
-                                                        alpha_ANOVA=NULL,
-                                                        alpha_PostHoc=NULL,
-                                                        palette="lancet",
-                                                        label.as.p.val = F){
+                                                                            var_group,
+                                                                            var_response,
+                                                                            Mean.Diff.Results,
+                                                                            alpha_ANOVA=NULL,
+                                                                            alpha_PostHoc=NULL,
+                                                                            palette="lancet",
+                                                                            label.as.p.val = F){
   ############################################################################
   # install.package
   ############################################################################

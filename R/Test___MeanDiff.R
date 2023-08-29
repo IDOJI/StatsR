@@ -13,6 +13,7 @@ Test___MeanDiff = function(##############################
                            alpha_Equal.Var  = 0.05,
                            alpha_ANOVA = 0.05,
                            alpha_PostHoc = 0.05,
+                           type = c("parametric", "nonparametric", "robust", "bayes"),
                            p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                            ##############################
                            # Figure
@@ -29,6 +30,17 @@ Test___MeanDiff = function(##############################
   # path
   #==================================================================================
   dir.create(save.path, showWarnings = F)
+
+
+
+
+
+
+  #==================================================================================
+  # type
+  #==================================================================================
+  type = mathc.arg(type)
+
 
 
 
@@ -63,9 +75,9 @@ Test___MeanDiff = function(##############################
   #==================================================================================
   Group_Var_Type = match.arg(Group_Var_Type)
   if(Response_Vars_Milti){
-    Results_ANOVA = Test___MeanDiff___Multi.Reponses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, alpha_PostHoc, is.Normal, is.Equal.Var)
+    Results_ANOVA = Test___MeanDiff___Multi.Reponses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, alpha_PostHoc, is.Normal, is.Equal.Var, type)
   }else{
-    Results_ANOVA = Test___MeanDiff___Single.Responses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, alpha_PostHoc, p.adjust.method, is.Normal, is.Equal.Var)
+    Results_ANOVA = Test___MeanDiff___Single.Responses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, alpha_PostHoc, p.adjust.method, is.Normal, is.Equal.Var, type)
   }
 
 

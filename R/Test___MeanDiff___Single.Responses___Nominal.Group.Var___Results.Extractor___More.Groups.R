@@ -1,5 +1,10 @@
-Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor = function(p, var_group, var_response){
-  Mean.Diff_results.list = ggstatsplot::extract_stats(p)
+Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor___More.Groups = function(p, Group_Var, Response_Var){
+  #===========================================================================
+  # Extract results
+  #===========================================================================
+  Results = ggstatsplot::extract_stats(p)
+
+
 
   #===========================================================================
   # Mean.diff results
@@ -11,8 +16,8 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor = fun
     Mean.Diff_results = Mean.Diff_results %>% dplyr::rename("Response" := "parameter1")
     Mean.Diff_results = Mean.Diff_results %>% dplyr::rename("Group(Trt)" := "parameter2")
   }else{
-   Mean.Diff_results = dplyr::bind_cols(var_response, var_group, Mean.Diff_results)
-   names(Mean.Diff_results)[1:2] = c("Response", "Group(Trt)")
+    Mean.Diff_results = dplyr::bind_cols(Response_Var, Group_Var, Mean.Diff_results)
+    names(Mean.Diff_results)[1:2] = c("Response", "Group(Trt)")
   }
   Mean.Diff_results = Mean.Diff_results %>% dplyr::rename("MeanDiff_p.value":="p.value")
   Mean.Diff_results = Mean.Diff_results %>% dplyr::rename("MeanDiff_statistic":="statistic")

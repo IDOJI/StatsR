@@ -6,9 +6,8 @@ Test___MeanDiff___Single.Responses = function(Data,
                                               alpha_PostHoc = 0.05,
                                               p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                               is.Normal,
-                                              is.Equal.Var){
-
-
+                                              is.Equal.Var,
+                                              robust=FALSE){
   if(Group_Var_Type %in% c("Nominal", "nominal")){
     Results_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var(Data,
                                                                            Response_Vars,
@@ -17,7 +16,8 @@ Test___MeanDiff___Single.Responses = function(Data,
                                                                            alpha_PostHoc,
                                                                            p.adjust.method,
                                                                            is.Normal,
-                                                                           is.Equal.Var)
+                                                                           is.Equal.Var,
+                                                                           robust)
   }else if(Group_Var_Type %in% c("Ordinal", "ordinal")){
     Results_ANOVA = Test___MeanDiff___Single.Responses___Ordinal.Group.Var(Data,
                                                                            Response_Vars,
@@ -26,7 +26,8 @@ Test___MeanDiff___Single.Responses = function(Data,
                                                                            alpha_PostHoc,
                                                                            p.adjust.method,
                                                                            is.Normal,
-                                                                           is.Equal.Var)
+                                                                           is.Equal.Var,
+                                                                           robust)
   }
 
   return(Results_ANOVA)
