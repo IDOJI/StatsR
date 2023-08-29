@@ -35,7 +35,7 @@ Test___MeanDiff___Single.Responses = function(Data,
   # Adjust p.vals & Significance
   #==================================================================================
   p.adjust.method = match.arg(p.adjust.method)
-  p.vals = sapply(Extracted_Results.list, function(x){x %>% select(p.value) %>% unlist() %>% unname()})
+  p.vals = sapply(Results_ANOVA, function(x){x %>% select(p.value) %>% unlist() %>% unname()})
   Adjusted_p.vals = Test___Adjust.p.values(p.vals, proc = p.adjust.method, alpha = alpha_ANOVA)
   # Adjusted_p.vals.list = split(Adjusted_p.vals, seq_len(nrow(Adjusted_p.vals)))
   for(i in 1:length(Results_ANOVA)){

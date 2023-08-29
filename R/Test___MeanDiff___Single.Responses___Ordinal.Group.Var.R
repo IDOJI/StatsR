@@ -3,7 +3,8 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var = function(Data,
                                                                   Group_Var,
                                                                   alpha_ANOVA = 0.05,
                                                                   is.Normal=NULL,
-                                                                  is.Equal.Var=NULL){
+                                                                  is.Equal.Var=NULL,
+                                                                  type){
   #==================================================================================
   # Test for each response
   #==================================================================================
@@ -26,10 +27,10 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var = function(Data,
   # Select min p.vals
   #=============================================================================
   Minimal_p.vals = lapply(Results.list, function(y){
-    if(y$p.vals[1] < alpha_ANOVA){
-      index_min_p.val = which.min(y$p.vals[2:3]) + 1
+    if(y$p.value[1] < alpha_ANOVA){
+      index_min_p.val = which.min(y$p.value[2:3]) + 1
     }else{
-      index_min_p.val = which.min(y$p.vals)
+      index_min_p.val = which.min(y$p.value)
     }
     return(y[index_min_p.val, ])
   })
@@ -45,12 +46,21 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var = function(Data,
   Combined_Results = do.call(rbind, Minimal_p.vals)
   Combined_Results = cbind(Group = Group_Var, Response = Response_Vars, Combined_Results)
   rownames(Combined_Results) = NULL
+  Combined_Results.list = split(Combined_Results, seq_len(nrow(Combined_Results)))
+  names(Combined_Results.list) = Response_Vars
 
 
 
-
-  return(Combined_Results)
+  return(Combined_Results.list)
 }
+
+
+
+
+
+
+
+
 
 
 

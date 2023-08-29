@@ -1,6 +1,6 @@
 Test___MeanDiff___Single.Responses___Ordinal.Group.Var___Nonparametric = function(Data,
-                                                               Group_Var,
-                                                               Response_Var){
+                                                                                  Group_Var,
+                                                                                  Response_Var){
   #=============================================================================
   # packages
   #=============================================================================
@@ -15,7 +15,6 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var___Nonparametric = functio
   #=============================================================================
   Group = Data %>% select(all_of(Group_Var)) %>% unlist() %>% unname()
   x = Data %>% select(all_of(Response_Var)) %>% unlist() %>% unname()
-
   Order = order(Group)
   x_Ordered = x[Order]
   Group_Ordered = Group[Order] %>% as.numeric
@@ -32,7 +31,7 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var___Nonparametric = functio
 
   method = c()
   statistic = c()
-  p.vals = c()
+  p.value = c()
 
 
   Results.list = lapply(alternative, function(ith_alternative){
@@ -40,7 +39,7 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var___Nonparametric = functio
 
     method <<- c(method, ith_Results$method)
     statistic <<- c(statistic, ith_Results$statistic)
-    p.vals <<- c(p.vals, ith_Results$p.value)
+    p.value <<- c(p.value, ith_Results$p.value)
     return(ith_Results)
   })
 
@@ -52,7 +51,7 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var___Nonparametric = functio
   #=============================================================================
   # Combine Results
   #=============================================================================
-  Combined_Results = data.frame(method, statistic, alternative, p.vals)
+  Combined_Results = data.frame(method, statistic, alternative, p.value)
 
 
   cat("\n",crayon::green("Testing"), crayon::red("Jonckheere-Terpstra"), crayon::green("is done!"), "\n")

@@ -160,7 +160,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     p.vals.adjusted_Rounded = round(p.vals.adjusted %>% as.numeric, 4)
 
     Significance = SUB___P.vals.Signif.Stars(p.vals.adjusted)
-    Result_2 = data.frame(p.adj.method = p.adjust.method,
+    Result_2 = data.frame(p.adj.method = proc,
                           p.vals.adj = p.vals.adjusted,
                           p.vals.adj.rounded = p.vals.adjusted_Rounded,
                           Significance)

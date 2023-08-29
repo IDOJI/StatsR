@@ -1,6 +1,8 @@
 Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
                                                          Results,
-                                                         label.as.p.val = F,
+                                                         label.as.p.val = FALSE,
+                                                         group.comparison=FALSE,
+                                                         lines.connecting.medians=FALSE,
                                                          save.path=NULL){
   #=============================================================================
   # install.package
@@ -41,13 +43,32 @@ Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
   #=============================================================================
   p1 = ggpubr::ggboxplot(data = Data,
                          x = Group_Var,
-                         y = Response_Var,
+                         y = `Response_Var`,
                          color = Group_Var,
                          palette = "lancet",
                          shape = Group_Var,
                          size = 0.5,
                          add = "jitter",
                          add.params = list(size=0.5))
+
+
+
+
+
+  #=============================================================================
+  # pointing out mean
+  #=============================================================================
+  p1 = p1 +  stat_summary(fun = mean, geom = "point", shape = 10, size = 6, color = "red")
+
+
+
+
+  #=============================================================================
+  # adding lines connecting neighboing medians
+  #=============================================================================
+  if(lines.connecting.medians){
+    p1 = p1 + stat_summary(fun = median, geom = "line", group = 1, aes(group = 1), color = "blue")
+  }
 
 
 
@@ -70,6 +91,7 @@ Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
 
 
 
+
   #=============================================================================
   # Label bold
   #=============================================================================
@@ -78,24 +100,31 @@ Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
 
 
 
+
+
   #=============================================================================
   # Adding p-values on comparing groups
   #=============================================================================
   # 두 그룹 사이의 비교 옵션 넣기
-  if(label.as.p.val){
-    labeling = "p.vals.adj"
-    label.size = 2
+  if(group.comparison){
+    if(label.as.p.val){
+      labeling = "p.vals.adj"
+      label.size = 2
+    }else{
+      labeling = "Significance"
+      label.size = 5
+    }
+
+    p3 = p2 + ggpubr::stat_pvalue_manual(Results_Signif,
+                                         y.position = 1.1*max(Data[,Response_Var] %>% unlist %>% as.numeric),
+                                         step.increase = 0.1,
+                                         label = labeling,
+                                         label.size = 5,
+                                         bracket.size = 0.8)
   }else{
-    labeling = "Significance"
-    label.size = 5
+    p3 = p2
   }
 
-  p3 = p2 + ggpubr::stat_pvalue_manual(Results_Signif,
-                                       y.position = 1.1*max(Data[,Response_Var] %>% unlist %>% as.numeric),
-                                       step.increase = 0.1,
-                                       label = labeling,
-                                       label.size = 5,
-                                       bracket.size = 0.8)
 
 
 
@@ -256,3 +285,5 @@ Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
 #   }
 #   return(palette)
 # }
+
+

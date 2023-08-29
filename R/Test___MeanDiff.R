@@ -18,7 +18,9 @@ Test___MeanDiff = function(##############################
                            ##############################
                            # Figure
                            ##############################
-                           Boxplot_label.as.p.val=F,
+                           label.as.p.val=F,
+                           group.comparison=F,
+                           lines.connecting.medians=F,
                            # title="",
                            # results.subtitle=T,
                            ##############################
@@ -39,7 +41,7 @@ Test___MeanDiff = function(##############################
   #==================================================================================
   # type
   #==================================================================================
-  type = mathc.arg(type)
+  type = match.arg(type)
 
 
 
@@ -106,7 +108,12 @@ Test___MeanDiff = function(##############################
   # 5) Boxplot
   #==================================================================================
   Boxplot.list = lapply(Results_ANOVA, function(ith_Results){
-    Test___MeanDiff___Single.Responses___Box.Plot(Data, ith_Results, label.as.p.val, save.path)
+    Test___MeanDiff___Single.Responses___Box.Plot(Data,
+                                                  ith_Results,
+                                                  label.as.p.val,
+                                                  group.comparison,
+                                                  lines.connecting.medians,
+                                                  save.path)
   })
 
 
