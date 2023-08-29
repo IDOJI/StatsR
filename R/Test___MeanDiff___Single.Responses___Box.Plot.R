@@ -38,19 +38,45 @@ Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
 
 
 
+
+  #=============================================================================
+  # pallette
+  #=============================================================================
+  install_packages("RColorBrewer")
+  # Step 1: Generate palette
+  all_colors <- brewer.pal(12, "Set3")  # 12 is the maximum for Set3
+
+  # Step 2: Filter out undesired color
+  filtered_colors <- all_colors[all_colors != "#FFFFB3"]
+
+  # Step 3: Check if you need more colors
+  n_colors <- Data[, Group_Var] %>% unlist %>% unique %>% length
+
+  if (length(filtered_colors) < n_colors) {
+    # This is just an example: you might want to add a color or generate colors in another way
+    filtered_colors <- c(filtered_colors, "#FF0000")
+  }
+
+  # Use 'filtered_colors' in your plot
+  colors <- filtered_colors[1:n_colors]
+
+
+
+
+
+
   #=============================================================================
   # Boxplot
   #=============================================================================
-  p1 = ggpubr::ggboxplot(data = Data,
-                         x = Group_Var,
-                         y = `Response_Var`,
-                         color = Group_Var,
-                         palette = "lancet",
-                         shape = Group_Var,
-                         size = 0.5,
-                         add = "jitter",
-                         add.params = list(size=0.5))
-
+  p1 <- ggpubr::ggboxplot(data = Data,
+                          x = Group_Var,
+                          y = `Response_Var`,
+                          color = Group_Var,
+                          palette = colors,
+                          # shape = Group_Var,
+                          size = 0.5,
+                          add = "jitter",
+                          add.params = list(size=0.5))
 
 
 
@@ -58,7 +84,7 @@ Test___MeanDiff___Single.Responses___Box.Plot = function(Data,
   #=============================================================================
   # pointing out mean
   #=============================================================================
-  p1 = p1 +  stat_summary(fun = mean, geom = "point", shape = 10, size = 6, color = "red")
+  p1 = p1 +  stat_summary(fun = mean, geom = "point", shape = 10, size = 4, color = "red")
 
 
 
