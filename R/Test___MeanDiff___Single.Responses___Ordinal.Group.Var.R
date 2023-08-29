@@ -2,8 +2,6 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var = function(Data,
                                                                   Response_Vars,
                                                                   Group_Var,
                                                                   alpha_ANOVA = 0.05,
-                                                                  alpha_PostHoc = 0.05,
-                                                                  p.adjust.method = c("TSBH", "Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH"),
                                                                   is.Normal=NULL,
                                                                   is.Equal.Var=NULL){
   #==================================================================================
@@ -49,15 +47,6 @@ Test___MeanDiff___Single.Responses___Ordinal.Group.Var = function(Data,
   rownames(Combined_Results) = NULL
 
 
-
-
-
-  #=============================================================================
-  # Adjust p.vals
-  #=============================================================================
-  Adjusted_P.vals = Test___Adjust.p.values(raw_p.vals = Combined_Results$p.vals, proc =  p.adjust.method, alpha_ANOVA)
-  # Combine
-  Combined_Results = cbind(Combined_Results, Adjusted_P.vals)
 
 
   return(Combined_Results)

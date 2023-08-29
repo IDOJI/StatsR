@@ -2,8 +2,6 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                   Response_Vars,
                                                                   Group_Var,
                                                                   alpha_ANOVA = 0.05,
-                                                                  alpha_PostHoc = 0.05,
-                                                                  p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                                                   is.Normal,
                                                                   is.Equal.Var,
                                                                   type = c("parametric", "nonparametric", "robust", "bayes"),
@@ -29,38 +27,26 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
+
+
   #==================================================================================
-  # Extraact Results
+  # Extract Results
   #==================================================================================
   Extracted_Results.list = lapply(seq_along(ggstats.list), function(i){
     Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(ggstats.list[[i]], Data, Group_Var, Response_Vars[i])
   })
-
+  names(Extracted_Results.list) = Response_Vars
+  # Extracted_Results.df = do.call(rbind, Extracted_Results.list)
 
 
 
 
 
   #==================================================================================
-  # file names
+  # return
   #==================================================================================
-  # var_group_filename = gsub(pattern = "/", replacement = ".", x = var_group)
-  # var_responses_filename = gsub(pattern = "/", replacement = ".", x = var_responses)
-
-
-
-
-  Test___MeanDiff___Single.Responses___Nominal.Group.Var()
-
-
-
-  return(list(Combined_Final.Data, Combined_Reporting.Data))
-
-
-
-
-
-  }
+  return(Extracted_Results.list)
+}
 
 
 
@@ -177,24 +163,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 #
 #
 #
-#   #==============================================================================
-#   # Highlighting results & Exporting
-#   #==============================================================================
-#   ### highlighting
-#   which_meandiff_sig = which(MeanDiff.Data$MeanDiff_p.val <= anova_alpha)
-#   which_posthoc_sig = which(MeanDiff.Data$PostHoc_p.val <= posthoc_alpha)
-#   coloring_index.list = c(rep(list(which_meandiff_sig),3),
-#                           rep(list(which_posthoc_sig),3))
-#   colors.list = c(rep(list("#F4FA58"), 3),
-#                   rep(list("#FE9A2E"), 3))
-#   which_cols.list = which_cols(MeanDiff.Data, c("Group Name","Response", "MeanDiff_p.val",
-#                                               "Group_1","Group_2","PostHoc_p.val")) %>% as.list
-#   coloring_xlsx_cells(data.Data = MeanDiff.Data,
-#                       colors.list = colors.list,
-#                       which_cols.list = which_cols.list,
-#                       coloring_index.list = coloring_index.list,
-#                       save_path = path,
-#                       file_name = file_name) %>% suppressWarnings
+
 #
 #
 #

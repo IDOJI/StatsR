@@ -3,32 +3,69 @@ Test___MeanDiff___Single.Responses = function(Data,
                                               Group_Var,
                                               Group_Var_Type = c("Nominal", "nominal","Ordinal", "ordinal"),
                                               alpha_ANOVA = 0.05,
-                                              alpha_PostHoc = 0.05,
                                               p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                               is.Normal,
                                               is.Equal.Var,
-                                              robust=FALSE){
+                                              type = c("parametric", "nonparametric", "robust", "bayes")){
+  #==================================================================================
+  # ANOVA
+  #==================================================================================
   if(Group_Var_Type %in% c("Nominal", "nominal")){
     Results_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var(Data,
                                                                            Response_Vars,
                                                                            Group_Var,
                                                                            alpha_ANOVA,
-                                                                           alpha_PostHoc,
-                                                                           p.adjust.method,
                                                                            is.Normal,
                                                                            is.Equal.Var,
-                                                                           robust)
+                                                                           type)
   }else if(Group_Var_Type %in% c("Ordinal", "ordinal")){
     Results_ANOVA = Test___MeanDiff___Single.Responses___Ordinal.Group.Var(Data,
                                                                            Response_Vars,
                                                                            Group_Var,
                                                                            alpha_ANOVA,
-                                                                           alpha_PostHoc,
-                                                                           p.adjust.method,
                                                                            is.Normal,
                                                                            is.Equal.Var,
-                                                                           robust)
+                                                                           type)
   }
 
+
+
+
+  #==================================================================================
+  # Adjust p.vals & Significance
+  #==================================================================================
+  p.adjust.method = match.arg(p.adjust.method)
+  p.vals = sapply(Extracted_Results.list, function(x){x %>% select(p.value) %>% unlist() %>% unname()})
+  Adjusted_p.vals = Test___Adjust.p.values(p.vals, proc = p.adjust.method, alpha = alpha_ANOVA)
+  # Adjusted_p.vals.list = split(Adjusted_p.vals, seq_len(nrow(Adjusted_p.vals)))
+  for(i in 1:length(Results_ANOVA)){
+    Results_ANOVA[[i]] = cbind(Results_ANOVA[[i]], Adjusted_p.vals[i,])
+  }
+
+
+
+
+
+  #==================================================================================
+  # Add group1 & group2
+  #==================================================================================
+  Groups = Data %>% select(!!Group_Var) %>% unlist() %>% unique
+  n_Groups = Groups %>% length
+  if(n_Groups == 2){
+    for(i in 1:length(Results_ANOVA)){
+      Results_ANOVA[[i]]$group1 = Groups[1]
+      Results_ANOVA[[i]]$group2 = Groups[2]
+      Results_ANOVA[[i]] = Results_ANOVA[[i]] %>% relocate(starts_with("group"), .after=Group)
+    }
+  }
+
+
+
+
+
+
+  #==================================================================================
+  # return
+  #==================================================================================
   return(Results_ANOVA)
 }

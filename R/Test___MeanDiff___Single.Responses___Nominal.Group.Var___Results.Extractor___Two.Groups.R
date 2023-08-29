@@ -5,10 +5,14 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor___Two
   Results = ggstatsplot::extract_stats(p)
   Results.df = Results$subtitle_data
 
+
+
   #=========================================================================
   # Rename
   #=========================================================================
-  Results_Renamed.df = Results.df %>% rename(Group:=parameter1) %>% rename(Response:=parameter2)
+  Results_Renamed.df = Results.df %>% rename(Response:=parameter1) %>% rename(Group:=parameter2)
+
+
 
 
 
@@ -24,9 +28,10 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor___Two
   # Relocate cols
   #=========================================================================
   Results_Relocated.df = Results_Selected.df %>%
-    relocate(n.obs, .after=Response) %>%
+    relocate(n.obs, .after=Group) %>%
     relocate(statistic, .after=last_col()) %>%
-    relocate(p.value, .after=last_col())
+    relocate(p.value, .after=last_col()) %>%
+    relocate(Response, .after=Group)
 
 
 
