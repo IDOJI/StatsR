@@ -1,8 +1,9 @@
 Test___Adjust.p.values = function(raw_p.vals,
-                                  proc = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
+                                  method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                   alpha = 0.05,
                                   na.rm = FALSE,
-                                  scientific = FALSE){
+                                  scientific = FALSE,
+                                  only.return.p.vals=TRUE){
     #===========================================================================
     # Defined function
     #===========================================================================
@@ -12,14 +13,14 @@ Test___Adjust.p.values = function(raw_p.vals,
     }else{
       mgood <- m
     }
-    n <- length(proc)
+    n <- length(method)
     a <- length(alpha)
     index <- order(raw_p.vals)
     h0.ABH <- NULL
     h0.TSBH <- NULL
     spval <- raw_p.vals[index]
     adjp <- matrix(0, m, n + 1)
-    dimnames(adjp) <- list(NULL, c("raw_p.vals", proc))
+    dimnames(adjp) <- list(NULL, c("raw_p.vals", method))
     adjp[, 1] <- spval
 
 
@@ -29,10 +30,10 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # TSBH
     #===========================================================================
-    if(is.element("TSBH", proc)){
-      TS.spot <- which(proc == "TSBH")
+    if(is.element("TSBH", method)){
+      TS.spot <- which(method == "TSBH")
       TSBHs <- paste("TSBH", alpha, sep = "_")
-      newprocs <- append(proc, TSBHs, after = TS.spot)
+      newprocs <- append(method, TSBHs, after = TS.spot)
       newprocs <- newprocs[newprocs != "TSBH"]
       adjp <- matrix(0, m, n + a)
       dimnames(adjp) <- list(NULL, c("raw_p.vals", newprocs))
@@ -55,7 +56,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # Bonferroni
     #===========================================================================
-    if (is.element("Bonferroni", proc)) {
+    if (is.element("Bonferroni", method)) {
       tmp <- mgood * spval
       tmp[tmp > 1] <- 1
       adjp[, "Bonferroni"] <- tmp
@@ -63,7 +64,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # Holm
     #===========================================================================
-    if (is.element("Holm", proc)) {
+    if (is.element("Holm", method)) {
       tmp <- spval
       tmp[1] <- min(mgood * spval[1], 1)
       for (i in 2:m) tmp[i] <- max(tmp[i - 1], min((mgood -
@@ -73,7 +74,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # Hochberg
     #===========================================================================
-    if (is.element("Hochberg", proc)) {
+    if (is.element("Hochberg", method)) {
       tmp <- spval
       for (i in (m - 1):1) {
         tmp[i] <- min(tmp[i + 1], min((mgood - i + 1) * spval[i],
@@ -86,9 +87,9 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # SidakSS
     #===========================================================================
-    if (is.element("SidakSS", proc))
+    if (is.element("SidakSS", method))
       adjp[, "SidakSS"] <- 1 - (1 - spval)^mgood
-    if (is.element("SidakSD", proc)) {
+    if (is.element("SidakSD", method)) {
       tmp <- spval
       tmp[1] <- 1 - (1 - spval[1])^mgood
       for (i in 2:m) tmp[i] <- max(tmp[i - 1], 1 - (1 - spval[i])^(mgood -
@@ -98,7 +99,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # BH
     #===========================================================================
-    if (is.element("BH", proc)) {
+    if (is.element("BH", method)) {
       tmp <- spval
       for (i in (m - 1):1) {
         tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
@@ -111,7 +112,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # BY
     #===========================================================================
-    if (is.element("BY", proc)) {
+    if (is.element("BY", method)) {
       tmp <- spval
       a <- sum(1/(1:mgood))
       tmp[m] <- min(a * spval[m], 1)
@@ -126,7 +127,7 @@ Test___Adjust.p.values = function(raw_p.vals,
     #===========================================================================
     # ABH
     #===========================================================================
-    if(is.element("ABH", proc)){
+    if(is.element("ABH", method)){
       tmp <- spval
       h0.m <- rep(0, mgood)
       for (k in 1:mgood) {
@@ -160,13 +161,26 @@ Test___Adjust.p.values = function(raw_p.vals,
     p.vals.adjusted_Rounded = round(p.vals.adjusted %>% as.numeric, 4)
 
     Significance = SUB___P.vals.Signif.Stars(p.vals.adjusted)
-    Result_2 = data.frame(p.adj.method = proc,
+    Result_2 = data.frame(p.adj.method = method,
                           p.vals.adj = p.vals.adjusted,
                           p.vals.adj.rounded = p.vals.adjusted_Rounded,
                           Significance)
 
 
-    return(Result_2)
+
+
+
+
+
+    #===========================================================================
+    # Return results
+    #===========================================================================
+    if(only.return.p.vals){
+      p.vals.adjusted %>% as.numeric %>% return
+    }else{
+      return(Result_2)
+    }
+
 }
 
 
