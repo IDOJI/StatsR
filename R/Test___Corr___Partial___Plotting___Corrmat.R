@@ -9,6 +9,8 @@ Test___Corr___Partial___Plotting___Corrmat = function(Corr.df,
 
 
 
+  method = unique(Corr.df$method)
+
 
   #=============================================================================
   # Visualization
@@ -27,7 +29,8 @@ Test___Corr___Partial___Plotting___Corrmat = function(Corr.df,
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
           axis.title.x = element_text(size = 16, face="bold"),  # Adjust size as needed
           axis.title.y = element_text(size = 16, face="bold")) +  # Adjust size as needed
-    labs(x = x_lab, y = y_lab)
+    labs(x = x_lab, y = y_lab) +
+    coord_fixed(ratio = 1)
 
 
 
@@ -35,7 +38,9 @@ Test___Corr___Partial___Plotting___Corrmat = function(Corr.df,
   # Exporting
   #=============================================================================
   if(!is.null(save.path)){
-    ggsave(filename = paste0(save.path, "/[Correlation] ", x_lab, " vs ",  y_lab, ".png"), plot = p, dpi = 300)
+    # ggsave(filename = paste0(save.path, "/[", Corr.df$method %>% unique," Correlation] ", x_lab, " vs ",  y_lab, ".png"), plot = p, dpi = 300)
+    ggsave(filename = paste0(save.path, "/[", method, " Correlation] ", x_lab, " vs ",  y_lab, ".png"), plot = p, dpi = 300, width = 10, height = 8)
+
   }
 
 

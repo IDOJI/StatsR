@@ -7,13 +7,13 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
                                                                             is.Equal.Var,
                                                                             type = c("parametric", "nonparametric", "robust", "bayes"),
                                                                             outlier.tagging = FALSE,
-                                                                            tr=0.2
+                                                                            tr=0.2,
                                                                             # plotting options
                                                                             # results.subtitle = T,
                                                                             # pairwise.comparisons = T,
                                                                             # p.adjust.method = c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY"),
                                                                             # title = ""
-                                                                            )
+                                                                            ...)
 {
   #=============================================================================
   # Packges
@@ -37,6 +37,36 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
       type = "nonparametric"
     }
   }
+
+
+
+
+
+  #=============================================================================
+  # pallette
+  #=============================================================================
+  # install_packages("RColorBrewer")
+  # # Step 1: Generate palette
+  # all_colors <- brewer.pal(12, "Set3")  # 12 is the maximum for Set3
+  #
+  # # Step 2: Filter out undesired color
+  # filtered_colors <- all_colors[all_colors != "#FFFFB3"]
+  #
+  # # Step 3: Check if you need more colors
+  # n_colors <- Data[, Group_Var] %>% unlist %>% unique %>% length
+  #
+  # if (length(filtered_colors) < n_colors) {
+  #   # This is just an example: you might want to add a color or generate colors in another way
+  #   filtered_colors <- c(filtered_colors, "#FF0000")
+  # }
+  #
+  # # Use 'filtered_colors' in your plot
+  # colors <- filtered_colors[1:n_colors]
+
+
+
+
+
 
 
 
@@ -81,6 +111,8 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
     ggplot.component = list(ggplot2::theme(plot.title = element_text(size = 20, face = "bold"))),
     results.subtitle = TRUE,
     title = "",
+    package = "yarrr", ## package from which color palette is to be taken
+    palette = "info2", ## choosing a different color palette
 
 
 
@@ -92,7 +124,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
     pairwise.annotation = "p.value",                # how do you want to annotate the pairwise comparisons
     p.adjust.method = "none"                       # method for adjusting p-values for multiple comparisons
 
-  )
+  ) %>% suppressWarnings()
 
 
 
@@ -128,6 +160,23 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
 
 
 
+
+
+
+
+#=============================================================================
+# Boxplot
+#=============================================================================
+# p1 <- ggpubr::ggboxplot(data = Data,
+#                         x = Group_Var,
+#                         y = `Response_Var`,
+#                         color = Group_Var,
+#                         palette = colors,
+#                         # shape = Group_Var,
+#                         size = 0.5,
+#                         add = "jitter",
+#                         add.params = list(size=0.5))
+#
 
 
 

@@ -11,13 +11,13 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
   # ggstats
   #==================================================================================
   type = match.arg(type)
-  ggstats.list = lapply(seq_along(Response_Vars), function(i){
+  ggstats.list = lapply(seq_along(Response_Vars), function(k){
     Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats(Data,
-                                                                     Response_Var = Response_Vars[i],
+                                                                     Response_Var = Response_Vars[k],
                                                                      Group_Var,
                                                                      alpha_ANOVA,
-                                                                     is.Normal = is.Normal[i],
-                                                                     is.Equal.Var = is.Equal.Var[i],
+                                                                     is.Normal = is.Normal[k],
+                                                                     is.Equal.Var = is.Equal.Var[k],
                                                                      type,
                                                                      outlier.tagging,
                                                                      tr)
@@ -32,13 +32,13 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
   #==================================================================================
   # Extract Results
   #==================================================================================
-  Extracted_Results.list = lapply(seq_along(ggstats.list), function(i){
-    Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(ggstats.list[[i]], Data, Group_Var, Response_Vars[i])
+  Extracted_Results.list = lapply(seq_along(ggstats.list), function(n){
+    Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(p = ggstats.list[[n]],
+                                                                               Data,
+                                                                               Group_Var,
+                                                                               Response_Var = Response_Vars[n])
   })
   names(Extracted_Results.list) = Response_Vars
-  # Extracted_Results.df = do.call(rbind, Extracted_Results.list)
-
-
 
 
 

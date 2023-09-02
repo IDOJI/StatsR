@@ -18,6 +18,7 @@ Test___MeanDiff___Single.Responses = function(Data,
                                                                            is.Normal,
                                                                            is.Equal.Var,
                                                                            type)
+    p.value_colname = "p.value_Comparison"
   }else if(Group_Var_Type %in% c("Ordinal", "ordinal")){
     Results_ANOVA = Test___MeanDiff___Single.Responses___Ordinal.Group.Var(Data,
                                                                            Response_Vars,
@@ -26,6 +27,7 @@ Test___MeanDiff___Single.Responses = function(Data,
                                                                            is.Normal,
                                                                            is.Equal.Var,
                                                                            type)
+    p.value_colname = "p.value"
   }
 
 
@@ -33,14 +35,18 @@ Test___MeanDiff___Single.Responses = function(Data,
 
   #==================================================================================
   # Adjust p.vals & Significance
-  #==================================================================================
   p.adjust.method = match.arg(p.adjust.method)
-  p.vals = sapply(Results_ANOVA, function(x){x %>% select(p.value) %>% unlist() %>% unname()})
-  Adjusted_p.vals = Test___Adjust.p.values(p.vals, proc = p.adjust.method, alpha = alpha_ANOVA)
+  test = do.call(rbind, Results_ANOVA)
+  p.vals = sapply(Results_ANOVA, function(x){x %>% select(!!p.value_colname) %>% unlist() %>% unname()}) %>% as.vector()
+  Adjusted_p.vals = Test___Adjust.p.values(p.vals, method = p.adjust.method, alpha = alpha_ANOVA)
   # Adjusted_p.vals.list = split(Adjusted_p.vals, seq_len(nrow(Adjusted_p.vals)))
   for(i in 1:length(Results_ANOVA)){
     Results_ANOVA[[i]] = cbind(Results_ANOVA[[i]], Adjusted_p.vals[i,])
   }
+
+
+
+
 
 
 

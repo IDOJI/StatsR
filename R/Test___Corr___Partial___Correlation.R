@@ -1,4 +1,16 @@
-Test___Corr___Partial___Correlation = function(Data, x_Vars, y_Vars, type, p.adjust.method, alpha, save.path){
+Test___Corr___Partial___Correlation = function(Data, x_Vars, y_Vars, type, p.adjust.method, alpha, x_lab, y_lab, save.path=NULL){
+  #=============================================================================
+  # type
+  #=============================================================================
+  if(type == "parametric"){
+    method = "Pearson"
+  }else if(type == "nonparametric"){
+    method = "Spearman"
+  }
+
+
+
+
   #=============================================================================
   # Correlation & P-values
   #=============================================================================
@@ -81,6 +93,24 @@ Test___Corr___Partial___Correlation = function(Data, x_Vars, y_Vars, type, p.adj
   melted_Corr_Sub.df$Significance = SUB___P.vals.Signif.Stars(p.vals = melted_Corr_Sub.df$Adj_p.value)
 
 
+
+
+
+
+
+  #=============================================================================
+  # export xlsx
+  #=============================================================================
+  if(!is.null(save.path)){
+    Export___xlsx___Highlighting(data.df             = melted_Corr_Sub.df,
+                                 colors.list         = "#ABEBC6",
+                                 which_cols.list     = names(melted_Corr_Sub.df),
+                                 coloring_index.list = which(melted_Corr_Sub.df$Adj_p.value <= alpha),
+                                 save.path           = save.path ,
+                                 file.name           = paste0("[", method, " Correlation] ", x_lab, " vs ", y_lab),
+                                 sheet.name          = "Correlation Results")
+
+  }
 
 
 
