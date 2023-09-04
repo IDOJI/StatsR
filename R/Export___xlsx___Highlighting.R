@@ -31,6 +31,8 @@ Export___xlsx___Highlighting = function(data.df,
   #===========================================================================
   # Creating workbook
   #===========================================================================
+  install_package("openxlsx")
+
   ### Create a new workbook
   wb = openxlsx::createWorkbook()
 
@@ -38,8 +40,7 @@ Export___xlsx___Highlighting = function(data.df,
   openxlsx::addWorksheet(wb, sheetName = sheet.name)
 
   ### write dataset
-  openxlsx::writeData(wb, sheet=sheet.name, x=data.df, na.string = "")
-
+  openxlsx::writeData(wb, sheet=sheet.name, x=data.df, na.string = "") # error 발생시 df의 원소들을 character로 바꿔볼 것
 
 
   #===========================================================================

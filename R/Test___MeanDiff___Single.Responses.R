@@ -33,17 +33,58 @@ Test___MeanDiff___Single.Responses = function(Data,
 
 
 
+
+
+
+
+
+
+
   #==================================================================================
-  # Adjust p.vals & Significance
+  # Adjust p-values
+  #==================================================================================
+  # adjust method
   p.adjust.method = match.arg(p.adjust.method)
-  test = do.call(rbind, Results_ANOVA)
-  p.vals = sapply(Results_ANOVA, function(x){x %>% select(!!p.value_colname) %>% unlist() %>% unname()}) %>% as.vector()
-  Adjusted_p.vals = Test___Adjust.p.values(p.vals, method = p.adjust.method, alpha = alpha_ANOVA)
-  # Adjusted_p.vals.list = split(Adjusted_p.vals, seq_len(nrow(Adjusted_p.vals)))
-  for(i in 1:length(Results_ANOVA)){
-    Results_ANOVA[[i]] = cbind(Results_ANOVA[[i]], Adjusted_p.vals[i,])
-  }
 
+  # Combine results
+  # Combined_Results_ANOVA = do.call(rbind, Results_ANOVA)
+
+  # Extract p.vals
+  p.vals = sapply(Results_ANOVA, function(x){x %>% select(!!p.value_colname) %>% unlist() %>% unname()}) %>% as.vector()
+
+  # Adjust p.vals
+  Adjusted_p.vals = Test___Adjust.p.values(p.vals, method = p.adjust.method, alpha = alpha_ANOVA)
+
+
+  # Replace p.vals and method
+  Results_ANOVA_New = Results_ANOVA
+  Adjusted_p.vals_New = Adjusted_p.vals
+
+  for(m in 1:length(Results_ANOVA_New)){
+    # mth ANOVA results
+    mth_Results_ANOVA = Results_ANOVA_New[[m]]
+
+    # mth nrow
+    mth_nrow = mth_Results_ANOVA %>% nrow
+
+    # replace pvals
+    mth_Results_ANOVA$p.value_Comparison = Adjusted_p.vals_New[1:mth_nrow]
+
+
+    # Decide significance
+    mth_Results_ANOVA$Significance = SUB___P.vals.Signif.Stars(mth_Results_ANOVA$p.value_Comparison)
+
+
+    # replace adjustment method
+    mth_Results_ANOVA$p.adjust.method = p.adjust.method
+
+    # remove the added p.vals
+    Adjusted_p.vals_New = Adjusted_p.vals_New[-c(1:mth_nrow)]
+
+    # replace new results
+    Results_ANOVA_New[[m]] = mth_Results_ANOVA
+  }
+  Results_ANOVA = Results_ANOVA_New
 
 
 
@@ -53,7 +94,7 @@ Test___MeanDiff___Single.Responses = function(Data,
 
 
   #==================================================================================
-  # Add group1 & group2
+  # Add group1 & group2 for 2 groups results only
   #==================================================================================
   Groups = Data %>% select(!!Group_Var) %>% unlist() %>% unique
   n_Groups = Groups %>% length

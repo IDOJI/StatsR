@@ -20,3 +20,14 @@ Test___Corr___Correlation.and.P.values = function(Data, x_Vars, y_Vars, type){
 
   return(Result.list)
 }
+?correlation::correlation
+
+
+
+
+
+hist(iris$Sepal.Length, main = "Original data")
+
+hist(winsorize(iris$Sepal.Length, threshold = 0.2),
+     xlim = c(4, 8), main = "Percentile Winsorization"
+)

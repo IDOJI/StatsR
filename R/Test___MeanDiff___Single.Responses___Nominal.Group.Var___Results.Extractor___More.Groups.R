@@ -6,7 +6,9 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor___Mor
   #===========================================================================
   Results = ggstatsplot::extract_stats(p)
   Mean.Diff = Results$subtitle_data
-  Post.Hoc = Results$pairwise_comparisons_data %>% rename("p.value_Comparison" := "p.value")
+  Post.Hoc = Results$pairwise_comparisons_data %>%
+    rename("p.value_Comparison" := "p.value") %>%
+    rename("Post.Hoc_Test" := "test")
 
 
 

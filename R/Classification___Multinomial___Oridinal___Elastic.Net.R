@@ -159,10 +159,44 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
                                                         title = title,
                                                         path_Export = path_Export)
 
+
   Final_Results.list = c(list(Best_Fit = Best_Fit_Final), Results.list)
+
+
   if(!is.null(path_Export)){
+    # save RDS
     saveRDS(Final_Results.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
+
+
+    # 1) best hyperparameters
+    Best_hyperparameters = data.frame(best_lambda = Final_Results.list$Best_Fit$lambdaVals, best_alpha = Final_Results.list$Best_alpha)
+    write.csv(Best_hyperparameters, paste0(path_Export, "/", "Best_hyperparameters.csv"))
+
+    # 2) Misclassified subjects
+    Misclassified_Subjects = Final_Results.list$Misclassified_Subjects
+    Misclassified_Subjects = tibble::rownames_to_column(Misclassified_Subjects, "Variables")
+    write.csv(Misclassified_Subjects, paste0(path_Export, "/", "Misclassified_Subjects.csv"))
+
+
+    # 3) Coefficients
+    Coefficients = Final_Results.list$Fit_Coef
+    Coefficients = tibble::rownames_to_column(as.data.frame(Coefficients), "Variables")
+    write.csv(Coefficients, paste0(path_Export, "/", "Coefficients.csv"))
+
+
+    # 4) Confusion matrix
+    Confusion = Final_Results.list$Confusion_Matrix %>% as.matrix %>% as.data.frame
+    Confusion.mat = Confusion %>% spread(key = Actual, value = Freq) %>% column_to_rownames(var = "Predicted") %>% as.data.frame
+    write.csv(Confusion.mat, paste0(path_Export, "/", "Confusion.mat.csv"))
+
+
+    # 5) Misclassification rate
+    Misclassification_Rate = Final_Results.list$Misclassification_Rate
+    write.csv(Misclassification_Rate, paste0(path_Export, "/", "Misclassification_Rate.csv"))
+
+
   }
+
 
 
   cat("\n", crayon::green("Congratulation! The fitting is done!"),"\n")
