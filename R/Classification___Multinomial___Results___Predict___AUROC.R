@@ -1,28 +1,8 @@
-Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test, y_Test, AUC_in_Legend = FALSE, title, path_Export=NULL){
+Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Probs, y_Test, AUC_in_Legend = FALSE, title, path_Export=NULL){
   #=============================================================================
   # pacakges
   #=============================================================================
   install_packages(c("pROC", "ggplot2", "dplyr"), load = TRUE)
-
-
-
-
-
-
-
-
-  #=============================================================================
-  # Prediction
-  #=============================================================================
-  Predicted_values = predict(fit, newx = X_Test)
-
-
-
-
-
-
-
-
 
 
 
@@ -39,7 +19,7 @@ Classification___Multinomial___Results___Predict___AUROC = function(fit, X_Test,
 
 
     # Compute ROC
-    ith_ROC = roc(binary_labels, Predicted_values[,i])
+    ith_ROC = roc(binary_labels, Predicted_Probs[,i])
 
 
     # AUC & its CI

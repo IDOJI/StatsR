@@ -3,29 +3,42 @@ Classification___Multinomial = function(X_Train,
                                         X_Test = NULL,
                                         y_Test = NULL,
                                         y_varname = NULL,
+                                        x_varname = NULL,
                                         standardize = T,
-                                        method = c("MLE", "Elastic"),
+                                        #=======================================
+                                        fitting.method = c("MLE", "Elastic"),
+                                        penatly_alpha=NULL,
+                                        penalty_lambda=NULL,
                                         response_type = c("Nominal", "Ordinal"),
                                         family = "cumulative",
                                         link = "logit",
                                         tuneMethod = "cvMisclass",
                                         best.model.criterion = "misclass",
                                         folds,
+                                        #=======================================
                                         AUC_in_Legend = T,
                                         title = "",
-                                        path_Export,
+                                        path_Export=NULL,
                                         ...){
   #=============================================================================
   # arguments
   #=============================================================================
-  response_type_choices = tolower(response_type)
+  reponse_type_choices = c("Nominal", "Ordinal") %>% tolower
+  response_type = match.arg(tolower(response_type), reponse_type_choices)
 
-  response_type = match.arg(response_type_choices)
 
-  if(!response_type %in% response_type_choices) {
-    stop("Invalid reponse_type choice.")
+
+
+
+
+
+  #=============================================================================
+  # standardize data
+  #=============================================================================
+  if(standardize){
+    X_Train = X_Train %>% mutate_all(scale)
+    X_Test = X_Test %>% mutate_all(scale)
   }
-
 
 
 
@@ -37,7 +50,26 @@ Classification___Multinomial = function(X_Train,
   if(response_type == "nominal"){
     Results = Classification___Multinomial___Nominal(X_Train, y_Train, ...)
   }else if(response_type == "ordinal"){
-    Results = Classification___Multinomial___Ordinal(X_Train, y_Train, ...)
+    Results = Classification___Multinomial___Ordinal(X_Train,
+                                                     y_Train,
+                                                     X_Test,
+                                                     y_Test,
+                                                     y_varname,
+                                                     x_varname,
+                                                     standardize,
+                                                     #=======================================
+                                                     fitting.method,
+                                                     penatly_alpha,
+                                                     penalty_lambda,
+                                                     family,
+                                                     link,
+                                                     tuneMethod,
+                                                     best.model.criterion,
+                                                     folds,
+                                                     #=======================================
+                                                     AUC_in_Legend ,
+                                                     title,
+                                                     path_Export)
   }
 
 
@@ -46,6 +78,7 @@ Classification___Multinomial = function(X_Train,
   #=============================================================================
   # Return
   #=============================================================================
+  cat("\n",crayon::green("Fitting a model is done!") ,"\n")
   return(Results)
 }
 

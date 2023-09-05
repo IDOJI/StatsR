@@ -1,23 +1,22 @@
 Classification___Multinomial___Oridinal___Elastic = function (X_Train,
                                                               y_Train,
-                                                              X_Test=NULL,
-                                                              y_Test=NULL,
+                                                              X_Test = NULL,
+                                                              y_Test = NULL,
                                                               y_varname = NULL,
-                                                              standardize = TRUE,
-                                                              #=============================== Modeling
-                                                              family = c("cumulative", "sratio", "cratio", "acat"),
-                                                              link = c("logit", "probit", "cloglog", "cauchit"),
-                                                              tuneMethod = c("cvMisclass", "cvLoglik", "cvBrier", "cvDevPct", "aic", "bic"),
-                                                              best.model.criterion = c("misclass", "brier", "loglik", "devPct"),
-                                                              folds = NULL,
-                                                              alpha_seq = seq(0, 1, 0.1),
-                                                              lambdaVals = NULL,
-                                                              printProgress = TRUE,
-                                                              warn = TRUE,
-                                                              #=============================== Prediction & AUC
-                                                              AUC_in_Legend = FALSE,
-                                                              title = NULL,
-                                                              path_Export = NULL){
+                                                              x_varname = NULL,
+                                                              standardize = T,
+                                                              #=======================================
+                                                              penatly_alpha = NULL,
+                                                              penalty_lambda = NULL,
+                                                              family = "cumulative",
+                                                              link = c("logit", "logistic", "probit", "loglog", "cloglog", "cauchit"),
+                                                              tuneMethod = "cvMisclass",
+                                                              best.model.criterion = "misclass",
+                                                              folds,
+                                                              #=======================================
+                                                              AUC_in_Legend = T,
+                                                              title = "",
+                                                              path_Export){
   # folds = Train_Fold_Index
   # alpha_seq =
   #=============================================================================
@@ -147,7 +146,7 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
 
 
   #=============================================================================
-  # Extract results and prediction
+  # Extract results and prediction & Exporting
   #=============================================================================
   Results.list = Classification___Multinomial___Results(Best_Fit = Best_Fit_Final,
                                                         Best_alpha = best_alpha,
@@ -157,43 +156,6 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
                                                         title = title,
                                                         path_Export = path_Export)
 
-
-  Final_Results.list = c(list(Best_Fit = Best_Fit_Final), Results.list)
-
-
-  if(!is.null(path_Export)){
-    # save RDS
-    saveRDS(Final_Results.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
-
-
-    # 1) best hyperparameters
-    Best_hyperparameters = data.frame(best_lambda = Final_Results.list$Best_Fit$lambdaVals, best_alpha = Final_Results.list$Best_alpha)
-    write.csv(Best_hyperparameters, paste0(path_Export, "/", "Best_hyperparameters.csv"))
-
-    # 2) Misclassified subjects
-    Misclassified_Subjects = Final_Results.list$Misclassified_Subjects
-    Misclassified_Subjects = tibble::rownames_to_column(Misclassified_Subjects, "Variables")
-    write.csv(Misclassified_Subjects, paste0(path_Export, "/", "Misclassified_Subjects.csv"))
-
-
-    # 3) Coefficients
-    Coefficients = Final_Results.list$Fit_Coef
-    Coefficients = tibble::rownames_to_column(as.data.frame(Coefficients), "Variables")
-    write.csv(Coefficients, paste0(path_Export, "/", "Coefficients.csv"))
-
-
-    # 4) Confusion matrix
-    Confusion = Final_Results.list$Confusion_Matrix %>% as.matrix %>% as.data.frame
-    Confusion.mat = Confusion %>% spread(key = Actual, value = Freq) %>% column_to_rownames(var = "Predicted") %>% as.data.frame
-    write.csv(Confusion.mat, paste0(path_Export, "/", "Confusion.mat.csv"))
-
-
-    # 5) Misclassification rate
-    Misclassification_Rate = Final_Results.list$Misclassification_Rate
-    write.csv(Misclassification_Rate, paste0(path_Export, "/", "Misclassification_Rate.csv"))
-
-
-  }
 
 
 
