@@ -1,4 +1,4 @@
-Classification___Multinomial___Results = function(Best_Fit, Best_alpha, X_Test=NULL, y_Test=NULL, AUC_in_Legend=FALSE, title=NULL, path_Export=NULL){
+Classification___Multinomial___Results = function(Best_Fit, Best_alpha=NULL, X_Test=NULL, y_Test=NULL, AUC_in_Legend=FALSE, title=NULL, path_Export=NULL){
   #=============================================================================
   # Extracting Results
   #=============================================================================

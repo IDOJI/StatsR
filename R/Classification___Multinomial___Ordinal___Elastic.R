@@ -1,22 +1,23 @@
-Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
-                                                                  y_Train,
-                                                                  X_Test=NULL,
-                                                                  y_Test=NULL,
-                                                                  standardize = TRUE,
-                                                                  #=============================== Modeling
-                                                                  family = c("cumulative", "sratio", "cratio", "acat"),
-                                                                  link = c("logit", "probit", "cloglog", "cauchit"),
-                                                                  tuneMethod = c("cvMisclass", "cvLoglik", "cvBrier", "cvDevPct", "aic", "bic"),
-                                                                  best.model.criterion = c("misclass", "brier", "loglik", "devPct"),
-                                                                  folds = NULL,
-                                                                  alpha_seq = seq(0, 1, 0.1),
-                                                                  lambdaVals = NULL,
-                                                                  printProgress = TRUE,
-                                                                  warn = TRUE,
-                                                                  #=============================== Prediction & AUC
-                                                                  AUC_in_Legend = FALSE,
-                                                                  title = NULL,
-                                                                  path_Export = NULL){
+Classification___Multinomial___Oridinal___Elastic = function (X_Train,
+                                                              y_Train,
+                                                              X_Test=NULL,
+                                                              y_Test=NULL,
+                                                              y_varname = NULL,
+                                                              standardize = TRUE,
+                                                              #=============================== Modeling
+                                                              family = c("cumulative", "sratio", "cratio", "acat"),
+                                                              link = c("logit", "probit", "cloglog", "cauchit"),
+                                                              tuneMethod = c("cvMisclass", "cvLoglik", "cvBrier", "cvDevPct", "aic", "bic"),
+                                                              best.model.criterion = c("misclass", "brier", "loglik", "devPct"),
+                                                              folds = NULL,
+                                                              alpha_seq = seq(0, 1, 0.1),
+                                                              lambdaVals = NULL,
+                                                              printProgress = TRUE,
+                                                              warn = TRUE,
+                                                              #=============================== Prediction & AUC
+                                                              AUC_in_Legend = FALSE,
+                                                              title = NULL,
+                                                              path_Export = NULL){
   # folds = Train_Fold_Index
   # alpha_seq =
   #=============================================================================
@@ -44,9 +45,6 @@ Classification___Multinomial___Oridinal___Elastic.Net = function (X_Train,
   # install.packages
   #=============================================================================
   install_packages(packages = "ordinalNet", load = T)
-
-
-
 
 
 

@@ -3,10 +3,13 @@ Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test,
   # Prediction
   #===========================================================================
   # Predicted Probabilities
-  Predicted_Prob = predict(fit, newx = X_Test, type = "response")
+  # Predicted_Prob = predict(fit, newx = X_Test, type = "response") # Ordinal_Elastic인 경우에는 잘 동작함.
+  Predicted_Prob = predict(fit, newdata = X_Test, type = "probs")
+  class(fit)
+  dim(Predicted_Prob)
 
   # Convert predicted probabilities to predicted classes
-  Predicted_classes = apply(Predicted_Prob, 1, which.max)
+  Predicted_classes = apply(Predicted_Prob, 1, which.max) %>% unname
 
 
 
@@ -15,7 +18,7 @@ Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test,
   # Compare the classification & Extract the misclassified subjects
   #===========================================================================
   y_Test_New = as.integer(y_Test)
-  Index_Misclassified = which(Predicted_classes!=y_Test_New)
+  Index_Misclassified = which(Predicted_classes != y_Test_New)
   Misclassified.df = cbind(Group = as.character(y_Test[Index_Misclassified]), X_Test[Index_Misclassified, ] %>% as.data.frame)
 
 
