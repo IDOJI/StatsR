@@ -124,7 +124,7 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
   # Export plot
   #=============================================================================
   if(!is.null(path_Export)){
-    ggsave(filename = paste0(path_Export, "/ROC_plot.png"), plot = p, width = 10, height = 8, dpi = 300)
+    ggsave(filename = paste0(path_Export, "/ROC_plot.png"), plot = p, width = 10, height = 8, dpi = 300, bg  = "white")
   }
 
 

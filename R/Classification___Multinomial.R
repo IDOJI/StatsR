@@ -35,7 +35,7 @@ Classification___Multinomial = function(X_Train,
   #=============================================================================
   # standardize data
   #=============================================================================
-  if(standardize){
+  if(standardize & fitting.method%in%c("elastic", "Elastic")){
     X_Train = X_Train %>% mutate_all(scale)
     X_Test = X_Test %>% mutate_all(scale)
   }

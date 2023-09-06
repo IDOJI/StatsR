@@ -12,13 +12,13 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
                                                               link = c("logit", "logistic", "probit", "loglog", "cloglog", "cauchit"),
                                                               tuneMethod = "cvMisclass",
                                                               best.model.criterion = "misclass",
-                                                              folds,
+                                                              Train_Folds_Index,
                                                               #=======================================
                                                               AUC_in_Legend = T,
                                                               title = "",
                                                               path_Export){
-  # folds = Train_Fold_Index
-  # alpha_seq =
+  # Train_Folds_Index = Train_Fold_Index
+  # penatly_alpha =
   #=============================================================================
   # path
   #=============================================================================
@@ -53,20 +53,20 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
   #=============================================================================
   # fitting by CV
   #=============================================================================
-  Fit_CV.list = lapply(alpha_seq, function(ith_alpha, ...){
+  Fit_CV.list = lapply(penatly_alpha, function(ith_alpha, ...){
     tictoc::tic()
     # Fitting CV for ith_alpha
-    ith_Fit_CV = ordinalNetCV(x = X_Train,
-                              y = y_Train,
+    ith_Fit_CV = ordinalNetCV(x = X_Train %>% as.matrix,
+                              y = y_Train %>% unlist,
                               standardize = standardize,
                               family = family,
                               link = link,
                               tuneMethod = tuneMethod,
                               lambdaVals = lambdaVals,
                               alpha = ith_alpha,
-                              folds = folds,
-                              printProgress = printProgress,
-                              warn = warn)
+                              fold = Train_Folds_Index,
+                              printProgress = TRUE,
+                              warn = TRUE)
     saveRDS(ith_Fit_CV, file = paste0(path_Export, "/", "Fit_CV", "___", ith_alpha, ".rds"))
     tictoc::toc()
 
@@ -102,8 +102,10 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
     ith_Fit_CV[names(ith_Fit_CV)==best.model.criterion]
   })
   best_ind = which_best(Combined_Criteria)
-  best_alpha = alpha_seq[best_ind]
+  best_alpha = penatly_alpha[best_ind]
   # best_lambda = Fit_CV.list[[best_ind]][1]
+
+
 
 
 
@@ -114,8 +116,8 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
   #=============================================================================
   # Fit again with best parameters
   #=============================================================================
-  Best_Fit = ordinalNet(x = X_Train,
-                        y = y_Train,
+  Best_Fit = ordinalNet(x = X_Train %>% as.matrix,
+                        y = y_Train %>% unlist,
                         alpha = best_alpha,
                         standardize = standardize,
                         family = family,
@@ -128,9 +130,9 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
     stop("Best indice of AIC and BIC are different!")
   }
 
-
-  Best_Fit_Final = ordinalNet(x = X_Train,
-                              y = y_Train,
+  # Fit again using best parameters
+  Best_Fit_Final = ordinalNet(x = X_Train %>% as.matrix,
+                              y = y_Train %>% unlist,
                               alpha = best_alpha,
                               lambdaVals = best_lambda,
                               standardize = standardize,
@@ -148,10 +150,12 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
   #=============================================================================
   # Extract results and prediction & Exporting
   #=============================================================================
-  Results.list = Classification___Multinomial___Results(Best_Fit = Best_Fit_Final,
+  Results.list = Classification___Multinomial___Results(fit = Best_Fit_Final,
                                                         Best_alpha = best_alpha,
                                                         X_Test = X_Test,
                                                         y_Test = y_Test,
+                                                        x_varname,
+                                                        y_varname,
                                                         AUC_in_Legend = AUC_in_Legend,
                                                         title = title,
                                                         path_Export = path_Export)
