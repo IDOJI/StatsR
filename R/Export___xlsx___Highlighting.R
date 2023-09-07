@@ -5,6 +5,14 @@ Export___xlsx___Highlighting = function(data.df,
                                         save.path, # save.path = "C:/Users/IDO/OneDrive/github/Rpkgs/StatAnalysis"
                                         file.name,  # file.name = "test"
                                         sheet.name){
+  #===========================================================================
+  # replace NA with ""
+  #===========================================================================
+  data.df[is.na(data.df)] = ""
+
+
+
+
 
   #===========================================================================
   # length of colors
@@ -65,6 +73,9 @@ Export___xlsx___Highlighting = function(data.df,
   ### Save Results
   save.path = path_tail_slash(save.path)
   openxlsx::saveWorkbook(wb, paste0(save.path, file.name, ".xlsx"), overwrite=TRUE)
+  #To save a data frame to an Excel file without "NA" values using the openxlsx package,
+  # you'll first need to replace the NA values in your data frame with an empty string "".
+  # After that, you can utilize the createWorkbook() and addWorksheet() functions from openxlsx to save the modified data frame as an Excel file.
   cat("\n", crayon::blue("Writing an xlsx is done!"),"\n")
 }
 

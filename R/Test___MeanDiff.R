@@ -27,7 +27,9 @@ Test___MeanDiff = function(##############################
                            # exporting
                            ##############################
                            save.path = NULL,
-                           file.name = NULL){
+                           file.name = NULL,
+                           export.separately=TRUE,
+                           ...){
   #==================================================================================
   # path
   #==================================================================================
@@ -95,7 +97,7 @@ Test___MeanDiff = function(##############################
     if(is.null(file.name)){
       file.name = paste0("[ANOVA] Results_", "`", Group_Var, "`")
     }
-    Test___MeanDiff___Export.xlsx.Highlight(Results_ANOVA, save.path, file.name)
+    Test___MeanDiff___Export.xlsx.Highlight(Results_ANOVA, save.path, file.name, export.separately)
   }
 
 
@@ -107,14 +109,14 @@ Test___MeanDiff = function(##############################
   #==================================================================================
   # 5) Boxplot
   #==================================================================================
-  Boxplot.list = lapply(Results_ANOVA, function(ith_Results){
-    Test___MeanDiff___Single.Responses___Box.Plot(Data,
-                                                  ith_Results,
-                                                  label.as.p.val,
-                                                  group.comparison,
-                                                  lines.connecting.medians,
-                                                  save.path)
-  })
+  # Boxplot.list = lapply(Results_ANOVA, function(ith_Results){
+  #   Test___MeanDiff___Single.Responses___Box.Plot(Data,
+  #                                                 ith_Results,
+  #                                                 label.as.p.val,
+  #                                                 group.comparison,
+  #                                                 lines.connecting.medians,
+  #                                                 save.path)
+  # })
 
 
 

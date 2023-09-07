@@ -29,6 +29,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
+
   #==================================================================================
   # Extract Results
   #==================================================================================
@@ -39,6 +40,14 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                                Response_Var = Response_Vars[n])
   })
   names(Extracted_Results.list) = Response_Vars
+
+
+
+
+
+
+
+
 
 
 

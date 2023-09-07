@@ -34,6 +34,18 @@ Test___MeanDiff___Single.Responses = function(Data,
 
 
 
+  #==================================================================================
+  # Which ANOVA were significant?
+  #==================================================================================
+  p.values = sapply(Results_ANOVA, function(x) x[1,"p.value"])
+  adj_p.values = Test___Adjust.p.values(raw_p.vals = p.values, method = p.adjust.method, alpha = alpha_ANOVA)
+  which_significant = which(adj_p.values <= alpha_ANOVA)
+
+
+
+
+
+
 
 
 
@@ -50,17 +62,20 @@ Test___MeanDiff___Single.Responses = function(Data,
   # Combined_Results_ANOVA = do.call(rbind, Results_ANOVA)
 
   # Extract p.vals
-  p.vals = sapply(Results_ANOVA, function(x){x %>% select(!!p.value_colname) %>% unlist() %>% unname()}) %>% as.vector()
+  p.vals = sapply(Results_ANOVA, function(x){x %>% select(!!p.value_colname) %>% unlist() %>% unname()})
+  p.vals = p.vals[,which_significant]
+
 
   # Adjust p.vals
-  Adjusted_p.vals = Test___Adjust.p.values(p.vals, method = p.adjust.method, alpha = alpha_ANOVA)
+  Adjusted_p.vals = Test___Adjust.p.values(raw_p.vals = p.vals, method = p.adjust.method, alpha = alpha_ANOVA)
 
 
   # Replace p.vals and method
   Results_ANOVA_New = Results_ANOVA
-  Adjusted_p.vals_New = Adjusted_p.vals
+  Adjusted_p.vals_New = Adjusted_p.vals %>% as.vector
 
-  for(m in 1:length(Results_ANOVA_New)){
+  for(m in which_significant){
+    # print(m)
     # mth ANOVA results
     mth_Results_ANOVA = Results_ANOVA_New[[m]]
 
@@ -70,10 +85,8 @@ Test___MeanDiff___Single.Responses = function(Data,
     # replace pvals
     mth_Results_ANOVA$p.value_Comparison = Adjusted_p.vals_New[1:mth_nrow]
 
-
     # Decide significance
     mth_Results_ANOVA$Significance = SUB___P.vals.Signif.Stars(mth_Results_ANOVA$p.value_Comparison)
-
 
     # replace adjustment method
     mth_Results_ANOVA$p.adjust.method = p.adjust.method
@@ -84,9 +97,20 @@ Test___MeanDiff___Single.Responses = function(Data,
     # replace new results
     Results_ANOVA_New[[m]] = mth_Results_ANOVA
   }
+
+
+
+
+
+  #==================================================================================
+  # Create new cols
+  #==================================================================================
+  for(k in 1:length(Results_ANOVA_New)){
+    if(!"Significance" %in% names(Results_ANOVA_New[[k]])){
+      Results_ANOVA_New[[k]]$Significance = "none"
+    }
+  }
   Results_ANOVA = Results_ANOVA_New
-
-
 
 
 
@@ -111,8 +135,39 @@ Test___MeanDiff___Single.Responses = function(Data,
 
 
 
+
+
+
   #==================================================================================
   # return
   #==================================================================================
   return(Results_ANOVA)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
