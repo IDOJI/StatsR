@@ -31,6 +31,17 @@ Classification___Multinomial = function(X_Train,
 
 
 
+  #=============================================================================
+  # path
+  #=============================================================================
+  if(!is.null(path_Export)){
+    dir.create(path_Export, F)
+  }
+
+
+
+
+
 
   #=============================================================================
   # standardize data
@@ -48,16 +59,20 @@ Classification___Multinomial = function(X_Train,
   # Fitting
   #=============================================================================
   if(response_type == "nominal"){
-    Results = Classification___Multinomial___Nominal(X_Train, y_Train, ...)
+
+    Results = Classification___Multinomial___Nominal(X_Train, y_Train)
+
+
+
   }else if(response_type == "ordinal"){
+
     Results = Classification___Multinomial___Ordinal(X_Train,
                                                      y_Train,
                                                      X_Test,
                                                      y_Test,
                                                      y_varname,
                                                      x_varname,
-                                                     standardize,
-                                                     #=======================================
+                                                     standardize,#
                                                      fitting.method,
                                                      penatly_alpha,
                                                      penalty_lambda,
@@ -65,9 +80,8 @@ Classification___Multinomial = function(X_Train,
                                                      link,
                                                      tuneMethod,
                                                      best.model.criterion,
-                                                     folds,
-                                                     #=======================================
-                                                     AUC_in_Legend ,
+                                                     folds,#
+                                                     AUC_in_Legend,
                                                      title,
                                                      path_Export)
   }
@@ -75,12 +89,35 @@ Classification___Multinomial = function(X_Train,
 
 
 
+
   #=============================================================================
   # Return
   #=============================================================================
-  cat("\n",crayon::green("Fitting a model is done!") ,"\n")
+  cat("\n", crayon::green("Fitting a model is done!"), "\n")
   return(Results)
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

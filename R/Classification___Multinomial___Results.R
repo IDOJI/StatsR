@@ -16,6 +16,12 @@ Classification___Multinomial___Results = function(fit,
 
   # Coefficients
   Fit_Coef = coef(fit, matrix=TRUE)
+  if(!is.null(fit$zeta)){
+    Fit_Coef = c(fit$zeta, Fit_Coef)
+    Fit_Coef = data.frame(Coef = names(Fit_Coef), value = Fit_Coef)
+  }
+
+
 
 
 
@@ -53,7 +59,8 @@ Classification___Multinomial___Results = function(fit,
   # Combined Results
   #=============================================================================
   Combined.list = c(list(Fit=fit, Fit_Summary = Fit_Summary, Best_alpha = Best_alpha, Fit_Coef = Fit_Coef, Cumulative_plot = Cumulative_plot),
-                    Prediction)
+                    Prediction,
+                    Cumulative_plot)
 
 
 

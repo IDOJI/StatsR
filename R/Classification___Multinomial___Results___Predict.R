@@ -3,7 +3,6 @@ Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test,
   # Prediction
   #===========================================================================
   # Predicted Probabilities
-
   newdata = X_Test %>% as_tibble %>% dplyr::select(all_of(x_varname))
   if(class(fit)=="ordinalNet"){
     Predicted_Probs = predict(fit, newx = X_Test %>% as.matrix, type = "response") # Ordinal_Elastic인 경우에는 잘 동작함.

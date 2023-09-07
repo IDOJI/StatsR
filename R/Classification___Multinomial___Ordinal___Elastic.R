@@ -140,8 +140,8 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
                               link = link)
 
 
-
-
+  # Best_Fit_Final = Fitting_3$Best_Fit
+  # best_alpha = Fitting_3$Best_alpha
 
 
 

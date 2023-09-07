@@ -21,11 +21,15 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
 
 
 
+
+
   #=============================================================================
   # Data combining
   #=============================================================================
   y_Train = y_Train %>% data.frame() %>% setNames(y_varname)
   Binded_Data = bind_cols(y_Train, X_Train) %>% as_tibble
+
+
 
 
 
@@ -39,10 +43,13 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
 
 
 
+
   #=============================================================================
   # Fit proportional odds model
   #=============================================================================
   fit = MASS::polr(SUB___as.formula(y_varname, x_varname), data = Binded_Data, Hess=TRUE, method = link) %>% suppressWarnings()
+
+
 
 
 
@@ -65,10 +72,20 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
 
 
 
+
+
   #=============================================================================
   # return results
   #=============================================================================
   return(Results)
 }
+
+
+
+
+
+
+
+
 
 

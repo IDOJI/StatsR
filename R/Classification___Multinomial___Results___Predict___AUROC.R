@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Probs, y_Test, AUC_in_Legend = FALSE, title, path_Export=NULL){
+Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Probs, y_Test_unlist, AUC_in_Legend = FALSE, title, path_Export=NULL){
   #=============================================================================
   # pacakges
   #=============================================================================
@@ -10,12 +10,12 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
   # Computing ROC
   #=============================================================================
   # Categories
-  Categories = levels(y_Test)
+  Categories = levels(y_Test_unlist)
 
   # Computing
   Extracted_ROC.list = lapply(seq_along(Categories), function(i, ...){
     # Binary version of true labels: 1 for current category, 0 for all other categories
-    binary_labels = ifelse(y_Test == Categories[i], 1, 0)
+    binary_labels = ifelse(y_Test_unlist == Categories[i], 1, 0)
 
 
     # Compute ROC
@@ -81,10 +81,11 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
     Categories_with_auc = paste(Categories, sprintf("(%.2f)", unlist(AUC)))
 
     p = ggplot(DF, aes(x = FPR, y = TPR, color = factor(Category, levels = Categories))) +
-      geom_line() +
+      geom_line(linewidth=1.5) +
       scale_color_manual(name = "Category", values = c("blue", "red", "green", "purple"), labels = Categories_with_auc) +
       labs(title = title, x = "1 - Specificity", y = "Sensitivity") +
       theme_minimal() +
+      theme(legend.key.size = unit(1, "cm")) +
       theme(legend.title = element_blank(),
             plot.title = element_text(size = 30, face = "bold", hjust = 0.5),  # Adjusting the title properties
             legend.text = element_text(size = 20),  # Adjusting the legend text size
@@ -96,13 +97,14 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
 
 
     p = ggplot(DF, aes(x = FPR, y = TPR, color = Category)) +
-      geom_line() +
+      geom_line(linewidth=1.5) +
       scale_color_manual(values = scales::hue_pal()(4)) +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
       geom_text(data = data.frame(AUC = unlist(AUC), Category = Categories, x = 0.2, y = c(0.9, 0.8, 0.7, 0.6)),
                 aes(x = x, y = y, label = sprintf("AUC: %.3f", AUC), color = Category), hjust = 0) +
       labs(title = title, x = "False Positive Rate", y = "True Positive Rate") +
       theme_minimal() +
+      theme(legend.key.size = unit(1, "cm")) +
       theme(legend.title = element_blank(),
             plot.title = element_text(size = 30, face = "bold", hjust = 0.5),  # Adjusting the title properties
             legend.text = element_text(size = 20),  # Adjusting the legend text size
@@ -112,7 +114,6 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
 
 
   }
-
 
 
 
