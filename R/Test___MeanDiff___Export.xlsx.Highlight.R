@@ -79,8 +79,7 @@ Test___MeanDiff___Export.xlsx.Highlight = function(Results_ANOVA, save.path, fil
   combined.df = Reduce(function(x, y) {
     merge(x, y, by = c("parameter2", "group1", "group2"))
   }, Combined.list)
-  write.csv(combined.df, file = paste0(save.path, "/Combined Results for Latex Table___", file.name, ".csv") ,na = "", row.names = F)
-
+  write.csv(combined.df, file = paste0(save.path, "/@_Combined Results for Latex Table___", file.name, ".csv") ,na = "", row.names = F)
 
 
 
@@ -89,10 +88,12 @@ Test___MeanDiff___Export.xlsx.Highlight = function(Results_ANOVA, save.path, fil
   #=============================================================================
   # Only p.values
   #=============================================================================
-
-
-
-
+  Results_p.val = lapply( Results_ANOVA , function(x){
+    x = x %>% dplyr::select(all_of(c("parameter1", "p.value", "Significance_Original")))
+    return(x[1,])
+  })
+  Results_p.val = do.call(rbind, Results_p.val)
+  write.csv(Results_p.val , paste0(save.path, "/@_Only p.values Combined Results for Latex Table___", file.name, ".csv") ,na = "", row.names = F)
 
 
 

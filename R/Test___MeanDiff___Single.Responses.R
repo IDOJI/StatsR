@@ -40,8 +40,25 @@ Test___MeanDiff___Single.Responses = function(Data,
   p.values = sapply(Results_ANOVA, function(x) x[1,"p.value"])
   adj_p.values = Test___Adjust.p.values(raw_p.vals = p.values, method = p.adjust.method, alpha = alpha_ANOVA)
   which_significant = which(adj_p.values <= alpha_ANOVA)
+  Significance_Original = SUB___P.vals.Signif.Stars(adj_p.values)
 
 
+  # adding significance
+  # Significance_Original = sapply(seq_along(adj_p.values), function(n){
+  #
+  #   if(n %in% which_significant){
+  #     Significance_Original = SUB___P.vals.Signif.Stars(adj_p.values[n])
+  #   }else{
+  #     Significance_Original = "None"
+  #   }
+  #
+  #   return("None")
+  # })
+
+  for(k in 1:length(Results_ANOVA)){
+    Results_ANOVA[[k]]$Significance_Original = c(Significance_Original[k], rep("", nrow(Results_ANOVA[[k]])-1))
+    Results_ANOVA[[k]] = Results_ANOVA[[k]] %>% relocate(Significance_Original, .after=p.value)
+  }
 
 
 
