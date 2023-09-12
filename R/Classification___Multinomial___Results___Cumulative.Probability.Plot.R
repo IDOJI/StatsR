@@ -1,4 +1,7 @@
-Classification___Multinomial___Results___Cumulative.Probability.Plot = function(fit, Data, x_varname, title_cum.plot = "Proportional Logit Model Curves", path_Export=NULL){
+Classification___Multinomial___Results___Cumulative.Probability.Plot = function(Fit_Coef,
+                                                                                Data,
+                                                                                x_varname,
+                                                                                path_Export=NULL){
   #=============================================================================
   # Data selection for plotting
   #=============================================================================
@@ -13,6 +16,16 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
 
 
   #=============================================================================
+  # Coefficients
+  #=============================================================================
+  intercepts = Fit_Coef$Intercept
+  slope = Fit_Coef$Slope
+
+
+
+
+
+  #=============================================================================
   # packages
   #=============================================================================
   install_packages(c("ggplot2", "dplyr"))
@@ -21,14 +34,11 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
 
 
 
-
-
-
   #=============================================================================
   # Define the logistic CDF
   #=============================================================================
-  logit_cdf = function(x,intercept, beta) {
-    exp(intercept + beta * x) / (1 + exp(intercept + beta * x))
+  logit_cdf = function(x,intercept, slope) {
+    exp(intercept + slope * x) / (1 + exp(intercept + slope * x))
   }
 
 
@@ -37,33 +47,10 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
 
 
   #=============================================================================
-  # Extract beta & intercepts
+  # slope
   #=============================================================================
-  if(class(fit)=="polr"){
-    summary_fit = summary(fit)
-    intercepts = summary_fit$coefficients[-1,1] %>% cumsum
-    beta = summary_fit$coefficients[1,1]
-
-  }else if(class(fit) == "ordinalNet"){
-    summary_fit = fit$coefs %>% as.data.frame
-    which_intercepts = grep("Intercept", names(summary_fit))
-
-    intercepts = summary_fit[1,which_intercepts] %>% unlist
-    beta = summary_fit[1,-which_intercepts]
-
-
-  }else{
-
-  }
-
-
-
-
-  #=============================================================================
-  # beta
-  #=============================================================================
-  if(length(beta)>1){
-    beta = beta[names(beta)==x_varname] %>% unlist
+  if(length(slope)>1){
+    slope = slope[names(slope)==x_varname] %>% unlist
   }
 
 
@@ -73,18 +60,39 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
   # Exporting intercepts information
   #=============================================================================
   levels = y_Test %>% unlist %>% levels
-  # if(beta<0){
+  # if(slope<0){
   #   levels = rev(levels)
   # }
+
 
   install_packages("tibble")
   # transition within groups
   transitions <- sapply(1:length(intercepts), function(i) {
-    paste(levels[i], " | ", levels[i + 1])
+    paste0(levels[i], " | ", levels[i + 1])
   })
+  transitions_2 <- sapply(1:length(intercepts), function(i) {
+    paste0(levels[i], "|", levels[i + 1])
+  })
+
+
+
+  if(grep("Intercept", names(intercepts)) %>% length == 0){
+    names(intercepts) = transitions_2
+  }
+
+
   # Save the dataframe to CSV
-  intercepts.df = tibble(Numbering = names(intercepts), Threshold = transitions, Coefficient = intercepts %>% unlist)
-  write.csv(intercepts.df, paste0(path_Export, "/0.Transition_threshold_info.csv"), row.names = FALSE)
+  if(sum(transitions_2==names(intercepts)) == length(intercepts)){
+    intercepts.df = tibble(Numbering = names(intercepts), Threshold = transitions, Coefficient = intercepts %>% unlist)
+    write.csv(intercepts.df, paste0(path_Export, "/0.Transition_threshold_info.csv"), row.names = FALSE)
+  }else{
+    stop("The names of intercepts are different!")
+  }
+
+
+
+
+
 
 
 
@@ -100,16 +108,18 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
   # where the cumulative probability is within a certain range.
   # For instance, if you want to focus on the range where cumulative probabilities lie between 0.01 and 0.99,
   # you could solve for these boundaries:
-  solve_for_x = function(p, intercept, beta) {
-    log((1 / p) - 1) / (-beta) - intercept/beta
+  solve_for_x = function(p, intercept, slope) {
+    log((1 / p) - 1) / (-slope) - intercept/slope
   }
-  x_min = sapply(intercepts, function(a) solve_for_x(0.01, a, beta)) %>% unlist %>% min()
-  x_max = sapply(intercepts, function(a) solve_for_x(0.99, a, beta)) %>% unlist %>% max()
+
+  x_min = sapply(intercepts, function(a) solve_for_x(0.001, a, slope)) %>% unlist %>% min() %>% suppressWarnings()
+  x_max = sapply(intercepts, function(a) solve_for_x(0.999, a, slope)) %>% unlist %>% max() %>% suppressWarnings()
   if(x_min > x_max){
-    x = seq(x_max, x_min, by = 0.01)
+    x = seq(x_max-20, x_min+20, by = 0.01)
   }else{
-    x = seq(x_min, x_max, by = 0.01)
+    x = seq(x_min-20, x_max+20, by = 0.01)
   }
+  # x = seq(-30,30,0.01)
 
 
 
@@ -123,17 +133,20 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
   #=============================================================================
   # Curve values
   Curves = lapply(intercepts, function(a, ...){
-    logit_cdf(x, a, beta)
+    logit_cdf(x, a, slope)
   })
   # Curves.df = do.call(cbind, Curves) %>% as_tibble %>% setNames(paste0("Curve", 1:length(intercepts)))
   Curves.df = do.call(cbind, Curves) %>% as_tibble
-  if(beta>0){
-    # Curves.df <- Curves.df %>% setNames(LETTERS[1:ncol(Curves.df)]) # ABC로 이름을 정하는 경우
-    Curves.df <- Curves.df %>% setNames(intercepts.df$Threshold) # 그룹|그룹으로 이름을 정하는 경우
-  }else if(beta<0){
-    Curves.df = Curves.df %>% setNames(length(intercepts):1)
-    stop("beta<0 and make should the labeling of plots' curves")
-  }
+  names(Curves.df) = transitions
+
+  # if(slope>0){
+  #   # Curves.df <- Curves.df %>% setNames(LETTERS[1:ncol(Curves.df)]) # ABC로 이름을 정하는 경우
+  #   Curves.df <- Curves.df %>% setNames(intercepts.df$Threshold) # 그룹|그룹으로 이름을 정하는 경우
+  # }else if(slope<0){
+  #   Curves.df = Curves.df %>% setNames(intercepts.df$Threshold)
+  #
+  #   stop("slope<0 and make should the labeling of plots' curves")
+  # }
   Binded.df = cbind(x, Curves.df)
 
   # Convert data to long format for plotting
@@ -142,6 +155,9 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
 
   # Explicitly set the levels of the Curve column:
   Long.df$Curve <- factor(Long.df$Curve, levels = colnames(Curves.df))
+
+
+
 
 
 
@@ -161,10 +177,12 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
 
 
 
+
+
   #=============================================================================
   # New data based on curve values
   #=============================================================================
-  # if (beta < 0) {
+  # if (slope < 0) {
   #   ylab_text <- expression("P(Y" > "j)")
   # } else {
   #   ylab_text <- expression("P(Y" <= "j)")
@@ -173,7 +191,7 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
 
   p_cumulative = ggplot(Long.df, aes(x = x, y = Value, color = Curve)) +
     geom_line(linewidth=1.5) +
-    labs(title = title_cum.plot) +
+    # labs(title = "Proportional Logit Model Curves") +
     xlab(x_varname) +
     ylab(ylab_text) +
     scale_color_brewer(palette = "Set2") +
@@ -264,7 +282,7 @@ Classification___Multinomial___Results___Cumulative.Probability.Plot = function(
     geom_line(linewidth = 1.5) +
     # labs(title = title_cum.plot,
     #      x = names(Data)) +
-    labs(title = title_cum.plot) +
+    # labs(title = title_cum.plot) +
     ylab(ylab_text) +
     xlab(x_varname) +
     scale_color_brewer(palette = "Set2") +

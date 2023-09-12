@@ -97,31 +97,31 @@ Test___MeanDiff = function(##############################
     if(is.null(file.name)){
       file.name = paste0("[ANOVA] Results_", "`", Group_Var, "`")
     }
-    Test___MeanDiff___Export.xlsx.Highlight(Results_ANOVA, save.path, file.name, export.separately)
+    Test___MeanDiff___Export.xlsx.Highlight(Results_ANOVA, save.path, file.name, export.separately, Group_Var_Type)
   }
 
 
-  # Combining tables for LaTeX
-  Combined.list = lapply(list.files(save.path, pattern = "@_Combined Results for Latex Table", full.names=T), read.csv)
-  First_Cols = Combined.list[[1]][,1:3]
-  Second_Cols = lapply(Combined.list, function(x) x[,-c(1:3)])
-  Combined_New.list = c(First_Cols, Second_Cols)
-  Combined_New.df = do.call(cbind, Combined_New.list)
-  Which_rows_to_highlight = apply(Combined_New.df, 1, function(x){
-    x = Combined_New.df[1,] %>% unlist
-    only_having_ns = sum(x[-c(1:3)] %in% c("none", "HNS", "NS")) == length(x)
-    return(!only_having_ns)
-  }) %>% which
-  Export___xlsx___Highlighting(Combined_New.df, colors.list = "red", which_cols.list = 1:ncol(Combined_New.df), coloring_index.list = Which_rows_to_highlight, save.path = save.path, file.name = "@@_Combined Results for Latex Table", sheet.name = "")
-  write.csv(Combined_New.df, paste0(save.path, "/@@_Combined Results for Latex Table", ".csv"), row.names=F)
-
+  # # Combining tables for LaTeX
+  # Combined.list = lapply(list.files(save.path, pattern = "@_Combined Results for Latex Table", full.names=T), read.csv)
+  # First_Cols = Combined.list[[1]][,1:3]
+  # Second_Cols = lapply(Combined.list, function(x) x[,-c(1:3)])
+  # Combined_New.list = c(First_Cols, Second_Cols)
+  # Combined_New.df = do.call(cbind, Combined_New.list)
+  # Which_rows_to_highlight = apply(Combined_New.df, 1, function(x){
+  #   x = Combined_New.df[1,] %>% unlist
+  #   only_having_ns = sum(x[-c(1:3)] %in% c("none", "HNS", "NS")) == length(x)
+  #   return(!only_having_ns)
+  # }) %>% which
+  # Export___xlsx___Highlighting(Combined_New.df, colors.list = "red", which_cols.list = 1:ncol(Combined_New.df), coloring_index.list = Which_rows_to_highlight, save.path = save.path, file.name = "@@_Combined Results for Latex Table", sheet.name = "")
+  # write.csv(Combined_New.df, paste0(save.path, "/@@_Combined Results for Latex Table", ".csv"), row.names=F)
+  #
 
 
 
 
   # Combining p.values
-  Combined.list = lapply(list.files(save.path, pattern = "@_Only p.values Combined Results", full.names=T), read.csv)
-  write.csv(do.call(rbind, Combined.list), paste0(save.path, "/@@_Only p.values Combined Results", ".csv"), row.names=F)
+  # Combined.list = lapply(list.files(save.path, pattern = "@_Only p.values Combined Results", full.names=T), read.csv)
+  # write.csv(do.call(rbind, Combined.list), paste0(save.path, "/@@_Only p.values Combined Results", ".csv"), row.names=F)
 
 
 

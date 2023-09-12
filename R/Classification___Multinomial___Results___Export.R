@@ -23,7 +23,7 @@ Classification___Multinomial___Results___Export = function(Combined.list, path_E
 
 
   # 3) Coefficients
-  Coefficients = Combined.list$Fit_Coef
+  Coefficients = Combined.list$Fit_Coef$Combined
   Coefficients = tibble::rownames_to_column(as.data.frame(Coefficients), "Variables_New")
   write.csv(Coefficients, paste0(path_Export, "/", "3.Coefficients.csv"), row.names=F)
   cat("\n", crayon::green("Exporting"), crayon::red("Coefficients"), crayon::green("is done!"), "\n")

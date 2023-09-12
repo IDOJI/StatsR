@@ -8,7 +8,6 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
                                                         link = c("logistic", "probit", "loglog", "cloglog", "cauchit"),
                                                         #=======================================
                                                         AUC_in_Legend = T,
-                                                        title = "",
                                                         path_Export=NULL,
                                                         ...){
   #=============================================================================
@@ -65,10 +64,18 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
                                                    x_varname,
                                                    y_varname,
                                                    AUC_in_Legend,
-                                                   title,
                                                    path_Export)
 
 
+
+
+
+
+  #=============================================================================
+  # interpretaion warning
+  #=============================================================================
+  # 음수 부호가 디폴트 모델이므로, 해석에 주의
+  # warning(paste0("Since polr uses the following logit ", "logit[P(Y <= j | X = x_i)] = a_j - bx_i", " the interpretation of the coefficiets should be careful!"))
 
 
 
@@ -79,13 +86,3 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
   #=============================================================================
   return(Results)
 }
-
-
-
-
-
-
-
-
-
-

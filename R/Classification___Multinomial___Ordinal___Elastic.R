@@ -1,29 +1,39 @@
-Classification___Multinomial___Oridinal___Elastic = function (X_Train,
-                                                              y_Train,
-                                                              X_Test = NULL,
-                                                              y_Test = NULL,
-                                                              y_varname = NULL,
-                                                              x_varname = NULL,
-                                                              standardize = T,
-                                                              #=======================================
-                                                              penatly_alpha = NULL,
-                                                              penalty_lambda = NULL,
-                                                              family = "cumulative",
-                                                              link = c("logit", "logistic", "probit", "loglog", "cloglog", "cauchit"),
-                                                              tuneMethod = "cvMisclass",
-                                                              best.model.criterion = "misclass",
-                                                              Train_Folds_Index,
-                                                              #=======================================
-                                                              AUC_in_Legend = T,
-                                                              title = "",
-                                                              path_Export){
+Classification___Multinomial___Ordinal___Elastic = function (X_Train,
+                                                            y_Train,
+                                                            X_Test = NULL,
+                                                            y_Test = NULL,
+                                                            y_varname = NULL,
+                                                            x_varname = NULL,
+                                                            standardize = T,
+                                                            #=======================================
+                                                            penalty_alpha = NULL,
+                                                            penalty_lambda = NULL,
+                                                            family = "cumulative",
+                                                            link = c("logit", "logistic", "probit", "loglog", "cloglog", "cauchit"),
+                                                            tuneMethod = "cvMisclass",
+                                                            best.model.criterion = "misclass",
+                                                            Train_Folds_Index,
+                                                            #=======================================
+                                                            AUC_in_Legend = T,
+                                                            path_Export){
   # Train_Folds_Index = Train_Fold_Index
-  # penatly_alpha =
+  # penalty_alpha =
+  #=============================================================================
+  # install.packages
+  #=============================================================================
+  install_packages(packages = c("ordinalNet", "fs"), load = T)
+
+
+
+
+
+
+
   #=============================================================================
   # path
   #=============================================================================
   if(!is.null(path_Export)){
-    dir.create(path_Export, FALSE)
+    fs::dir_create(path_Export, recurse=T)
   }
 
 
@@ -39,11 +49,11 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
 
 
 
+  #=============================================================================
+  # Input
+  #=============================================================================
+  X_Train_New = apply(X_Train, 2, as.numeric) %>% as.matrix()
 
-  #=============================================================================
-  # install.packages
-  #=============================================================================
-  install_packages(packages = "ordinalNet", load = T)
 
 
 
@@ -53,16 +63,16 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
   #=============================================================================
   # fitting by CV
   #=============================================================================
-  Fit_CV.list = lapply(penatly_alpha, function(ith_alpha, ...){
+  Fit_CV.list = lapply(penalty_alpha, function(ith_alpha, ...){
     tictoc::tic()
     # Fitting CV for ith_alpha
-    ith_Fit_CV = ordinalNetCV(x = X_Train %>% as.matrix,
+    ith_Fit_CV = ordinalNetCV(x = X_Train_New,
                               y = y_Train %>% unlist,
                               standardize = standardize,
                               family = family,
                               link = link,
                               tuneMethod = tuneMethod,
-                              lambdaVals = lambdaVals,
+                              lambdaVals = penalty_lambda,
                               alpha = ith_alpha,
                               fold = Train_Folds_Index,
                               printProgress = TRUE,
@@ -75,10 +85,10 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
     return(ith_Fit_CV_Mean)
   })
 
-#
-#   Fit_CV.list = lapply(list.files(path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
-#     readRDS(y) %>% summary %>% colMeans
-#   })
+
+  # Fit_CV.list = lapply(list.files(path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
+  #   readRDS(y) %>% summary %>% colMeans
+  # })
 
 
 
@@ -102,7 +112,7 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
     ith_Fit_CV[names(ith_Fit_CV)==best.model.criterion]
   })
   best_ind = which_best(Combined_Criteria)
-  best_alpha = penatly_alpha[best_ind]
+  best_alpha = penalty_alpha[best_ind]
   # best_lambda = Fit_CV.list[[best_ind]][1]
 
 
@@ -157,14 +167,13 @@ Classification___Multinomial___Oridinal___Elastic = function (X_Train,
                                                         x_varname,
                                                         y_varname,
                                                         AUC_in_Legend = AUC_in_Legend,
-                                                        title = title,
                                                         path_Export = path_Export)
 
 
 
 
   cat("\n", crayon::green("Congratulation! The fitting is done!"),"\n")
-  return(Final_Results.list)
+  return(Results.list)
 }
 
 

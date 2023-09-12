@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Probs, y_Test_unlist, AUC_in_Legend = FALSE, title, path_Export=NULL){
+Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Probs, y_Test_unlist, AUC_in_Legend = FALSE, path_Export=NULL){
   #=============================================================================
   # pacakges
   #=============================================================================
@@ -83,7 +83,7 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
     p = ggplot(DF, aes(x = FPR, y = TPR, color = factor(Category, levels = Categories))) +
       geom_line(linewidth=1.5) +
       scale_color_manual(name = "Category", values = c("blue", "red", "green", "purple"), labels = Categories_with_auc) +
-      labs(title = title, x = "1 - Specificity", y = "Sensitivity") +
+      labs(title = "", x = "1 - Specificity", y = "Sensitivity") +
       theme_minimal() +
       theme(legend.key.size = unit(1, "cm")) +
       theme(legend.title = element_blank(),
@@ -102,7 +102,7 @@ Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Pr
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
       geom_text(data = data.frame(AUC = unlist(AUC), Category = Categories, x = 0.2, y = c(0.9, 0.8, 0.7, 0.6)),
                 aes(x = x, y = y, label = sprintf("AUC: %.3f", AUC), color = Category), hjust = 0) +
-      labs(title = title, x = "False Positive Rate", y = "True Positive Rate") +
+      labs(title = "", x = "False Positive Rate", y = "True Positive Rate") +
       theme_minimal() +
       theme(legend.key.size = unit(1, "cm")) +
       theme(legend.title = element_blank(),

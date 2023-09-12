@@ -5,21 +5,14 @@ Classification___Multinomial___Results = function(fit,
                                                   x_varname=NULL,
                                                   y_varname=NULL,
                                                   AUC_in_Legend=FALSE,
-                                                  title=NULL,
                                                   path_Export=NULL){
   #=============================================================================
   # Extracting Results
   #=============================================================================
-  # summary
-  Fit_Summary = summary(fit)
+  Fit_Coef = Classification___Multinomial___Results___Coefficients(fit)
 
 
-  # Coefficients
-  Fit_Coef = coef(fit, matrix=TRUE)
-  if(!is.null(fit$zeta)){
-    Fit_Coef = c(fit$zeta, Fit_Coef)
-    Fit_Coef = data.frame(Coef = names(Fit_Coef), value = Fit_Coef)
-  }
+
 
 
 
@@ -31,7 +24,7 @@ Classification___Multinomial___Results = function(fit,
   # Cumulative Probability plot for most effective variable
   #=============================================================================
   if(!is.null(x_varname)){
-    Cumulative_plot = Classification___Multinomial___Results___Cumulative.Probability.Plot(fit, Data=X_Test, x_varname, title_cum.plot = "", path_Export)
+    Cumulative_plot = Classification___Multinomial___Results___Cumulative.Probability.Plot(Fit_Coef, Data=X_Test, x_varname, path_Export)
   }else{
     Cumulative_plot = NULL
   }
@@ -46,7 +39,7 @@ Classification___Multinomial___Results = function(fit,
   # Prediction
   #=============================================================================
   if(!is.null(X_Test) && !is.null(y_Test)){
-    Prediction = Classification___Multinomial___Results___Predict(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, title, path_Export)
+    Prediction = Classification___Multinomial___Results___Predict(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export)
   }else{
     Prediction = NULL
   }
@@ -58,7 +51,7 @@ Classification___Multinomial___Results = function(fit,
   #=============================================================================
   # Combined Results
   #=============================================================================
-  Combined.list = c(list(Fit=fit, Fit_Summary = Fit_Summary, Best_alpha = Best_alpha, Fit_Coef = Fit_Coef, Cumulative_plot = Cumulative_plot),
+  Combined.list = c(list(Fit=fit, Best_alpha = Best_alpha, Fit_Coef = Fit_Coef, Cumulative_plot = Cumulative_plot),
                     Prediction,
                     Cumulative_plot)
 

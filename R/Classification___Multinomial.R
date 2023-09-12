@@ -7,17 +7,16 @@ Classification___Multinomial = function(X_Train,
                                         standardize = T,
                                         #=======================================
                                         fitting.method = c("MLE", "Elastic"),
-                                        penatly_alpha=NULL,
+                                        penalty_alpha=NULL,
                                         penalty_lambda=NULL,
                                         response_type = c("Nominal", "Ordinal"),
                                         family = "cumulative",
                                         link = "logit",
                                         tuneMethod = "cvMisclass",
                                         best.model.criterion = "misclass",
-                                        folds,
+                                        Train_Folds_Index,
                                         #=======================================
                                         AUC_in_Legend = T,
-                                        title = "",
                                         path_Export=NULL,
                                         ...){
   #=============================================================================
@@ -72,17 +71,16 @@ Classification___Multinomial = function(X_Train,
                                                      y_Test,
                                                      y_varname,
                                                      x_varname,
-                                                     standardize,#
+                                                     standardize,
                                                      fitting.method,
-                                                     penatly_alpha,
+                                                     penalty_alpha,
                                                      penalty_lambda,
                                                      family,
                                                      link,
                                                      tuneMethod,
                                                      best.model.criterion,
-                                                     folds,#
+                                                     Train_Folds_Index,
                                                      AUC_in_Legend,
-                                                     title,
                                                      path_Export)
   }
 
