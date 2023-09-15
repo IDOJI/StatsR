@@ -5,9 +5,13 @@ Classification___Multinomial___Results___Coefficients = function(fit){
   if(class(fit)=="polr"){
     # Intercept
     Fit_Intercept = fit$zeta
+
     # Slope
     Fit_Slope = -fit$coefficients
 
+    # SE
+    Fit_deviance = fit$deviance
+    fit
     # Combined
     Fit_Coef = c(Fit_Intercept, Fit_Slope)
     Fit_Coef = data.frame(Coef = names(Fit_Coef), value = Fit_Coef)
