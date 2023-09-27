@@ -14,12 +14,6 @@ Classification___Multinomial___Results = function(fit,
 
 
 
-
-
-
-
-
-
   #=============================================================================
   # Cumulative Probability plot for most effective variable
   #=============================================================================
@@ -28,8 +22,6 @@ Classification___Multinomial___Results = function(fit,
   }else{
     Cumulative_plot = NULL
   }
-
-
 
 
 

@@ -26,7 +26,10 @@ Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test,
   y_Test_unlist = y_Test %>% unlist()
   y_Test_New = y_Test_unlist %>% as.integer()
   Index_Misclassified = which(Predicted_Classes != y_Test_New)
-  Misclassified.df = cbind(Group = as.character(y_Test_unlist[Index_Misclassified]), X_Test[Index_Misclassified, ] %>% as.data.frame)
+  Misclassified.df = cbind(Group = as.character(y_Test_unlist[Index_Misclassified]),
+                           Predicted_Class = levels(y_Test)[Predicted_Classes[Index_Misclassified]],
+                           X_Test[Index_Misclassified, ] %>% as.data.frame,
+                           Index = Index_Misclassified)
 
 
 
