@@ -1,30 +1,154 @@
-FDA___Smoothing___Bspline = function(y, knots_length.out = 2:floor((length(y)/4)), norders = 4, lambdas, penalty.type = "second", file.name_prefix = "", save.path = NULL){
-  ##############################################################################
-  if(penalty.type == "harmonic" || penalty.type == "Harmonic"){
-    # results.list = lapply(lambdas, FUN=function(ith_lambda, ...){
-    #   FDA___Smoothing___Bspline___Pen.Harmonic(y = y, nbasis = n_basis, lambda = ith_lambda) %>% suppressWarnings()
-    # })
-  }else if(penalty.type == "Second" || penalty.type == "second"){
-    results.list = lapply(lambdas, FUN=function(ith_lambda, ...){
-      tryCatch(FDA___Smoothing___Bspline___Pen.Second(y, ith_lambda, length.out_seq = knots_length.out, norders = norders),
-               error = function(e){NULL},
-               warning = function(w){NULL},
-               finally = NULL)
-    }) %>% rm_list_null
-  }else if(is.null(penalty.type)){
+FDA___Smoothing___Bspline___ = function(Bslpline, best.criterion = "gcv", path_Export){
+  #=============================================================================
+  # Input
+  #=============================================================================
+  # Bspline = list(y = y,
+  #                x = x,
+  #                range_vals = NULL,
+  #                nbasis = NULL,
+  #                norder = NULL,
+  #                breaks = NULL,
+  #                labmdas = NULL,
+  #                m_int2Lfd = NULL)
+  #-------------------------------
+  # y & x
+  #-------------------------------
+  y = Bspline$y
+  x = Bspline$x
+
+
+
+  #-------------------------------
+  # range_vals
+  #-------------------------------
+  range_vals = Bspline$range_vals
+  if(is.null(range_vals)){
+    range_vals = c(min(x), max(x))
+  }
+  # rangeval = c(1,length(y))
+
+
+
+  #-------------------------------
+  # nbasis
+  #-------------------------------
+  nbasis = Bspline$nbasis
+
+
+
+  #-------------------------------
+  # norder
+  #-------------------------------
+  norder = Bspline$norder
+  if(is.null(norder)){
+    norder = 4
+  }
+
+
+
+
+  #-------------------------------
+  # breaks
+  #-------------------------------
+  # break 오류가 나면 중복값 있는지 확인
+  breaks = Bspline$breaks
+  if(is.null(breaks)){
+    if(is.null(x)){
+      # breaks =
+      # knots = seq(1, length(y), length.out = jth_length.out)
+    }else{
+      breaks = x
+    }
+  }
+
+
+
+  #-------------------------------
+  # lambdas
+  #-------------------------------
+  lambdas = Bspline$labmdas
+  if(is.null(lambdas)){
+    lambdas = exp(-100:100)
+  }
+
+
+
+
+  #-------------------------------
+  # m_int2Lfd
+  #-------------------------------
+  m_int2Lfd = Bspline$m_int2Lfd
+  if(is.null(m_int2Lfd)){
+    m_int2Lfd = 2 # Curvature : the rate of change of slope
+  }
+
+
+
+
+
+  #=============================================================================
+  # 1) Basis Object
+  #=============================================================================
+  basis_obj = fda::create.bspline.basis(rangeval = range_vals,
+                                        # nbasis = nbasis,
+                                        norder = norder,
+                                        breaks = breaks %>% unname %>% as.numeric)
+
+  # eval_basis = eval.basis(evalarg = seq(range_vals[1], range_vals[2], by = 0.01), basisobj = basis_obj)
+  # matplot(x = seq(range_vals[1], range_vals[2], by = 0.01), y = eval_basis, type = "l")
+
+
+
+
+
+
+
+
+  #=============================================================================
+  # 2) Functional Data Object & Smoothing
+  #=============================================================================
+  if(null(m_int2Lfd)){
+
+    fd_par_obj = fdPar(fdobj = basis_obj)
+
+  }else{
+
+    gcv = sapply(lambdas, function(ith_lambda){
+
+
+      tryCatch({
+
+        fd_par_obj = fdPar(fdobj = basis_obj,
+                           Lfdobj = int2Lfd(m_int2Lfd),
+                           lambda = ith_lambda)
+
+
+        smoothing = smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
+
+        mean(smoothing$gcv) # mean gcv
+
+      }, error = function(e) {
+        return(NA)
+      })
+    })
+
+
+    ind = which.min(gcv)
+
+
+    fd_par_obj = fdPar(fdobj = basis_obj,
+                       Lfdobj = int2Lfd(m_int2Lfd),
+                       lambda = lambdas[ind])
+
+
+    smoothing = smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
+
 
   }
-  ### The minimum GCV & Plotting out
-  GCVs = sapply(results.list, FUN=function(ith_results){
-    ith_results[[1]]$gcv
-  })
-  selected_results.list = results.list[[which.min(GCVs)]]
-  # FDA___Smoothing___Plotting(y,
-  #                            knots = seq(1, length(y), length.out = selected_results.list$knots_length),
-  #                            smoothed = selected_results.list$smoothed,
-  #                            main = paste0(file.name_prefix, "\n", "___norder-", selected_results.list$norder, "_", "knots_length-", selected_results.list$knots_length, "_", "LogLambda-", log(selected_results.list$lambda)),
-  #                            # file.name = paste0(file.name_prefix, "___", "norder-", selected_results.list$norder, "_", "knots_length-", selected_results.list$knots_length, "_", "lambda-",selected_results.list$lambda, "_", "LogLambda-", log(selected_results.list$lambda), ".png"),
-  #                            save.path = save.path)
-  ###
-  return(selected_results.list)
 }
+
+
+
+
+
+
