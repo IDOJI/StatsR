@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Export = function(Combined.list, path_Export){
+Classification___Logistic___Results___Export = function(Combined.list, path_Export){
   # save RDS
   saveRDS(Combined.list, file=paste0(path_Export, "/Best_Model_Fitting_Results.RDS"))
 

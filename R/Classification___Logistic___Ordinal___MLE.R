@@ -1,4 +1,4 @@
-Classification___Multinomial___Ordinal___MLE = function(X_Train,
+Classification___Logistic___Ordinal___MLE = function(X_Train,
                                                         y_Train,
                                                         X_Test=NULL,
                                                         y_Test=NULL,
@@ -57,7 +57,7 @@ Classification___Multinomial___Ordinal___MLE = function(X_Train,
   #=============================================================================
   # Extract results
   #=============================================================================
-  Results = Classification___Multinomial___Results(fit,
+  Results = Classification___Logistic___Results(fit,
                                                    Best_alpha=NULL,
                                                    X_Test,
                                                    y_Test,

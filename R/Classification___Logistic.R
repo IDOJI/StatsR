@@ -1,4 +1,4 @@
-Classification___Multinomial = function(X_Train,
+Classification___Logistic = function(X_Train,
                                         y_Train,
                                         X_Test = NULL,
                                         y_Test = NULL,
@@ -59,13 +59,13 @@ Classification___Multinomial = function(X_Train,
   #=============================================================================
   if(response_type == "nominal"){
 
-    Results = Classification___Multinomial___Nominal(X_Train, y_Train)
+    Results = Classification___Logistic___Nominal(X_Train, y_Train)
 
 
 
   }else if(response_type == "ordinal"){
 
-    Results = Classification___Multinomial___Ordinal(X_Train,
+    Results = Classification___Logistic___Ordinal(X_Train,
                                                      y_Train,
                                                      X_Test,
                                                      y_Test,

@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Cumulative.Probability.Plot = function(Fit_Coef,
+Classification___Logistic___Results___Cumulative.Probability.Plot = function(Fit_Coef,
                                                                                 Data,
                                                                                 x_varname,
                                                                                 path_Export=NULL){

@@ -70,6 +70,7 @@ Split.Data___CV.Fold___Stratified___One.Var = function(Data, Var_1, n_fold, seed
     Which_Fold[Train_Folds_Index[[k]]] = k
   }
   Train$Which_Fold = Which_Fold
+  Train = Train %>% relocate(Which_Fold)
 
 
 

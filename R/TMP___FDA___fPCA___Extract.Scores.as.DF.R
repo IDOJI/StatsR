@@ -1,4 +1,4 @@
-FDA___FPCA___Extract.Scores.as.DF = function(FPCA.list, suffix.for.each.score, path_Export=NULL, file.name){
+FDA___fPCA___Extract.Scores.as.DF = function(FPCA.list, suffix.for.each.score, path_Export=NULL, file.name){
   # FPCA.list = New_FPCA_AD.list
   # suffix.for.each.score = paste0("ROI_", fit_length(1:length(FPCA.list), 3))
 

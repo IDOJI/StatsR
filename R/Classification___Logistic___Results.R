@@ -1,4 +1,4 @@
-Classification___Multinomial___Results = function(fit,
+Classification___Logistic___Results = function(fit,
                                                   Best_alpha=NULL,
                                                   X_Test=NULL,
                                                   y_Test=NULL,
@@ -9,7 +9,7 @@ Classification___Multinomial___Results = function(fit,
   #=============================================================================
   # Extracting Results
   #=============================================================================
-  Fit_Coef = Classification___Multinomial___Results___Coefficients(fit)
+  Fit_Coef = Classification___Logistic___Results___Coefficients(fit)
 
 
 
@@ -18,7 +18,7 @@ Classification___Multinomial___Results = function(fit,
   # Cumulative Probability plot for most effective variable
   #=============================================================================
   if(!is.null(x_varname)){
-    Cumulative_plot = Classification___Multinomial___Results___Cumulative.Probability.Plot(Fit_Coef, Data=X_Test, x_varname, path_Export)
+    Cumulative_plot = Classification___Logistic___Results___Cumulative.Probability.Plot(Fit_Coef, Data=X_Test, x_varname, path_Export)
   }else{
     Cumulative_plot = NULL
   }
@@ -31,7 +31,7 @@ Classification___Multinomial___Results = function(fit,
   # Prediction
   #=============================================================================
   if(!is.null(X_Test) && !is.null(y_Test)){
-    Prediction = Classification___Multinomial___Results___Predict(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export)
+    Prediction = Classification___Logistic___Results___Predict(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export)
   }else{
     Prediction = NULL
   }
@@ -57,7 +57,7 @@ Classification___Multinomial___Results = function(fit,
   #=============================================================================
   # Export results
   #=============================================================================
-  Classification___Multinomial___Results___Export(Combined.list, path_Export)
+  Classification___Logistic___Results___Export(Combined.list, path_Export)
 
 
 

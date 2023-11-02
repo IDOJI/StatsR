@@ -1,4 +1,4 @@
-Classification___Multinomial___Ordinal___Elastic = function (X_Train,
+Classification___Logistic___Ordinal___Elastic = function(X_Train,
                                                             y_Train,
                                                             X_Test = NULL,
                                                             y_Test = NULL,
@@ -160,7 +160,7 @@ Classification___Multinomial___Ordinal___Elastic = function (X_Train,
   #=============================================================================
   # Extract results and prediction & Exporting
   #=============================================================================
-  Results.list = Classification___Multinomial___Results(fit = Best_Fit_Final,
+  Results.list = Classification___Logistic___Results(fit = Best_Fit_Final,
                                                         Best_alpha = best_alpha,
                                                         X_Test = X_Test,
                                                         y_Test = y_Test,

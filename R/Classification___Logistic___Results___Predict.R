@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export){
+Classification___Logistic___Results___Predict = function(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export){
   #===========================================================================
   # Prediction
   #===========================================================================
@@ -70,7 +70,7 @@ Classification___Multinomial___Results___Predict = function(fit, X_Test, y_Test,
   #===========================================================================
   # ROAUC
   #===========================================================================
-  ROAUC.list = Classification___Multinomial___Results___Predict___AUROC(Predicted_Probs, y_Test_unlist, AUC_in_Legend, path_Export) %>% suppressWarnings()
+  ROAUC.list = Classification___Logistic___Results___Predict___AUROC(Predicted_Probs, y_Test_unlist, AUC_in_Legend, path_Export) %>% suppressWarnings()
 
 
 

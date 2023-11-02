@@ -1,6 +1,6 @@
-FDA___Smoothing___Bspline___ = function(Bslpline, best.criterion = "gcv", path_Export){
+FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Export=NULL, file.name=NULL){
   #=============================================================================
-  # Input
+  # 0.Input
   #=============================================================================
   # Bspline = list(y = y,
   #                x = x,
@@ -107,25 +107,31 @@ FDA___Smoothing___Bspline___ = function(Bslpline, best.criterion = "gcv", path_E
   #=============================================================================
   # 2) Functional Data Object & Smoothing
   #=============================================================================
-  if(null(m_int2Lfd)){
+  if(is.null(m_int2Lfd)){
+    #---------------------------------
+    # non penalty
+    #---------------------------------
+    fd_par_obj = fda::fdPar(fdobj = basis_obj)
 
-    fd_par_obj = fdPar(fdobj = basis_obj)
+    smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
 
+    best_lambda = NULL
   }else{
-
+    #---------------------------------
+    # mean gcv from all curves
+    #---------------------------------
     gcv = sapply(lambdas, function(ith_lambda){
-
 
       tryCatch({
 
-        fd_par_obj = fdPar(fdobj = basis_obj,
+        fd_par_obj = fda:::fdPar(fdobj = basis_obj,
                            Lfdobj = int2Lfd(m_int2Lfd),
                            lambda = ith_lambda)
 
 
-        smoothing = smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
+        smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
 
-        mean(smoothing$gcv) # mean gcv
+        return(mean(smoothing$gcv)) # mean gcv
 
       }, error = function(e) {
         return(NA)
@@ -133,18 +139,55 @@ FDA___Smoothing___Bspline___ = function(Bslpline, best.criterion = "gcv", path_E
     })
 
 
-    ind = which.min(gcv)
 
 
-    fd_par_obj = fdPar(fdobj = basis_obj,
+
+    #---------------------------------
+    # Best
+    #---------------------------------
+    best_ind = which.min(gcv)
+
+    best_lambda = lambdas[best_ind]
+
+    fd_par_obj = fda::fdPar(fdobj = basis_obj,
                        Lfdobj = int2Lfd(m_int2Lfd),
-                       lambda = lambdas[ind])
+                       lambda = best_lambda)
 
-
-    smoothing = smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
-
-
+    smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
   }
+
+
+  Results = list(smoothing = smoothing, best_lambda = best_lambda)
+
+
+
+
+
+
+
+  #=============================================================================
+  # 3) Plotting & Exporting data
+  #=============================================================================
+  if(!is.null(path_Export)){
+    dir.create(path_Export, F)
+
+    # Open a PNG graphics device
+    png(paste0(path_Export, "/", file.name, ".png"), width = 1500, height = 600)  # Specify the file name and dimensions
+
+    # Create your plot (replace with your actual plotting code)
+    plot(smoothing, main = file.name)
+    abline(v = breaks, col = 'red')
+
+    # Close the PNG graphics device
+    dev.off()
+
+    saveRDS(Results, file = paste0(path_Export, "/", file.name, ".rds"))
+
+    cat("\n", crayon::red(file.name), crayon::green("is done!"), "\n")
+  }
+
+
+  return(Results)
 }
 
 

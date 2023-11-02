@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Predict___AUROC = function(Predicted_Probs, y_Test_unlist, AUC_in_Legend = FALSE, path_Export=NULL){
+Classification___Logistic___Results___Predict___AUROC = function(Predicted_Probs, y_Test_unlist, AUC_in_Legend = FALSE, path_Export=NULL){
   #=============================================================================
   # pacakges
   #=============================================================================

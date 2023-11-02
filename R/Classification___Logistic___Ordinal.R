@@ -1,4 +1,4 @@
-Classification___Multinomial___Ordinal = function(X_Train,
+Classification___Logistic___Ordinal = function(X_Train,
                                                   y_Train,
                                                   X_Test=NULL,
                                                   y_Test=NULL,
@@ -32,7 +32,7 @@ Classification___Multinomial___Ordinal = function(X_Train,
   #=============================================================================
   # Code for MLE method
   if(fitting.method == "mle"){
-    Results = Classification___Multinomial___Ordinal___MLE(X_Train, y_Train,
+    Results = Classification___Logistic___Ordinal___MLE(X_Train, y_Train,
                                                            X_Test, y_Test,
                                                            y_varname, x_varname,
                                                            link, AUC_in_Legend, path_Export)
@@ -40,7 +40,7 @@ Classification___Multinomial___Ordinal = function(X_Train,
 
     # Code for Elastic method
   }else if(fitting.method == "elastic"){
-    Results = Classification___Multinomial___Ordinal___Elastic(X_Train,
+    Results = Classification___Logistic___Ordinal___Elastic(X_Train,
                                                                y_Train,
                                                                X_Test,
                                                                y_Test,

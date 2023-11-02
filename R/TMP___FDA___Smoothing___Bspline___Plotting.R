@@ -1,4 +1,4 @@
-FDA___Smoothing___Plotting = function(y, knots, smoothed, main="", file.name=NULL, save.path=NULL){
+FDA___Smoothing___Bspline___Plotting = function(y, breaks, smoothed, main="", file.name=NULL, save.path=NULL){
   if(is.null(file.name) || is.null(save.path)){
     plot(x = 1:length(y), y = y, col = 2, main = main)
     abline(v = knots, lty = 2, lwd = 1)

@@ -1,4 +1,4 @@
-Classification___Multinomial___Results___Coefficients = function(fit){
+Classification___Logistic___Results___Coefficients = function(fit){
   #===========================================================================
   # polr
   #===========================================================================
