@@ -1,68 +1,5 @@
 Classification___Logistic = function(Logistic){
   #=============================================================================
-  # Arguments Setting
-  #=============================================================================
-  # Logistic = list(#----------------------------------------
-  #                 # Data Setting
-  #                 #----------------------------------------
-  #                 Train_X = Train_X,
-  #                 Train_y = Train_y,
-  #                 Test_X = Test_X,
-  #                 Test_y = Test_y,
-  #                 Train_Folds_Index.vec = Train_Folds_Index.vec,
-  #                 Train_Folds_Index.list = Train_Folds_Index.list,
-  #                 Standardize = TRUE,
-  #                 #----------------------------------------
-  #                 # Modeling Fitting
-  #                 #----------------------------------------
-  #                 # Method
-  #                 Response_Type = c("Nominal", "Ordinal"),
-  #                 Fitting_Method = c("MLE", "ElasticNet"), #
-  #                 # Model
-  #                 Family = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                            "cumulative", "sratio", "cratio", "acat",
-  #                            #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
-  #                            "gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
-  #                 Link = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                          "logit", "probit", "cloglog", "cauchit"),
-  #                 # Penalty
-  #                 penalty_alpha = seq(0, 1, 0.01),
-  #                 penalty_lambda = exp(seq(-2,2,0.01)),
-  #                 #----------------------------------------
-  #                 # Tuning measures
-  #                 #----------------------------------------
-  #                 Tune_Method = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                                 "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic",
-  #                                 #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
-  #                                 "default", "mse", "deviance", "class", "auc", "mae", "C"),
-  #                 # Best_Model_Criterion = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                 #                          "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic"),
-  #                 #----------------------------------------
-  #                 # Grouping variables
-  #                 #----------------------------------------
-  #                 Grouped_Vars_Index = NULL, # NULL이 아니면 그룹 정보를 사용, 그룹 위치 벡터를 넣어야 함.
-  #                 #----------------------------------------
-  #                 # Plotting
-  #                 #----------------------------------------
-  #                 Plot_y_varname = NULL, # proportional logit plot은 하나의 변수만 가능하므로 한 변수 지정
-  #                 Plot_x_varname = NULL, # 지정하지 않으면 plot 안 그려짐
-  #                 AUC_in_Legend = TRUE,
-  #                 #----------------------------------------
-  #                 # Export Results
-  #                 #----------------------------------------
-  #                 path_Export = NULL)
-  # Logistic$Plot_x_varname = "pregnant"
-  # Logistic$Plot_y_varname = "age group"
-  # Logistic$Family = "cumulative"
-  # Logistic$Link = "logit"
-  # Logistic$Tune_Method = "cvMisclass"
-  # Logistic$Fitting_Method = "ElasticNet"
-
-
-
-
-
-  #=============================================================================
   # Generated path
   #=============================================================================
   if(!is.null(Logistic$path_Export)){
@@ -105,6 +42,7 @@ Classification___Logistic = function(Logistic){
 
 
 
+
   #=============================================================================
   # Fitting Models
   #=============================================================================
@@ -116,11 +54,12 @@ Classification___Logistic = function(Logistic){
 
     Results = Classification___Logistic___Nominal(Logistic)
 
-  }else if(response_type == "ordinal"){
+  }else if(Response_Type == "ordinal"){
 
     Results = Classification___Logistic___Ordinal(Logistic)
 
   }
+
 
 
 
@@ -134,9 +73,64 @@ Classification___Logistic = function(Logistic){
   cat("\n", crayon::green("Fitting a Logistic model is done!"), "\n")
   return(Results)
 }
-
-
-
+#===============================================================================
+# Arguments Setting
+#===============================================================================
+# Logistic = list(#----------------------------------------
+#                 # Data Setting
+#                 #----------------------------------------
+#                 Train_X = Train_X,
+#                 Train_y = Train_y,
+#                 Test_X = Test_X,
+#                 Test_y = Test_y,
+#                 Train_Folds_Index.vec = Train_Folds_Index.vec,
+#                 Train_Folds_Index.list = Train_Folds_Index.list,
+#                 Standardize = TRUE,
+#                 #----------------------------------------
+#                 # Modeling Fitting
+#                 #----------------------------------------
+#                 # Method
+#                 Response_Type = c("Nominal", "Ordinal"),
+#                 Fitting_Method = c("MLE", "ElasticNet"), #
+#                 # Model
+#                 Family = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                            "cumulative", "sratio", "cratio", "acat",
+#                            #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
+#                            "gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
+#                 Link = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                          "logit", "probit", "cloglog", "cauchit"),
+#                 # Penalty
+#                 penalty_alpha = seq(0, 1, 0.01),
+#                 penalty_lambda = exp(seq(-2,2,0.01)),
+#                 #----------------------------------------
+#                 # Tuning measures
+#                 #----------------------------------------
+#                 Tune_Method = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                                 "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic",
+#                                 #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
+#                                 "default", "mse", "deviance", "class", "auc", "mae", "C"),
+#                 # Best_Model_Criterion = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                 #                          "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic"),
+#                 #----------------------------------------
+#                 # Grouping variables
+#                 #----------------------------------------
+#                 Grouped_Vars_Index = NULL, # NULL이 아니면 그룹 정보를 사용, 그룹 위치 벡터를 넣어야 함.
+#                 #----------------------------------------
+#                 # Plotting
+#                 #----------------------------------------
+#                 Plot_y_varname = NULL, # proportional logit plot은 하나의 변수만 가능하므로 한 변수 지정
+#                 Plot_x_varname = NULL, # 지정하지 않으면 plot 안 그려짐
+#                 AUC_in_Legend = TRUE,
+#                 #----------------------------------------
+#                 # Export Results
+#                 #----------------------------------------
+#                 path_Export = NULL)
+# Logistic$Plot_x_varname = "pregnant"
+# Logistic$Plot_y_varname = "age group"
+# Logistic$Family = "cumulative"
+# Logistic$Link = "logit"
+# Logistic$Tune_Method = "cvMisclass"
+# Logistic$Fitting_Method = "ElasticNet"
 
 
 
