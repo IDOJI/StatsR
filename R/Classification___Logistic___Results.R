@@ -1,15 +1,8 @@
-Classification___Logistic___Results = function(fit,
-                                                  Best_alpha=NULL,
-                                                  X_Test=NULL,
-                                                  y_Test=NULL,
-                                                  x_varname=NULL,
-                                                  y_varname=NULL,
-                                                  AUC_in_Legend=FALSE,
-                                                  path_Export=NULL){
+Classification___Logistic___Results = function(Logistic){
   #=============================================================================
   # Extracting Results
   #=============================================================================
-  Fit_Coef = Classification___Logistic___Results___Coefficients(fit)
+  Logistic$Best_Model_Coef = Classification___Logistic___Results___Coefficients(Logistic$Best_Model)
 
 
 
@@ -17,10 +10,10 @@ Classification___Logistic___Results = function(fit,
   #=============================================================================
   # Cumulative Probability plot for most effective variable
   #=============================================================================
-  if(!is.null(x_varname)){
-    Cumulative_plot = Classification___Logistic___Results___Cumulative.Probability.Plot(Fit_Coef, Data=X_Test, x_varname, path_Export)
+  if(!is.null(Logistic$Plot_x_varname)){
+    Logistic$Cumulative_plot = Classification___Logistic___Results___Cumulative.Probability.Plot(Logistic)
   }else{
-    Cumulative_plot = NULL
+    Logistic$Cumulative_plot = NULL
   }
 
 
@@ -30,26 +23,7 @@ Classification___Logistic___Results = function(fit,
   #=============================================================================
   # Prediction
   #=============================================================================
-  if(!is.null(X_Test) && !is.null(y_Test)){
-    Prediction = Classification___Logistic___Results___Predict(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export)
-  }else{
-    Prediction = NULL
-  }
-
-
-
-
-
-  #=============================================================================
-  # Combined Results
-  #=============================================================================
-  Combined.list = c(list(Fit=fit, Best_alpha = Best_alpha, Fit_Coef = Fit_Coef, Cumulative_plot = Cumulative_plot),
-                    Prediction,
-                    Cumulative_plot)
-
-
-
-
+  Logistic$Prediction = Classification___Logistic___Results___Predict(Logistic)
 
 
 
@@ -57,8 +31,7 @@ Classification___Logistic___Results = function(fit,
   #=============================================================================
   # Export results
   #=============================================================================
-  Classification___Logistic___Results___Export(Combined.list, path_Export)
-
+  Classification___Logistic___Results___Export(Logistic)
 
 
 
@@ -67,7 +40,7 @@ Classification___Logistic___Results = function(fit,
   #=============================================================================
   # Return
   #=============================================================================
-  return(Combined.list)
+  return(Logistic)
 }
 
 

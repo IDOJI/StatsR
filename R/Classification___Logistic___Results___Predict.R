@@ -1,4 +1,21 @@
-Classification___Logistic___Results___Predict = function(fit, X_Test, y_Test, x_varname, y_varname, AUC_in_Legend, path_Export){
+Classification___Logistic___Results___Predict = function(Logistic){
+  #===========================================================================
+  # Arguments
+  #===========================================================================
+  fit = Logistic$Best_Model
+  X_Test = Logistic$Test_X
+  y_Test = Logistic$Test_y
+  x_varname = Logistic$Plot_x_varname
+  y_varname = Logistic$Plot_y_varname
+  AUC_in_Legend = Logistic$AUC_in_Legend
+  path_Export = Logistic$path_Export
+
+
+
+
+
+
+
   #===========================================================================
   # Prediction
   #===========================================================================

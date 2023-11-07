@@ -9,7 +9,8 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   #                norder = NULL,
   #                breaks = NULL,
   #                labmdas = NULL,
-  #                m_int2Lfd = NULL)
+  #                m_int2Lfd = NULL,
+  #                argvals = NULL)
   #-------------------------------
   # y & x
   #-------------------------------
@@ -86,6 +87,21 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
+  #-------------------------------
+  # argvals
+  #-------------------------------
+  argvals = Bspline$argvals
+  if(is.null(argvals)){
+    argvals = 1:(dim(y)[1])
+  }
+
+
+
+
+
+
+
+
   #=============================================================================
   # 1) Basis Object
   #=============================================================================
@@ -93,6 +109,8 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
                                         # nbasis = nbasis,
                                         norder = norder,
                                         breaks = breaks %>% unname %>% as.numeric)
+
+
 
   # eval_basis = eval.basis(evalarg = seq(range_vals[1], range_vals[2], by = 0.01), basisobj = basis_obj)
   # matplot(x = seq(range_vals[1], range_vals[2], by = 0.01), y = eval_basis, type = "l")
@@ -123,13 +141,12 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
     gcv = sapply(lambdas, function(ith_lambda){
 
       tryCatch({
-
         fd_par_obj = fda:::fdPar(fdobj = basis_obj,
-                           Lfdobj = int2Lfd(m_int2Lfd),
-                           lambda = ith_lambda)
+                                 Lfdobj = int2Lfd(m_int2Lfd),
+                                 lambda = ith_lambda)
 
+        smoothing = fda::smooth.basis(argvals = argvals, y = y, fdParobj = fd_par_obj)
 
-        smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
 
         return(mean(smoothing$gcv)) # mean gcv
 
@@ -141,19 +158,21 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
     #---------------------------------
-    # Best
+    # Best Smoothing
     #---------------------------------
     best_ind = which.min(gcv)
 
     best_lambda = lambdas[best_ind]
 
-    fd_par_obj = fda::fdPar(fdobj = basis_obj,
-                       Lfdobj = int2Lfd(m_int2Lfd),
-                       lambda = best_lambda)
 
-    smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
+    fd_par_obj = fda::fdPar(fdobj = basis_obj,
+                            Lfdobj = int2Lfd(m_int2Lfd),
+                            lambda = best_lambda)
+
+    smoothing = fda::smooth.basis(argvals = argvals,
+                                  y = y,
+                                  fdParobj = fd_par_obj)
   }
 
 
@@ -169,19 +188,37 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   # 3) Plotting & Exporting data
   #=============================================================================
   if(!is.null(path_Export)){
+    # dir
     dir.create(path_Export, F)
 
-    # Open a PNG graphics device
-    png(paste0(path_Export, "/", file.name, ".png"), width = 1500, height = 600)  # Specify the file name and dimensions
 
-    # Create your plot (replace with your actual plotting code)
-    plot(smoothing, main = file.name)
-    abline(v = breaks, col = 'red')
 
-    # Close the PNG graphics device
+    #---------------------------------------
+    # plot
+    #---------------------------------------
+    png(filename = paste0(path_Export, "/", file.name, ".png"), bg = "white", width = 5000, height = 1000)
+    par(mfrow=c(1,3))
+
+    # gcv
+    plot(gcv, main = "gcv with best index")
+    abline(v=best_ind, col = 'red')
+
+    # matplot
+    matplot(x=x, y=y, type= "l", main = paste0("Raw Signals : ", file.name))
+
+    # smoothing
+    plot(smoothing, main = paste0("Smoothing : ", "lambda=", round(best_lambda, 4)))
     dev.off()
 
+
+
+
+    #---------------------------------------
+    # Data saving
+    #---------------------------------------
     saveRDS(Results, file = paste0(path_Export, "/", file.name, ".rds"))
+
+
 
     cat("\n", crayon::red(file.name), crayon::green("is done!"), "\n")
   }
@@ -189,6 +226,11 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
   return(Results)
 }
+
+
+
+
+
 
 
 

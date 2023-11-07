@@ -1,7 +1,22 @@
-Classification___Logistic___Results___Cumulative.Probability.Plot = function(Fit_Coef,
-                                                                                Data,
-                                                                                x_varname,
-                                                                                path_Export=NULL){
+Classification___Logistic___Results___Cumulative.Probability.Plot = function(Logistic){
+  #=============================================================================
+  # Arguments
+  #=============================================================================
+  Fit_Coef = Logistic$Best_Model_Coef
+  Data = Logistic$Train_X
+  y_Test  = Logistic$Test_y
+  x_varname = Logistic$Plot_x_varname
+  y_varname = Logistic$Plot_y_varname
+  path_Export = Logistic$path_Export
+
+
+
+
+
+
+
+
+
   #=============================================================================
   # Data selection for plotting
   #=============================================================================
@@ -82,12 +97,12 @@ Classification___Logistic___Results___Cumulative.Probability.Plot = function(Fit
 
 
   # Save the dataframe to CSV
-  if(sum(transitions_2==names(intercepts)) == length(intercepts)){
-    intercepts.df = tibble(Numbering = names(intercepts), Threshold = transitions, Coefficient = intercepts %>% unlist)
-    write.csv(intercepts.df, paste0(path_Export, "/0.Transition_threshold_info.csv"), row.names = FALSE)
-  }else{
-    stop("The names of intercepts are different!")
-  }
+  # if(sum(transitions_2==names(intercepts)) == length(intercepts)){
+  #   intercepts.df = tibble(Numbering = names(intercepts), Threshold = transitions, Coefficient = intercepts %>% unlist)
+  #   write.csv(intercepts.df, paste0(path_Export, "/0.Transition_threshold_info.csv"), row.names = FALSE)
+  # }else{
+  #   stop("The names of intercepts are different!")
+  # }
 
 
 
