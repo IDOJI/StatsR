@@ -2,7 +2,8 @@ FDA___fPCA___Plots = function(fPCA_Results, threshold, path_Export, file.name){
   #===========================================================================
   # Directory
   #===========================================================================
-  dir.create(path_Export, F)
+  fs::dir_create(path_Export, recurse = T)
+
 
 
 

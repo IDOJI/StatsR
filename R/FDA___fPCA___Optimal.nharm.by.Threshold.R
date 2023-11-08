@@ -22,7 +22,6 @@ FDA___fPCA___Optimal.nharm.by.Threshold = function(fdobj, threshold=0.9, path_Ex
   #=============================================================================
   # Export rds data
   #=============================================================================
-  dir.create(path_Export, F)
   saveRDS(fPCA_results, file = paste0(path_Export, "/", file.name, ".rds"))
   cat("\n", paste0(crayon::green("Exported RDS of fPCA results :"), crayon::red(file.name)),"\n")
 

@@ -19,6 +19,9 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
+
+
+
   #-------------------------------
   # range_vals
   #-------------------------------
@@ -30,10 +33,16 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
+
+
+
   #-------------------------------
   # nbasis
   #-------------------------------
   nbasis = Bspline$nbasis
+
+
+
 
 
 
@@ -48,10 +57,13 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
+
+
   #-------------------------------
   # breaks
   #-------------------------------
   # break 오류가 나면 중복값 있는지 확인
+  # breaks = c(Bspline$breaks[1], seq(7,10, 0.1), Bspline$breaks[-1])
   breaks = Bspline$breaks
   if(is.null(breaks)){
     if(is.null(x)){
@@ -64,6 +76,9 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
+
+
+
   #-------------------------------
   # lambdas
   #-------------------------------
@@ -71,6 +86,9 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   if(is.null(lambdas)){
     lambdas = exp(-100:100)
   }
+
+
+
 
 
 
@@ -134,6 +152,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
     smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
 
     best_lambda = NULL
+
   }else{
     #---------------------------------
     # mean gcv from all curves
@@ -145,6 +164,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
                                  Lfdobj = int2Lfd(m_int2Lfd),
                                  lambda = ith_lambda)
 
+        # smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
         smoothing = fda::smooth.basis(argvals = argvals, y = y, fdParobj = fd_par_obj)
 
 
@@ -154,6 +174,10 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
         return(NA)
       })
     })
+    if(is.na(gcv) %>% sum == length(gcv)){
+      stop("All lambdas are error!")
+    }
+
 
 
 
@@ -173,8 +197,8 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
     smoothing = fda::smooth.basis(argvals = argvals,
                                   y = y,
                                   fdParobj = fd_par_obj)
+    # plot(smoothing)
   }
-
 
   Results = list(smoothing = smoothing, best_lambda = best_lambda)
 
@@ -188,8 +212,13 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   # 3) Plotting & Exporting data
   #=============================================================================
   if(!is.null(path_Export)){
+    #---------------------------------------
     # dir
-    dir.create(path_Export, F)
+    #---------------------------------------
+    fs::dir_create(path_Export, recurse = T)
+
+
+
 
 
 
@@ -213,13 +242,12 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
+
+
     #---------------------------------------
     # Data saving
     #---------------------------------------
     saveRDS(Results, file = paste0(path_Export, "/", file.name, ".rds"))
-
-
-
     cat("\n", crayon::red(file.name), crayon::green("is done!"), "\n")
   }
 
