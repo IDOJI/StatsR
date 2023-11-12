@@ -78,10 +78,26 @@ Split.Data___CV.Fold___Stratified___One.Var = function(Data, Var_1, n_fold, seed
 
 
 
+
+
+  #=============================================================================
+  # Results
+  #=============================================================================
+  Results = list(X_Train = Train %>% dplyr::select(-all_of(c(Var_1, "Which_Fold"))),
+                 y_Train = Train %>% dplyr::select(all_of(Var_1)),
+                 Train_Folds_Index.vec = Train$Which_Fold,
+                 Train_Folds_Index.list = Train_Folds_Index,
+                 X_Test = Test %>% dplyr::select(-all_of(Var_1)),
+                 y_Test = Test %>% dplyr::select(all_of(Var_1)))
+
+
+
+
+
   #=============================================================================
   # returning
   #=============================================================================
-  list(Train = Train, Train_Fold_Index = Train_Folds_Index, Test = Test) %>% return
+  Results %>% return
 }
 
 

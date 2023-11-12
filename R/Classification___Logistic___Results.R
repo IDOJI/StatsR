@@ -7,6 +7,7 @@ Classification___Logistic___Results = function(Logistic){
 
 
 
+
   #=============================================================================
   # Cumulative Probability plot for most effective variable
   #=============================================================================
@@ -20,10 +21,12 @@ Classification___Logistic___Results = function(Logistic){
 
 
 
+
   #=============================================================================
   # Prediction
   #=============================================================================
   Logistic$Prediction = Classification___Logistic___Results___Predict(Logistic)
+
 
 
 

@@ -38,17 +38,21 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
 
     tictoc::tic()
     # Fitting CV for ith_alpha
-    ith_Fit_CV = ordinalNet::ordinalNetCV(x = Logistic$Train_X %>% as.matrix,
-                                          y = Logistic$Train_y %>% unlist,
-                                          standardize = FALSE,
-                                          family = Logistic$Family,
-                                          link = Logistic$Link,
-                                          tuneMethod = Logistic$Tune_Method,
-                                          lambdaVals = NULL,
-                                          alpha = ith_alpha,
-                                          fold = Logistic$Train_Folds_Index.list, # "list" with legnth of n_folds : Fold_1 should include row indice for Fold_1
-                                          printProgress = TRUE,
-                                          warn = TRUE)
+
+    ij_CV_Result = lapply(Logistic$penalty_lambda, function(jth_lambda){
+      ith_Fit_CV = ordinalNet::ordinalNetCV(x = Logistic$Train_X %>% as.matrix,
+                                            y = Logistic$Train_y %>% unlist,
+                                            standardize = FALSE,
+                                            family = Logistic$Family,
+                                            link = Logistic$Link,
+                                            tuneMethod = Logistic$Tune_Method,
+                                            lambdaVals = jth_lambda,
+                                            alpha = ith_alpha,
+                                            fold = Logistic$Train_Folds_Index.list, # "list" with legnth of n_folds : Fold_1 should include row indice for Fold_1
+                                            printProgress = TRUE,
+                                            warn = TRUE)
+    })
+
     #  Save result for each alpha
     saveRDS(ith_Fit_CV, file = paste0(Logistic$path_Export, "/", "Fit_CV", "___", ith_alpha, ".rds"))
     tictoc::toc()
@@ -67,9 +71,9 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
   #=============================================================================
   # When error happens, we need to load the saved fitting results
   #=============================================================================
-  # Fit_CV.list = lapply(list.files(path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
-  #   readRDS(y) %>% summary %>% colMeans
-  # })
+  Fit_CV.list = lapply(list.files(Logistic$path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
+    readRDS(y) %>% summary %>% colMeans
+  })
 
 
 
@@ -91,7 +95,7 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
   Combined_Criteria = sapply(Fit_CV.list, function(ith_Fit_CV){
     if(Logistic$Tune_Method == "cvLoglik"){
 
-      ith_Fit_CV[names(ith_Fit_CV)=="loglik"] %>% return
+     ith_Fit_CV[names(ith_Fit_CV)=="loglik"] %>% return
 
     }else if(Logistic$Tune_Method == "cvMisclass"){
 
@@ -123,7 +127,7 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
   #=============================================================================
   # Fit again with best parameters
   #=============================================================================
-  Best_Fit = ordinalNet(x = Logistic$Train_X %>% as.matrix,,
+  Best_Fit = ordinalNet(x = Logistic$Train_X %>% as.matrix,
                         y = Logistic$Train_y %>% unlist,
                         alpha = Best_alpha,
                         standardize = FALSE,
