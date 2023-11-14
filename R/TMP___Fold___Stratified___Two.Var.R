@@ -1,4 +1,4 @@
-Split.Data___CV.Fold___Stratified___Two.Var = function(Data, Var_1, Var_2, n_fold, seed){
+Fold___Stratified___Two.Var = function(Data, Var_1, Var_2, n_fold, seed){
   # 두 변수의 조합의 비율은 유지한 채 n_fold
   # var의 prop을 유지한 채 n-fold
   #=============================================================================
@@ -28,7 +28,7 @@ Split.Data___CV.Fold___Stratified___Two.Var = function(Data, Var_1, Var_2, n_fol
   #=============================================================================
   # Perform n_fold splitting by "Strata"
   #=============================================================================
-  Splitted_Data = Split.Data___CV.Fold___Stratified___One.Var(Data, Var_1 = "Strata", n_fold, seed)
+  Splitted_Data = Fold___Stratified___One.Var(Data, Var_1 = "Strata", n_fold, seed)
 
 
 

@@ -1,4 +1,4 @@
-Split.Data___CV.Fold___Stratified___One.Var = function(Data, Var_1, n_fold, seed){
+Fold___Stratified___One.Var = function(Data, Var_1, n_fold, seed){
   # Var_1의 prop을 유지한 채 n-fold
   #=============================================================================
   # packages
