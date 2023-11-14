@@ -24,9 +24,12 @@ Classification___Logistic___Results___Export = function(Logistic){
   # 2) Misclassified subjects
   #=============================================================================
   Misclassified_Subjects = Logistic$Prediction$Misclassified_Subjects
-  Misclassified_Subjects = tibble::rownames_to_column(Misclassified_Subjects, "Variables")
-  write.csv(Misclassified_Subjects, paste0(path_Export, "/", "2.Misclassified_Subjects.csv"), row.names=F)
-  cat("\n", crayon::green("Exporting"), crayon::red("Misclassified subjects"), crayon::green("is done!"), "\n")
+  if(!is.null(Misclassified_Subjects)){
+    Misclassified_Subjects = tibble::rownames_to_column(Misclassified_Subjects, "Variables")
+    write.csv(Misclassified_Subjects, paste0(path_Export, "/", "2.Misclassified_Subjects.csv"), row.names=F)
+    cat("\n", crayon::green("Exporting"), crayon::red("Misclassified subjects"), crayon::green("is done!"), "\n")
+  }
+
 
 
 
@@ -58,11 +61,10 @@ Classification___Logistic___Results___Export = function(Logistic){
   # 5) Misclassification rate
   #=============================================================================
   Misclassification_Rate = Logistic$Prediction$Misclassification_Rate
-  write.csv(Misclassification_Rate, paste0(path_Export, "/", "5.Misclassification_Rate.csv"), row.names=F)
-  cat("\n", crayon::green("Exporting"), crayon::red("Misclassification rate"), crayon::green("is done!"), "\n")
-
-
-
+  if(!is.null(Misclassification_Rate)){
+    write.csv(Misclassification_Rate, paste0(path_Export, "/", "5.Misclassification_Rate.csv"), row.names=F)
+    cat("\n", crayon::green("Exporting"), crayon::red("Misclassification rate"), crayon::green("is done!"), "\n")
+  }
 }
 
 

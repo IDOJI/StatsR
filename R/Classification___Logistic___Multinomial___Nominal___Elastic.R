@@ -1,4 +1,4 @@
-Classification___Multinomial___Nominal___MLE = function(){
+Classification___Logistic___Multinomial___Nominal___Elastic = function(){
 
 
 

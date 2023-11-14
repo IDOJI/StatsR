@@ -1,4 +1,4 @@
-Classification___Multinomial___Nominal = function(X_Train,
+Classification___Logistic___Multinomial___Nominal = function(X_Train,
                                                   y_Train,
                                                   X_Test = NULL,
                                                   y_Test = NULL,
@@ -23,7 +23,7 @@ Classification___Multinomial___Nominal = function(X_Train,
   if(!response_type %in% response_type_choices) {
     stop("Invalid reponse_type choice.")
   }
-  Results = Classification___Multinomial___Nominal___MLE()
+  Results = Classification___Logistic___Multinomial___Nominal___MLE()
   #glmnet
 
 

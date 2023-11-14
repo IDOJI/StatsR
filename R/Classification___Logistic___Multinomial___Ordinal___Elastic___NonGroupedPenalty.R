@@ -1,4 +1,4 @@
-Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Logistic){
+Classification___Logistic___Multinomial___Ordinal___Elastic___NonGroupedPenalty = function(Logistic){
   #=============================================================================
   # install.packages
   #=============================================================================
@@ -35,11 +35,10 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
   # Fitting by CV
   #=============================================================================
   Fit_CV.list = lapply(Logistic$penalty_alpha, function(ith_alpha, ...){
-
-    tictoc::tic()
     # Fitting CV for ith_alpha
-
     ij_CV_Result = lapply(Logistic$penalty_lambda, function(jth_lambda){
+      tictoc::tic()
+
       ith_Fit_CV = ordinalNet::ordinalNetCV(x = Logistic$Train_X %>% as.matrix,
                                             y = Logistic$Train_y %>% unlist,
                                             standardize = FALSE,
@@ -51,16 +50,40 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
                                             fold = Logistic$Train_Folds_Index.list, # "list" with legnth of n_folds : Fold_1 should include row indice for Fold_1
                                             printProgress = TRUE,
                                             warn = TRUE)
+      tictoc::toc()
+      return(ith_Fit_CV)
     })
 
-    #  Save result for each alpha
-    saveRDS(ith_Fit_CV, file = paste0(Logistic$path_Export, "/", "Fit_CV", "___", ith_alpha, ".rds"))
-    tictoc::toc()
 
-    # Averaging
-    ith_Fit_CV_Mean = summary(ith_Fit_CV) %>% colMeans()
-    return(ith_Fit_CV_Mean)
+
+    # Compute average
+    ij_Summary = lapply(ij_CV_Result, function(ij_Results){
+      ij_Results_Summary = list()
+      ij_Results_Summary$alpha = ith_alpha  # Make sure ith_alpha is defined in your environment
+      ij_Results_Summary$lambda = ij_Results$lambdaVals
+
+      ij_Results_Summary$loglik = mean(ij_Results$loglik)
+      ij_Results_Summary$misclass = mean(ij_Results$misclass)
+      ij_Results_Summary$brier = mean(ij_Results$brier)
+      ij_Results_Summary$devPct = mean(ij_Results$devPct)
+
+      do.call(cbind, ij_Results_Summary) %>% return()
+    })
+
+    # ith alpha summary
+    ith_Summary = do.call(rbind, ij_Summary)
+
+
+
+    #  Save result for each alpha
+    saveRDS(ith_Summary, file = paste0(Logistic$path_Export, "/", "Fit_CV", "___", ith_alpha, ".rds"))
+
+
+    return(ith_Summary)
   })
+
+
+
 
 
 
@@ -71,11 +94,8 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
   #=============================================================================
   # When error happens, we need to load the saved fitting results
   #=============================================================================
-  Fit_CV.list = lapply(list.files(Logistic$path_Export, full.names=T, pattern = "Fit_CV_"), function(y){
-    readRDS(y) %>% summary %>% colMeans
-  })
-
-
+  Fit_CV.list = lapply(list.files(Logistic$path_Export, full.names=T, pattern = "Fit_CV_"), readRDS)
+  Fit_CV = do.call(rbind, Fit_CV.list)
 
 
 
@@ -127,12 +147,13 @@ Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty = function(Log
   #=============================================================================
   # Fit again with best parameters
   #=============================================================================
-  Best_Fit = ordinalNet(x = Logistic$Train_X %>% as.matrix,
-                        y = Logistic$Train_y %>% unlist,
-                        alpha = Best_alpha,
-                        standardize = FALSE,
-                        family = Logistic$Family,
-                        link = Logistic$Link)
+  # Best_Fit = ordinalNet(x = Logistic$Train_X %>% as.matrix,
+  #                       y = Logistic$Train_y %>% unlist,
+  #                       alpha = Best_alpha,
+  #                       standardize = FALSE,
+  #                       family = Logistic$Family,
+  #                       link = Logistic$Link)
+
 
 
 

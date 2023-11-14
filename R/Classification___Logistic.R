@@ -20,7 +20,7 @@ Classification___Logistic = function(Logistic){
 
 
 
-  # standardization for Penalization
+  # standardization for Penalizations
   if(match.arg(tolower(Logistic$Fitting_Method), c("elasticnet")) %in% c("elasticnet") || Logistic$Standardize){
     Logistic$Train_X = Logistic$Train_X %>% mutate_if(is.numeric, scale)
     Logistic$Test_X = Logistic$Test_X %>% mutate_if(is.numeric, scale)
@@ -39,8 +39,12 @@ Classification___Logistic = function(Logistic){
 
 
   # Response
-  Logistic$Train_y = Logistic$Train_y %>% unlist() %>% factor() %>% droplevels()
-  Logistic$Test_y = Logistic$Test_y %>% unlist() %>% factor() %>% droplevels()
+  Logistic$Train_y = Logistic$Train_y %>% droplevels()
+  Logistic$Test_y = Logistic$Test_y %>% droplevels()
+
+
+
+
 
 
 
@@ -50,17 +54,16 @@ Classification___Logistic = function(Logistic){
   #=============================================================================
   # Fitting Models
   #=============================================================================
-  Response_Type = Logistic$Response_Type
-  Reponse_Type_Choices = c("Nominal", "Ordinal") %>% tolower
-  Response_Type = match.arg(tolower(Response_Type), Reponse_Type_Choices)
+  Groups = Logistic$Train_y %>% unlist %>% levels %>% length
 
-  if(Response_Type == "nominal"){
 
-    Results = Classification___Logistic___Nominal(Logistic)
+  if(Groups == 2){
 
-  }else if(Response_Type == "ordinal"){
+    Results = Classification___Logistic___Binomial(Logistic)
 
-    Results = Classification___Logistic___Ordinal(Logistic)
+  }else if(Groups > 2){
+
+    Results = Classification___Logistic___Multinomial(Logistic)
 
   }
 
@@ -79,7 +82,7 @@ Classification___Logistic = function(Logistic){
 }
 #===============================================================================
 # Arguments Setting
-#===============================================================================
+#===============================================================================s
 # Logistic = list(#----------------------------------------
 #                 # Data Setting
 #                 #----------------------------------------
@@ -96,16 +99,22 @@ Classification___Logistic = function(Logistic){
 #                 # Method
 #                 Response_Type = c("Nominal", "Ordinal"),
 #                 Fitting_Method = c("MLE", "ElasticNet"), #
+#                 #
+#                 Cut_Off = 0.5, # for Binomial prediction cut-off
 #                 # Model
 #                 Family = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
 #                            "cumulative", "sratio", "cratio", "acat",
-#                            #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
+#                            #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty : glmnet
 #                            "gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian"),
 #                 Link = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-#                          "logit", "probit", "cloglog", "cauchit"),
+#                          "logit", "probit", "cloglog", "cauchit",
+#                          #Classification___Logistic___Ordinal___MLE : method
+#                          "logistic", "probit", "loglog", "cloglog", "cauchit"
+#                          ),
 #                 # Penalty
 #                 penalty_alpha = seq(0, 1, 0.01),
 #                 penalty_lambda = exp(seq(-2,2,0.01)),
+#                 penalty.factor = rep(1, ncol(Train_X)), # which variables no penalty? The corresponding position of 0 is the variables with no penalty
 #                 #----------------------------------------
 #                 # Tuning measures
 #                 #----------------------------------------

@@ -1,8 +1,8 @@
-Classification___Logistic___Results___Predict___AUROC = function(Predicted_Probs, y_Test_unlist, AUC_in_Legend = FALSE, path_Export=NULL){
+Classification___Logistic___Results___Predict___AUROC = function(Predicted_Probs, Logistic){
   #=============================================================================
   # pacakges
   #=============================================================================
-  install_packages(c("pROC", "ggplot2", "dplyr"), load = TRUE)
+  install_packages(c("pROC", "ggplot2", "dplyr", "ROCR", "caTools"), load = TRUE)
 
 
 
@@ -13,24 +13,15 @@ Classification___Logistic___Results___Predict___AUROC = function(Predicted_Probs
   # Categories
   Categories = levels(y_Test_unlist)
   if(length(Categories) > 2){
-    Extracted_ROC.list = Classification___Logistic___Results___Predict___AUROC___Multi(Predicted_Probs, y_Test_unlist, Categories)
+    Extracted_ROC.list = Classification___Logistic___Results___Predict___AUROC___Multi(Predicted_Probs, Logistic$Test_y, Categories)
+
+    if(!is.null(path_Export)){
+      ggsave(filename = paste0(path_Export, "/ROC_plot.png"), plot = Extracted_ROC.list$p, width = 10, height = 8, dpi = 300, bg  = "white")
+    }
+
   }else{
-    Extracted_ROC.list = Classification___Logistic___Results___Predict___AUROC___Binary(Predicted_Probs, y_Test_unlist, Categories)
+    Extracted_ROC.list = Classification___Logistic___Results___Predict___AUROC___Binary(Predicted_Probs, Logistic$Test_y, Categories)
   }
-
-
-
-
-
-
-  #=============================================================================
-  # Export plot
-  #=============================================================================
-  if(!is.null(path_Export)){
-    ggsave(filename = paste0(path_Export, "/ROC_plot.png"), plot = Extracted_ROC.list$p, width = 10, height = 8, dpi = 300, bg  = "white")
-  }
-
-
 
 
 

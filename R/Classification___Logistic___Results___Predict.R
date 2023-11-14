@@ -3,15 +3,20 @@ Classification___Logistic___Results___Predict = function(Logistic){
   # Arguments
   #===========================================================================
   fit = Logistic$Best_Model
+
   Test_X = Logistic$Test_X
   Test_y = Logistic$Test_y
+
+  Levels = Test_y %>% unlist %>% levels
+
   x_varname = Logistic$Plot_x_varname
   y_varname = Logistic$Plot_y_varname
+
   AUC_in_Legend = Logistic$AUC_in_Legend
   path_Export = Logistic$path_Export
 
 
-
+  Results.list = list()
 
 
 
@@ -20,22 +25,49 @@ Classification___Logistic___Results___Predict = function(Logistic){
   # Prediction
   #===========================================================================
   # Predicted Probabilities
-  newdata = Test_X %>% as_tibble %>% dplyr::select(all_of(x_varname))
-  if(class(fit)=="ordinalNet"){
+  if("glm" %in% class(fit)){
+
+    Predicted_Probs = predict(fit, newdata = Test_X %>% as.data.frame, type = "response")
+
+  }else if(class(fit)=="ordinalNet"){
+
     Predicted_Probs = predict(fit, newx = Test_X %>% as.matrix, type = "response") # Ordinal_Elastic인 경우에는 잘 동작함.
+
   }else{
+
     Predicted_Probs = predict(fit, newdata = Test_X, type = "probs")
+
   }
 
-  # Get the predicted classes from the probabilities
-  Predicted_Classes = apply(Predicted_Probs, 1, which.max) %>% unname
 
-  # Predicted_Classes 벡터를 실제 레이블로 변환
-  # fit 객체의 클래스 레벨을 가져옵니다
-  class_levels = levels(Test_y)
 
-  # 인덱스를 레이블로 변환합니다
-  Predicted_Classes = factor(class_levels[Predicted_Classes], levels = class_levels)
+
+
+
+  #===========================================================================
+  # Predict class
+  #===========================================================================
+  if(Levels %>% length == 2){
+    # 확률을 바탕으로 클래스 레이블 결정 (예: 확률이 0.5 이상이면 1, 그렇지 않으면 0)
+    Predicted_Classes = ifelse(Predicted_Probs > Logistic$Cut_Off, Levels[2], Levels[1])
+    Predicted_Classes = factor(Predicted_Classes, levels = Levels)
+
+
+  }else{
+    # Get the predicted classes from the probabilities
+    Predicted_Classes = apply(Predicted_Probs, 1, which.max) %>% unname
+
+    # Predicted_Classes 벡터를 실제 레이블로 변환
+    # fit 객체의 클래스 레벨을 가져옵니다
+    class_levels = levels(Test_y)
+
+    # 인덱스를 레이블로 변환합니다
+    Predicted_Classes = factor(class_levels[Predicted_Classes], levels = class_levels)
+  }
+
+
+  Results.list$Predicted_Classes = Predicted_Classes
+
 
 
 
@@ -46,16 +78,46 @@ Classification___Logistic___Results___Predict = function(Logistic){
   # Confusion matrix
   #===========================================================================
   # Confusion matrix 생성
-  Confusion_Matrix = table(Predicted = Predicted_Classes, Actual = Test_y)
+  Results.list$Confusion_Matrix = Confusion_Matrix = table(Predicted = Predicted_Classes, Actual = Test_y %>% unlist)
 
   # Calculate the number of correct predictions (diagonal of the confusion matrix)
   Correct_Predictions = sum(diag(Confusion_Matrix))
 
   # Calculate the total number of predictions (sum of all elements in the confusion matrix)
-  Total_predictions = sum(Confusion_Matrix)
+  Total_Predictions = sum(Confusion_Matrix)
 
   # Calculate the misclassification rate
-  Misclassification_rate = 1 - (Correct_predictions / Total_predictions)
+  Results.list$Misclassification_Rate = 1 - (Correct_Predictions / Total_Predictions)
+
+
+
+  # library(caret)
+  # > confusionMatrix(as.factor(raw_data$vs), as.factor(result$predicted))
+  # Confusion Matrix and Statistics
+  #
+  # Reference
+  # Prediction  0  1
+  # 0 15  3
+  # 1  4 10
+  #
+  # Accuracy : 0.7812
+  # 95% CI : (0.6003, 0.9072)
+  # No Information Rate : 0.5938
+  # P-Value [Acc > NIR] : 0.02102
+  # ...이하 생략...
+
+
+
+
+
+
+
+  #===========================================================================
+  # Misclassified subjects
+  #===========================================================================
+
+
+
 
 
 
@@ -65,11 +127,8 @@ Classification___Logistic___Results___Predict = function(Logistic){
   #===========================================================================
   # ROAUC
   #===========================================================================
-  ROAUC.list = Classification___Logistic___Results___Predict___AUROC(Predicted_Probs = Predicted_Probs,
-                                                                     y_Test_unlist = Test_y,
-                                                                     AUC_in_Legend = Logistic$AUC_in_Legend,
-                                                                     path_Export = Logistic$path_Export) %>% suppressWarnings()
-
+  Results.list$ROAUC = ROAUC.list = Classification___Logistic___Results___Predict___AUROC(Predicted_Probs = Predicted_Probs,
+                                                                                          Logistic) %>% suppressWarnings()
 
 
 
@@ -79,32 +138,8 @@ Classification___Logistic___Results___Predict = function(Logistic){
   #===========================================================================
   # return
   #===========================================================================
-  c(list(Confusion_Matrix = Confusion_matrix, Misclassification_Rate = Misclassification_rate, Misclassified_Subjects = Misclassified.df), ROAUC.list) %>% return()
-
-
+  return(Results.list)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
 # #===========================================================================
 # # Compare the classification & Extract the misclassified subjects
 # #===========================================================================
