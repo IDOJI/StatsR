@@ -2,14 +2,14 @@ Classification___Logistic___Binomial = function(Logistic){
 
   if(Logistic$Fitting_Method == "MLE"){
 
-    Results = Classification___Logistic___Binomial___MLE(Logistic)
+    Logistic = Classification___Logistic___Binomial___MLE(Logistic)
 
-  }else if(Logistic$Fitting_Method == "Elastic"){
+  }else{
 
-    Results = Classification___Logistic___Binomial___Elastic(Logistic)
+    Logistic = Classification___Logistic___Binomial___Penalty(Logistic)
 
   }
 
-  return(Results)
+  return(Logistic)
 
 }

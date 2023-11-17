@@ -4,7 +4,7 @@ Classification___Logistic___Results___Predict___AUROC___Binary = function(Predic
   # Assuming you have a data frame `data` with predictor variables and a binary outcome `response`
   # Fit the logistic model
   # Calculate the AUC
-  roc_obj <- roc(Logistic$Test_y %>% unlist, Predicted_Probs)
+  roc_obj <- roc(Logistic$Test_y %>% unlist %>% unname, Predicted_Probs)
   auc_value <- auc(roc_obj)
 
 

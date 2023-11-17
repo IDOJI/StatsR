@@ -29,15 +29,19 @@ Classification___Logistic___Results___Predict = function(Logistic){
 
     Predicted_Probs = predict(fit, newdata = Test_X %>% as.data.frame, type = "response")
 
-  }else if(class(fit)=="ordinalNet"){
+  }else if("ordinalNet" %in% class(fit)){
 
     Predicted_Probs = predict(fit, newx = Test_X %>% as.matrix, type = "response") # Ordinal_Elastic인 경우에는 잘 동작함.
 
+  }else if("glmnet" %in% class(fit)){
+
+    Predicted_Probs = predict(fit, newx = Test_X %>% as.matrix, type = "response", s = fit$lambda)
+
   }else{
-
-    Predicted_Probs = predict(fit, newdata = Test_X, type = "probs")
-
+    stop("??????????????????Prediction Probs")
   }
+
+
 
 
 
@@ -46,13 +50,15 @@ Classification___Logistic___Results___Predict = function(Logistic){
 
   #===========================================================================
   # Predict class
-  #===========================================================================
+  #===========================================================================)
   if(Levels %>% length == 2){
-    # 확률을 바탕으로 클래스 레이블 결정 (예: 확률이 0.5 이상이면 1, 그렇지 않으면 0)
-    Predicted_Classes = ifelse(Predicted_Probs > Logistic$Cut_Off, Levels[2], Levels[1])
-    Predicted_Classes = factor(Predicted_Classes, levels = Levels)
-
-
+    if(Logistic$Cut_Off %>% is.null){
+      Predicted_Classes = NULL
+    }else{
+      # 확률을 바탕으로 클래스 레이블 결정 (예: 확률이 0.5 이상이면 1, 그렇지 않으면 0)
+      Predicted_Classes = ifelse(Predicted_Probs > Logistic$Cut_Off, Levels[2], Levels[1])
+      Predicted_Classes = factor(Predicted_Classes, levels = Levels)
+    }
   }else{
     # Get the predicted classes from the probabilities
     Predicted_Classes = apply(Predicted_Probs, 1, which.max) %>% unname
@@ -77,34 +83,23 @@ Classification___Logistic___Results___Predict = function(Logistic){
   #===========================================================================
   # Confusion matrix
   #===========================================================================
-  # Confusion matrix 생성
-  Results.list$Confusion_Matrix = Confusion_Matrix = table(Predicted = Predicted_Classes, Actual = Test_y %>% unlist)
+  if(!is.null(Results.list$Predicted_Classes)){
+    # Confusion matrix 생성
+    Results.list$Confusion_Matrix = Confusion_Matrix = table(Predicted = Predicted_Classes, Actual = Test_y %>% unlist)
 
-  # Calculate the number of correct predictions (diagonal of the confusion matrix)
-  Correct_Predictions = sum(diag(Confusion_Matrix))
+    # Calculate the number of correct predictions (diagonal of the confusion matrix)
+    Correct_Predictions = sum(diag(Confusion_Matrix))
 
-  # Calculate the total number of predictions (sum of all elements in the confusion matrix)
-  Total_Predictions = sum(Confusion_Matrix)
+    # Calculate the total number of predictions (sum of all elements in the confusion matrix)
+    Total_Predictions = sum(Confusion_Matrix)
 
-  # Calculate the misclassification rate
-  Results.list$Misclassification_Rate = 1 - (Correct_Predictions / Total_Predictions)
+    # Calculate the misclassification rate
+    Results.list$Misclassification_Rate = 1 - (Correct_Predictions / Total_Predictions)
+  }
 
 
 
-  # library(caret)
-  # > confusionMatrix(as.factor(raw_data$vs), as.factor(result$predicted))
-  # Confusion Matrix and Statistics
-  #
-  # Reference
-  # Prediction  0  1
-  # 0 15  3
-  # 1  4 10
-  #
-  # Accuracy : 0.7812
-  # 95% CI : (0.6003, 0.9072)
-  # No Information Rate : 0.5938
-  # P-Value [Acc > NIR] : 0.02102
-  # ...이하 생략...
+
 
 
 
@@ -127,8 +122,8 @@ Classification___Logistic___Results___Predict = function(Logistic){
   #===========================================================================
   # ROAUC
   #===========================================================================
-  Results.list$ROAUC = ROAUC.list = Classification___Logistic___Results___Predict___AUROC(Predicted_Probs = Predicted_Probs,
-                                                                                          Logistic) %>% suppressWarnings()
+  Results.list$ROAUC = Classification___Logistic___Results___Predict___AUROC(Predicted_Probs,
+                                                                             Logistic) %>% suppressWarnings()
 
 
 

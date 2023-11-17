@@ -1,4 +1,4 @@
-SUB___Fold = function(Data, Var_1, Var_2 = NULL, y_Var = NULL, Train_percentage=0.8, Train_K_Fold=5, Fold_N = 70, seed = 1123){
+SUB___Fold = function(Data, Var_1, Var_2 = NULL, y_Var = NULL, Train_percentage=0.8, Train_K_Fold=5, Fold_N = 70, seed = 1123, Return_Test=T){
   #=============================================================================
   # Arguments
   #=============================================================================

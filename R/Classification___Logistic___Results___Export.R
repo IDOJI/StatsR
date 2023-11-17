@@ -1,5 +1,7 @@
 Classification___Logistic___Results___Export = function(Logistic){
   path_Export = Logistic$path_Export
+  fs::dir_create(path_Export, recurse = T)
+
 
 
   #=============================================================================
@@ -37,7 +39,7 @@ Classification___Logistic___Results___Export = function(Logistic){
   #=============================================================================
   # 3) Coefficients
   #=============================================================================
-  Coefficients = Logistic$Best_Model_Coef$Combined
+  Coefficients = Logistic$Best_Model_NonZeroCoefs
   Coefficients = tibble::rownames_to_column(as.data.frame(Coefficients), "Variables_New")
   write.csv(Coefficients, paste0(path_Export, "/", "3.Coefficients.csv"), row.names=F)
   cat("\n", crayon::green("Exporting"), crayon::red("Coefficients"), crayon::green("is done!"), "\n")
@@ -48,10 +50,13 @@ Classification___Logistic___Results___Export = function(Logistic){
   #=============================================================================
   # 4) Confusion matrix
   #=============================================================================
-  Confusion = Logistic$Prediction$Confusion_Matrix %>% as.matrix %>% as.data.frame
-  Confusion.mat = Confusion %>% spread(key = Actual, value = Freq) %>% column_to_rownames(var = "Predicted") %>% as.data.frame
-  write.csv(Confusion.mat, paste0(path_Export, "/", "4.Confusion.mat.csv"), row.names=F)
-  cat("\n", crayon::green("Exporting"), crayon::red("Confusion matrix"), crayon::green("is done!"), "\n")
+  if(!is.null(Logistic$Prediction$Confusion_Matrix)){
+    Confusion = Logistic$Prediction$Confusion_Matrix %>% as.matrix %>% as.data.frame
+    Confusion.mat = Confusion %>% spread(key = Actual, value = Freq) %>% column_to_rownames(var = "Predicted") %>% as.data.frame
+    write.csv(Confusion.mat, paste0(path_Export, "/", "4.Confusion.mat.csv"), row.names=F)
+    cat("\n", crayon::green("Exporting"), crayon::red("Confusion matrix"), crayon::green("is done!"), "\n")
+
+  }
 
 
 
@@ -60,11 +65,14 @@ Classification___Logistic___Results___Export = function(Logistic){
   #=============================================================================
   # 5) Misclassification rate
   #=============================================================================
-  Misclassification_Rate = Logistic$Prediction$Misclassification_Rate
-  if(!is.null(Misclassification_Rate)){
-    write.csv(Misclassification_Rate, paste0(path_Export, "/", "5.Misclassification_Rate.csv"), row.names=F)
-    cat("\n", crayon::green("Exporting"), crayon::red("Misclassification rate"), crayon::green("is done!"), "\n")
+  if(!is.null(Logistic$Prediction$Misclassification_Rate)){
+    Misclassification_Rate = Logistic$Prediction$Misclassification_Rate
+    if(!is.null(Misclassification_Rate)){
+      write.csv(Misclassification_Rate, paste0(path_Export, "/", "5.Misclassification_Rate.csv"), row.names=F)
+      cat("\n", crayon::green("Exporting"), crayon::red("Misclassification rate"), crayon::green("is done!"), "\n")
+    }
   }
+
 }
 
 

@@ -1,6 +1,7 @@
 Classification___Logistic___Results___Coefficients = function(Logistic){
   fit = Logistic$Best_Model
 
+
   #===========================================================================
   # glm
   #===========================================================================
@@ -10,36 +11,17 @@ Classification___Logistic___Results___Coefficients = function(Logistic){
 
 
 
-
-
-
   #===========================================================================
   # glmnet
   #===========================================================================
   }else if("glmnet" %in% class(fit)){
 
-    # Check if lambda.min is present
-    if("lambda.min" %in% names(fit)){
-      # lambda.min exists, use it to extract coefficients
-      non_zero_coefs = coef(fit, s = Fit$lambda.min)
-    } else {
-      # lambda.min does not exist, use the first lambda in the sequence
-      # Alternatively, you could use a specific lambda value of your choice
-      non_zero_coefs = coef(fit, s = fit$lambda[1])
-    }
+    # 모델 계수 추출
+    Coef.mat = coef(fit, s = fit$lambda)
 
-    # Convert to a regular matrix if it is a sparse matrix
-    if (class(non_zero_coefs) == "dgCMatrix") {
-      non_zero_coefs_matrix = as.matrix(non_zero_coefs)
-    } else {
-      non_zero_coefs_matrix = non_zero_coefs
-    }
-
-    # Extract non-zero coefficients
-    non_zero_coef_names = rownames(non_zero_coefs_matrix)[non_zero_coefs_matrix[, 1] != 0]
-    non_zero_coef_values = non_zero_coefs_matrix[non_zero_coefs_matrix[, 1] != 0, 1]
-    Logistic$Best_Coef = data.frame(names(non_zero_coef_values), non_zero_coef_values %>% unname)
-
+    # 0이 아닌 계수만 추출 (절편 제외)
+    Logistic$Best_Model_NonZeroCoefs = Coef.mat[Coef.mat[,1] != 0, , drop = FALSE] %>% as.matrix %>% as.data.frame
+    Logistic$Best_Model_NonZeroCoefs = data.frame(rownames(Logistic$Best_Model_NonZeroCoefs), Logistic$Best_Model_NonZeroCoefs)
 
 
 
@@ -85,10 +67,9 @@ Classification___Logistic___Results___Coefficients = function(Logistic){
     Fit_Coef = Fit_Coef %>% filter(Values!=0)
 
     Logistic$Best_Coef = Fit_Coef
+  }else{
+    stop("Coef????????")
   }
-
-  # Combine as a list
-  # Fit_Coef = list(Intercept = Fit_Intercept, Slope = Fit_Slope[Fit_Slope!=0], Combined = Fit_Coef)
 
 
 
