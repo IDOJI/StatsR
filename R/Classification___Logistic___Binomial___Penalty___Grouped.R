@@ -11,42 +11,14 @@ Classification___Logistic___Binomial___Penalty___Grouped = function(Logistic){
   #=============================================================================
   # CV glmnet
   #=============================================================================
-  grpreg::cv.grpreg
+  tictoc::tic()
+  Logistic$cv_fit = cv.grpreg(X = Logistic$Train_X,
+                              y = Logistic$Train_y %>% unlist,
+                              group = Logistic$Grouped_Vars_Index,
+                              penalty = Logistic$Fitting_Method,
+                              family = "binomial")
+  tictoc::toc()
 
-  # 필요한 패키지를 설치하고 라이브러리를 불러옵니다.
-  if (!require(grpreg)) install.packages("")
-  library(grpreg)
-
-  # 예시 데이터 생성
-  set.seed(123)
-  n <- 100 # 관측치 개수
-  p <- 10  # 변수 개수
-  groups <- rep(1:2, each = p/2) # 변수를 두 그룹으로 나눕니다.
-  X <- matrix(rnorm(n * p), nrow = n, ncol = p)
-  beta <- c(rep(1, 5), rep(0, 5)) # 첫 번째 그룹에만 계수를 부여합니다.
-  y <- rbinom(n, 1, prob = plogis(X %*% beta))
-
-  # 그룹 라쏘 로지스틱 회귀 적합
-  fit <- grpreg(X, y, group = groups, family = "binomial")
-
-  # 모델 요약
-  summary(fit)
-
-  # 최적의 람다 값 선택 (예를 들어, CV를 사용)
-  cv_fit <- cv.grpreg(X, y, group = groups, family = "binomial")
-  best_lambda <- cv_fit$lambda.min
-
-  # 최적의 람다 값으로 적합된 모델 사용
-  coef(cv_fit, s = best_lambda)
-
-
-
-
-
-
-  #=============================================================================
-  # CV glmnet : find optimal lambda
-  #=============================================================================
 
 
 
@@ -55,11 +27,28 @@ Classification___Logistic___Binomial___Penalty___Grouped = function(Logistic){
 
 
   #=============================================================================
-  # Fit best model
+  # Best Model
   #=============================================================================
+  # Fit the final model using the best lambda found in cross-validations
+  Logistic$Best_Model = grpreg(X = Logistic$Train_X,
+                               y = Logistic$Train_y %>% unlist,
+                               group = Logistic$Grouped_Vars_Index,
+                               penalty = Logistic$Fitting_Method,
+                               lambda = Logistic$cv_fit$lambda.min, # Use the best lambda from CV
+                               family = "binomial")
 
 
 
+
+
+
+
+  #=============================================================================
+  # plotting
+  #=============================================================================
+  # plot(cv_fit)
+  # summary(Logistic$Best_Model)
+  # plot(Logistic$Best_Model)
 
 
 
@@ -70,6 +59,9 @@ Classification___Logistic___Binomial___Penalty___Grouped = function(Logistic){
   # Extract Results
   #=============================================================================
   Logistic = Classification___Logistic___Results(Logistic)
+
+
+
 
 
   return(Logistic)

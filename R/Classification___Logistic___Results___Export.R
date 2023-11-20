@@ -40,7 +40,6 @@ Classification___Logistic___Results___Export = function(Logistic){
   # 3) Coefficients
   #=============================================================================
   Coefficients = Logistic$Best_Model_NonZeroCoefs
-  Coefficients = tibble::rownames_to_column(as.data.frame(Coefficients), "Variables_New")
   write.csv(Coefficients, paste0(path_Export, "/", "3.Coefficients.csv"), row.names=F)
   cat("\n", crayon::green("Exporting"), crayon::red("Coefficients"), crayon::green("is done!"), "\n")
 
@@ -72,6 +71,35 @@ Classification___Logistic___Results___Export = function(Logistic){
       cat("\n", crayon::green("Exporting"), crayon::red("Misclassification rate"), crayon::green("is done!"), "\n")
     }
   }
+
+
+
+
+
+
+
+  #=============================================================================
+  # AUC
+  #=============================================================================
+  if(!is.null(Logistic$Prediction$ROAUC)){
+    AUC = Logistic$Prediction$ROAUC
+    if(!is.null(AUC)){
+      write.csv(AUC, paste0(path_Export, "/", "6.AUC.csv"), row.names=F)
+      cat("\n", crayon::green("Exporting"), crayon::red("AUC"), crayon::green("is done!"), "\n")
+    }
+  }
+
+
+
+
+
+
+
+  #=============================================================================
+  # return
+  #=============================================================================
+  return(Logistic)
+
 
 }
 

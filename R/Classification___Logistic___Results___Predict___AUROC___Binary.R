@@ -9,6 +9,7 @@ Classification___Logistic___Results___Predict___AUROC___Binary = function(Predic
 
 
   # ROC 커브와 AUC 값 출력
+  fs::dir_create(Logistic$path_Export)
   png(filename = paste0(Logistic$path_Export, "/AUC.png"))
   plot(roc_obj, main = paste("ROC curve (AUC = ", auc_value, ")", sep = ""))
   dev.off()

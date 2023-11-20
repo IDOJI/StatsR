@@ -35,13 +35,18 @@ Classification___Logistic___Results___Predict = function(Logistic){
 
   }else if("glmnet" %in% class(fit)){
 
-    Predicted_Probs = predict(fit, newx = Test_X %>% as.matrix, type = "response", s = fit$lambda)
+    Predicted_Probs = predict(fit, newx = Test_X %>% as.matrix, type = "response", s = fit$lambda.min)
+
+  }else if("grpreg" %in% class(fit)){
+
+    Predicted_Probs = predict(fit, X = Test_X %>% as.matrix, type = "response")
+
 
   }else{
+
     stop("??????????????????Prediction Probs")
+
   }
-
-
 
 
 
@@ -70,8 +75,6 @@ Classification___Logistic___Results___Predict = function(Logistic){
     # 인덱스를 레이블로 변환합니다
     Predicted_Classes = factor(class_levels[Predicted_Classes], levels = class_levels)
   }
-
-
   Results.list$Predicted_Classes = Predicted_Classes
 
 
@@ -168,10 +171,6 @@ Classification___Logistic___Results___Predict = function(Logistic){
 # }
 # rownames(Confusion_matrix) = levels(Test_y_unlist)
 #
-
-#
-
-
 
 
 

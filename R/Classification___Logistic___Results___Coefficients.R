@@ -6,7 +6,7 @@ Classification___Logistic___Results___Coefficients = function(Logistic){
   # glm
   #===========================================================================
   if("glm" %in% class(fit)){
-    Logistic$Best_Coef = fit$coefficients
+    Logistic$Best_Model_NonZeroCoefs = fit$coefficients
 
 
 
@@ -44,7 +44,7 @@ Classification___Logistic___Results___Coefficients = function(Logistic){
     Fit_Coef = data.frame(Coef = names(Fit_Coef), value = Fit_Coef)
     rownames(Fit_Coef) = NULL
 
-    Logistic$Best_Coef = Fit_Coef
+    Logistic$Best_Model_NonZeroCoefs = Fit_Coef
 
 
 
@@ -66,10 +66,30 @@ Classification___Logistic___Results___Coefficients = function(Logistic){
     Fit_Coef = data.frame(Coef = colnames(Fit_Coef), Values = Fit_Coef %>% as.vector)
     Fit_Coef = Fit_Coef %>% filter(Values!=0)
 
-    Logistic$Best_Coef = Fit_Coef
+    Logistic$Best_Model_NonZeroCoefs = Fit_Coef
+
+
+
+
+  #===========================================================================
+  # grpreg
+  #===========================================================================
+  }else if("grpreg" %in% class(Logistic$Best_Model)){
+
+    Coef = coef(Logistic$Best_Model, s = Logistic$Best_Model$cv_fit$lambda.min)
+
+    # Filter out the non-zero coefficients
+    NonZero_Coef = Coef[Coef != 0]
+    NonZero_Coef = data.frame(names(NonZero_Coef), NonZero_Coef)
+    rownames(NonZero_Coef) = NULL
+    Logistic$Best_Model_NonZeroCoefs = NonZero_Coef
+
   }else{
     stop("Coef????????")
   }
+
+
+
 
 
 

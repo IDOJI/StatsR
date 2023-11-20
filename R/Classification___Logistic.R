@@ -94,68 +94,70 @@ Classification___Logistic = function(Logistic){
 #===============================================================================
 # Arguments Setting
 #===============================================================================s
-  # Logistic = list(#----------------------------------------
-  #                 # Data Setting
-  #                 #----------------------------------------
-  #                 Train_X = Train_X,
-  #                 Train_y = Train_y, # factor with levels
-  #                 Test_X = Test_X,
-  #                 Test_y = Test_y, # factor with levels
-  #                 Train_Folds_Index.vec = Train_Folds_Index.vec,
-  #                 Train_Folds_Index.list = Train_Folds_Index.list,
-  #                 Standardize = TRUE,
-  #                 #----------------------------------------
-  #                 # Modeling Fitting
-  #                 #----------------------------------------
-  #                 # Method
-  #                 Response_Type = c("Nominal", "Ordinal"),
-  #                 Fitting_Method = c("MLE", "ElasticNet",
-  #                                    # Grouped Penalty
-  #                                    "grLasso", "grMCP","grSCAD", "gel", "cMCP"
-  #                                    ), #
-  #                 #
-  #                 Cut_Off = 0.5, # for Binomial prediction cut-off
-  #                 # Model
-  #                 Family = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                            "cumulative", "sratio", "cratio", "acat",
-  #                            #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty : glmnet
-  #                            "gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian",
-  #                            # glm인 경우 Link argument 참고
-  #                            ),
-  #                 Link = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                          "logit", "probit", "cloglog", "cauchit",
-  #                          #Classification___Logistic___Ordinal___MLE : method
-  #                          "logistic", "probit", "loglog", "cloglog", "cauchit",
-  #                          #Classification___Logistic___Nominal___MLE___NonGroupedPenalty
-  #                          "logit", "identity", "inverse", "log", "identity", "logit", "log"
-  #                          ),
-  #                 # Penalty
-  #                 penalty_alpha = seq(0, 1, 0.01),
-  #                 penalty_lambda = exp(seq(-2,2,0.01)),
-  #                 penalty.factor = rep(1, ncol(Train_X)), # which variables no penalty? The corresponding position of 0 is the variables with no penalty
-  #                 #----------------------------------------
-  #                 # Tuning measures
-  #                 #----------------------------------------
-  #                 Tune_Method = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                                 "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic",
-  #                                 #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
-  #                                 "default", "mse", "deviance", "class", "auc", "mae", "C"),
-  #                 # Best_Model_Criterion = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
-  #                 #                          "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic"),
-  #                 #----------------------------------------
-  #                 # Grouping variables
-  #                 #----------------------------------------
-  #                 Grouped_Vars_Index = NULL, # NULL이 아니면 그룹 정보를 사용, 그룹 위치 벡터를 넣어야 함.
-  #                 #----------------------------------------
-  #                 # Plotting
-  #                 #----------------------------------------
-  #                 Plot_y_varname = NULL, # proportional logit plot은 하나의 변수만 가능하므로 한 변수 지정
-  #                 Plot_x_varname = NULL, # 지정하지 않으면 plot 안 그려짐
-  #                 AUC_in_Legend = TRUE,
-  #                 #----------------------------------------
-  #                 # Export Results
-  #                 #----------------------------------------
-  #                 path_Export = NULL)
+# Logistic = list(#----------------------------------------
+#                 # Data Setting
+#                 #----------------------------------------
+#                 Train_X = Train_X,
+#                 Train_y = Train_y, # factor with levels
+#                 Test_X = Test_X,
+#                 Test_y = Test_y, # factor with levels
+#                 Train_Folds_Index.vec = Train_Folds_Index.vec,
+#                 Train_Folds_Index.list = Train_Folds_Index.list,
+#                 Standardize = TRUE,
+#                 #----------------------------------------
+#                 # Modeling Fitting
+#                 #----------------------------------------
+#                 # Method
+#                 Response_Type = c("Nominal", "Ordinal"),
+#                 Fitting_Method = c("MLE", "ElasticNet",
+#                                    # Grouped Penalty
+#                                    "grLasso", "grMCP","grSCAD", "gel", "cMCP"
+#                                    ), #
+#                 #
+#                 Cut_Off = 0.5, # for Binomial prediction cut-off
+#                 # Model
+#                 Family = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                            "cumulative", "sratio", "cratio", "acat",
+#                            #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty : glmnet
+#                            "gaussian", "binomial", "poisson", "multinomial", "cox", "mgaussian",
+#                            # glm인 경우 Link argument 참고
+                              # # Group penalty
+                              # "gaussian", "binomial", "poisson"
+#                            ),
+#                 Link = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                          "logit", "probit", "cloglog", "cauchit",
+#                          #Classification___Logistic___Ordinal___MLE : method
+#                          "logistic", "probit", "loglog", "cloglog", "cauchit",
+#                          #Classification___Logistic___Nominal___MLE___NonGroupedPenalty
+#                          "logit", "identity", "inverse", "log", "identity", "logit", "log"
+#                          ),
+#                 # Penalty
+#                 penalty_alpha = seq(0, 1, 0.01),
+#                 penalty_lambda = exp(seq(-2,2,0.01)),
+#                 penalty.factor = rep(1, ncol(Train_X)), # which variables no penalty? The corresponding position of 0 is the variables with no penalty
+#                 #----------------------------------------
+#                 # Tuning measures
+#                 #----------------------------------------
+#                 Tune_Method = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                                 "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic",
+#                                 #Classification___Logistic___Nominal___Elastic___NonGroupedPenalty
+#                                 "default", "mse", "deviance", "class", "auc", "mae", "C"),
+#                 # Best_Model_Criterion = c(#Classification___Logistic___Ordinal___Elastic___NonGroupedPenalty
+#                 #                          "cvLoglik", "cvMisclass", "cvBrier", "cvDevPct", "aic", "bic"),
+#                 #----------------------------------------
+#                 # Grouping variables
+#                 #----------------------------------------
+#                 Grouped_Vars_Index = NULL, # NULL이 아니면 그룹 정보를 사용, 그룹 위치 벡터를 넣어야 함.
+#                 #----------------------------------------
+#                 # Plotting
+#                 #----------------------------------------
+#                 Plot_y_varname = NULL, # proportional logit plot은 하나의 변수만 가능하므로 한 변수 지정
+#                 Plot_x_varname = NULL, # 지정하지 않으면 plot 안 그려짐
+#                 AUC_in_Legend = TRUE,
+#                 #----------------------------------------
+#                 # Export Results
+#                 #----------------------------------------
+#                 path_Export = NULL)
 
 
 
