@@ -6,11 +6,11 @@ Classification___Logistic___Multinomial = function(Logistic){
 
   if(Response_Type == "nominal"){
 
-    Results = Classification___Logistic___Nominal(Logistic)
+    Results = Classification___Logistic___Multinomial___Nominal(Logistic)
 
   }else if(Response_Type == "ordinal"){
 
-    Results = Classification___Logistic___Ordinal(Logistic)
+    Results = Classification___Logistic___Multinomial___Ordinal(Logistic)
 
   }
 
