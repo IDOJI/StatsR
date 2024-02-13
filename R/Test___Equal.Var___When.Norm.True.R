@@ -1,4 +1,4 @@
-Test___Equal.Var___When.Norm.True = function(Data, Group_Var, Response_Var, is.normal, alpha){
+Test___Equal.Var___When.Norm.True = function(Data, Group_Var, Response_Var, is.normal, outlier_method, alpha){
   data.list = as_list_by(Data, Group_Var)
 
   results.list = list(NA, NA, NA, NA)

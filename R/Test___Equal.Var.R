@@ -1,4 +1,9 @@
-Test___Equal.Var = function(Data, Group_Var, Response_Vars, is.Normal, alpha=0.05){
+Test___Equal.Var = function(Data,
+                            Group_Var,
+                            Response_Vars,
+                            is.Normal,
+                            outlier_method,
+                            alpha=0.05){
   if(length(Response_Vars) != length(is.Normal)){
     stop("The length of Response_Vars and is.Normal is different!")
   }
@@ -11,11 +16,27 @@ Test___Equal.Var = function(Data, Group_Var, Response_Vars, is.Normal, alpha=0.0
 
     ### Normality : TRUE
     if(ith_is.Normal){
-      Test___Equal.Var___When.Norm.True(Data, Group_Var, ith_Response_Var, ith_is.Normal, alpha)
+      ith_Results = Test___Equal.Var___When.Norm.True(Data,
+                                                      Group_Var,
+                                                      Response_Var = ith_Response_Var,
+                                                      is.normal = ith_is.Normal,
+                                                      outlier_method = outlier_method,
+                                                      alpha)
     }else{
     ### Normality : FALSE
-      Test___Equal.Var___When.Norm.False(Data, Group_Var, ith_Response_Var, ith_is.Normal, alpha)
+      ith_Results = Test___Equal.Var___When.Norm.False(Data,
+                                         Group_Var,
+                                         Response_Var = ith_Response_Var,
+                                         is.normal = ith_is.Normal,
+                                         outlier_method = outlier_method,
+                                         alpha)
     }
+
+    ith_Results = data.frame(Homoscedasticity_Test = ith_Results$Equal.Var_What.Test,
+                             Homoscedasticity_p.val = ith_Results$Equal.Var_p.val,
+                             is.Homoscedastic = ith_Results$is.Equal.Var)
+
+    return(ith_Results)
   })
 
 

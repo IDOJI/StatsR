@@ -1,10 +1,10 @@
-Test___Equal.Var___When.Norm.False = function(Data, Group_Var, Response_Var, is.normal, alpha, outlier_method = c("IQR")){
+Test___Equal.Var___When.Norm.False = function(Data, Group_Var, Response_Var, is.normal, outlier_method = c("IQR"), alpha){
   #===========================================================================
   # Check outliers
   #===========================================================================
   Have_Outliers = tapply(
-    Data %>% select(!!Response_Var) %>% unlist(),
-    Data %>% select(!!Group_Var) %>% unlist(),
+    Data %>% dplyr::select(!!Response_Var) %>% unlist(),
+    Data %>% dplyr::select(!!Group_Var) %>% unlist(),
     function(x){
       ith_Outliers = SUB___Which.Outliers(x, method = outlier_method)
       ith_Have_Outliers = is.numeric(ith_Outliers)
@@ -19,8 +19,12 @@ Test___Equal.Var___When.Norm.False = function(Data, Group_Var, Response_Var, is.
   #===========================================================================
   # test
   #===========================================================================
-  results.list = list(NA, NA, NA, NA)
-  names(results.list) = c("Equal.Var_results", "Equal.Var_What.Test", "Equal.Var_p.val", "is.Equal.Var")
+  results.list = list(NA, NA, NA, NA) %>% setNames(c("Equal.Var_results",
+                                                     "Equal.Var_What.Test",
+                                                     "Equal.Var_p.val",
+                                                     "is.Equal.Var"))
+
+
 
 
   if(Have_Outliers){
@@ -33,6 +37,6 @@ Test___Equal.Var___When.Norm.False = function(Data, Group_Var, Response_Var, is.
     results.list[[3]] = results.list[[1]]$`Pr(>F)`[1] %>% as.numeric
   }
 
-  results.list[[4]] = results.list[[3]] > alpha
+  results.list[[4]] = results.list[[3]] > alpha # Test results : is it homoscedasticity?
   return(results.list)
 }

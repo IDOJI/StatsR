@@ -1,4 +1,4 @@
-Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var, alpha=0.05){
+Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var, outlier_method, alpha=0.05){
   #=============================================================================
   # Group var
   #=============================================================================
@@ -13,7 +13,7 @@ Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var, alp
   #=============================================================================
   }else{
     Response = Data %>% select(!!Response_Var) %>% unlist() %>% unname()
-    Results = Test___Normality___Single.Vector(Response, alpha)
+    Results = Test___Normality___Single.Vector(Response, outlier_method, alpha)
   }
 
 

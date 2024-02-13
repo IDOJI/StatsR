@@ -6,20 +6,33 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
                                                                             is.Normal,
                                                                             is.Equal.Var,
                                                                             type = c("parametric", "nonparametric", "robust", "bayes"),
+                                                                            plot_title = "",
                                                                             outlier.tagging = FALSE,
                                                                             tr=0.2,
                                                                             # plotting options
                                                                             # results.subtitle = T,
                                                                             # pairwise.comparisons = T,
-                                                                            # p.adjust.method = c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY"),
-                                                                            # title = ""
+                                                                            # p.adjust.method = c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY")
                                                                             ...)
 {
   #=============================================================================
   # Packges
   #=============================================================================
   # install.packages("/Users/Ido/Downloads/ggstatsplot_0.12.0.tar.gz", repos = NULL, type = "source")
+  install_packages = function(packages, load=TRUE) {
+    # load : load the packages after installation?
+    for(pkg in packages) {
+      if (!require(pkg, character.only = TRUE)) {
+        install.packages(pkg)
+      }
+
+      if(load){
+        library(pkg, character.only = TRUE)
+      }
+    }
+  }
   install_packages("ggthemes")
+
 
 
 
@@ -110,7 +123,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
     #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ggplot.component = list(ggplot2::theme(plot.title = element_text(size = 20, face = "bold"))),
     results.subtitle = TRUE,
-    title = "",
+    title = plot_title,
     package = "yarrr", ## package from which color palette is to be taken
     palette = "info2", ## choosing a different color palette
 

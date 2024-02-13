@@ -2,7 +2,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor = fun
   #=============================================================================
   # Grouping
   #=============================================================================
-  n_Group = Data %>% select(!!Group_Var) %>% unlist() %>% table %>% names %>% length
+  n_Group = Data %>% dplyr::select(!!Group_Var) %>% unlist() %>% table %>% names %>% length
 
 
 

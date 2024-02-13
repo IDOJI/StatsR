@@ -6,19 +6,23 @@ Test___MeanDiff___Single.Responses = function(Data,
                                               p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                                               is.Normal,
                                               is.Equal.Var,
-                                              type = c("parametric", "nonparametric", "robust", "bayes")){
+                                              type = c("parametric", "nonparametric", "robust", "bayes"),
+                                              # Plot
+                                              plot_title=""){
   #==================================================================================
   # ANOVA
   #==================================================================================
   if(Group_Var_Type %in% c("Nominal", "nominal")){
-    stop("check function p.adjustment code is change because of 'Ordinal' method. They should be included in Nominal too")
+    warning("check function p.adjustment code was changed because of 'Ordinal' method. They should be included in Nominal too. However I didn't change the code yet")
     Results_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var(Data,
                                                                            Response_Vars,
                                                                            Group_Var,
                                                                            alpha_ANOVA,
                                                                            is.Normal,
                                                                            is.Equal.Var,
-                                                                           type)
+                                                                           type,
+                                                                           # plot
+                                                                           plot_title)
     p.value_colname = "p.value_Comparison"
   }else if(Group_Var_Type %in% c("Ordinal", "ordinal")){
     Results_ANOVA = Test___MeanDiff___Single.Responses___Ordinal.Group.Var(Data,
@@ -31,16 +35,13 @@ Test___MeanDiff___Single.Responses = function(Data,
                                                                            type)
     p.value_colname = "p.value_adj"
   }
-  p.vals[2] =
-  p.vals= p.vals[-2]
-  p.vals_new = c(p.vals, Results_ANOVA_Kruskal$RERA$p.value_Comparison)
-  Test___Adjust.p.values(  p.vals_new , method = p.adjust.method, alpha = 0.05)
 
-  p.vals = c()
-  for(m in 1:nrow(Results_ANOVA_Ordinal)){
-    mth_row = Results_ANOVA_Ordinal[m,]
-    p.vals = c(p.vals, mth_row[, grep(mth_row$alternative, names(mth_row))])
-  }
+
+
+  # for(m in 1:nrow(Results_ANOVA_Ordinal)){
+  #   mth_row = Results_ANOVA_Ordinal[m,]
+  #   p.vals = c(p.vals, mth_row[, grep(mth_row$alternative, names(mth_row))])
+  # }
 
 
 
@@ -157,10 +158,6 @@ Test___MeanDiff___Single.Responses = function(Data,
   #     Results_ANOVA[[i]] = Results_ANOVA[[i]] %>% relocate(starts_with("group"), .after=Group)
   #   }
   # }
-
-
-
-
 
 
 

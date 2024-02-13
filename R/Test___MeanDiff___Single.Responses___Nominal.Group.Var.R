@@ -5,6 +5,8 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                   is.Normal,
                                                                   is.Equal.Var,
                                                                   type = c("parametric", "nonparametric", "robust", "bayes"),
+                                                                  # plot
+                                                                  plot_title,
                                                                   outlier.tagging = FALSE,
                                                                   tr=0.2){
   #==================================================================================
@@ -19,11 +21,10 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                      is.Normal = is.Normal[k],
                                                                      is.Equal.Var = is.Equal.Var[k],
                                                                      type,
+                                                                     plot_title,
                                                                      outlier.tagging,
                                                                      tr)
-  })
-
-
+  }) %>% setNames(Response_Vars)
 
 
 
@@ -33,15 +34,15 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
   #==================================================================================
   # Extract Results
   #==================================================================================
-  Extracted_Results.list = lapply(seq_along(ggstats.list), function(n){
-    Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(p = ggstats.list[[n]],
-                                                                               Data,
-                                                                               Group_Var,
-                                                                               Response_Var = Response_Vars[n])
-  })
-  names(Extracted_Results.list) = Response_Vars
+  Extracted_Results.list = lapply(seq_along(ggstats.list), function(k){
+    kth_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(p = ggstats.list[[k]],
+                                                                                           Data,
+                                                                                           Group_Var,
+                                                                                           Response_Var = Response_Vars[k])
 
-
+    kth_ANOVA$Group.Difference = kth_ANOVA$p.value < alpha_ANOVA
+    return(kth_ANOVA)
+  }) %>% setNames(Response_Vars)
 
 
 
@@ -54,7 +55,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
   #==================================================================================
   # return
   #==================================================================================
-  return(Extracted_Results.list)
+  list(Boxplots = ggstats.list, Results = Extracted_Results.list)
 }
 
 

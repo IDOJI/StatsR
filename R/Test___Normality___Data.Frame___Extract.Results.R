@@ -29,7 +29,7 @@ Test___Normality___Data.Frame___Extract.Results = function(Results){
   rownames(combined.df) = NULL
   is.normal = sum(combined.df$is.normal)==nrow(combined.df)
 
-  return(list(Norm_reslts=combined.df, is.normal=is.normal))
+  return(list(Norm_results=combined.df, is.normal=is.normal))
 }
 
 
