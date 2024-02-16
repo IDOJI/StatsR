@@ -31,16 +31,18 @@ Test___Normality___Single.Vector = function(x.vec, outlier_method, alpha=0.05){
     results.list[[2]] = "Nonparametric needed"
     results.list[[3]] = 0
   ## 🟧MJB Test : superior to others in every aspect ====================================================================
-  }else{
+  }else if(Have_Outliers){
     results.list[[1]] = Test___Normality___Single.Vector___MJBTest(data = x.vec)
     results.list[[2]] = results.list[[1]]$Test
     results.list[[3]] = results.list[[1]]$p_value
+  }else{
+    results.list[[1]] = shapiro.test(x.vec)
+    results.list[[2]] = "Shapiro-Wilk"
+    results.list[[3]] = results.list[[1]]$p.value
   }
 
   # else if(n < 2000){
-  #   results.list[[1]] = shapiro.test(x.vec)
-  #   results.list[[2]] = "Shapiro-Wilk"
-  #   results.list[[3]] = results.list[[1]]$p.value
+
   # ## 🟧sample size : n < 2000 ====================================================================
   # }else{
   #   results.list[[1]] = moments::agostino.test(x.vec)

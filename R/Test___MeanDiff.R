@@ -174,14 +174,14 @@ Test___MeanDiff = function(##############################
   #==================================================================================
   # 6) Save combined result
   #==================================================================================
-  if(!is.null(path_save)){
-    file.name = paste0("[ANOVA] Combined_Results_", "`", Group_Var, "`")
-
-    # save RDS file
-    saveRDS(object = Combined_Results.list, file = paste0(path_save, "/", file.name, ".rds"))
-
-    cat("\n", crayon::green("Exporting"), crayon::red("Combined Results"), crayon::green("is done!"),"\n")
-  }
+  # if(!is.null(path_save)){
+  #   file.name = paste0("[ANOVA] Combined_Results_", "`", Group_Var, "`")
+  #
+  #   # save RDS file
+  #   saveRDS(object = Combined_Results.list, file = paste0(path_save, "/", file.name, ".rds"))
+  #
+  #   cat("\n", crayon::green("Exporting"), crayon::red("Combined Results"), crayon::green("is done!"),"\n")
+  # }
 
 
   # # Combining tables for LaTeX
@@ -225,7 +225,7 @@ Test___MeanDiff = function(##############################
   #                                                 path_save)
   # })
 
-  return(Combined_Results.list)
+  return(list(Combined_Results.df = Combined_Results.df, Combined_Results.list = Combined_Results.list))
 }
 
 
