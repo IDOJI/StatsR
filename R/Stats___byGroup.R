@@ -1,6 +1,5 @@
 Stats___byGroup <- function(df, group_var, numeric_var, na.rm=TRUE) {
 
-
   # 그룹 별 통계량 계산
   stats <- df %>%
     dplyr::group_by(!!sym(group_var)) %>%

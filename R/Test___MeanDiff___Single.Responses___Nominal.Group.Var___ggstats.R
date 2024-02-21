@@ -13,8 +13,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
                                                                             # results.subtitle = T,
                                                                             # pairwise.comparisons = T,
                                                                             # p.adjust.method = c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY")
-                                                                            ...)
-{
+                                                                            ...){
   #=============================================================================
   # Packges
   #=============================================================================
@@ -31,7 +30,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
       }
     }
   }
-  install_packages("ggthemes")
+  install_packages(c("ggthemes", "ggsignif"))
 
 
 
@@ -134,15 +133,78 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
     #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     conf.level = 1-alpha_ANOVA,
     pairwise.comparisons = TRUE,
+    pairwise.display = "s",
     pairwise.annotation = "p.value",                # how do you want to annotate the pairwise comparisons
-    p.adjust.method = "none"                       # method for adjusting p-values for multiple comparisons
-
-  ) %>% suppressWarnings()
+    p.adjust.method = "none")                        # method for adjusting p-values for multiple comparisons
 
 
 
-  return(p)
+
+
+
+
+  #============================================================================
+  # p value bar
+  #============================================================================
+  # Extract p-val
+  Results = ggstatsplot::extract_stats(p)
+  pval = Results$subtitle_data$p.value
+
+  if(pval <= alpha_ANOVA){
+
+    Groups = p$data[[1]] %>% unique %>% as.character
+
+
+    if(length(Groups) > 2){
+
+      # Extract comparison results
+      Comparison = Results$pairwise_comparisons_data %>% as.data.frame
+
+      # Extract significant cases only
+      Significant_pairs = Comparison[Comparison$p.value <= alpha_ANOVA, ]
+
+      # generate `group` variable
+      Significant_pairs = Significant_pairs %>%
+        dplyr::mutate(groups = purrr::pmap(.l = list(group1, group2), .f = c)) %>%
+        dplyr::arrange(group1)
+
+      # plotting
+      by = max(p$data[[2]]) * 0.25 / 6
+      p2 = p + geom_signif(comparisons = Significant_pairs$groups,
+                           y_position = max(p$data[[2]]) + seq(0, 10, by = by)[1:length(Groups)],
+                           test.args = list(exact = FALSE),
+                           annotations = SUB___P.vals.Signif.Stars(Significant_pairs$p.value)
+      )
+
+
+
+      # 2 groups =================================================================
+    }else if(length(Groups) == 2){
+
+      p2 = p + geom_signif(comparisons = list(Groups),
+                           test.args = list(exact = FALSE),
+                           annotations = SUB___P.vals.Signif.Stars(pval)
+      )
+
+    }else{
+
+      stop("Check the number of groups")
+
+    }
+
+  }else{
+
+    p2 = p
+
+  }
+
+
+
+
+  return(p2)
+
 }
+
 #
 #
 # #============================================================================
@@ -165,31 +227,6 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats = function(Data
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#=============================================================================
-# Boxplot
-#=============================================================================
-# p1 <- ggpubr::ggboxplot(data = Data,
-#                         x = Group_Var,
-#                         y = `Response_Var`,
-#                         color = Group_Var,
-#                         palette = colors,
-#                         # shape = Group_Var,
-#                         size = 0.5,
-#                         add = "jitter",
-#                         add.params = list(size=0.5))
-#
 
 
 

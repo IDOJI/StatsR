@@ -39,7 +39,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                                            Data,
                                                                                            Group_Var,
                                                                                            Response_Var = Response_Vars[k])
-
+    kth_ANOVA$Used.Significance.Level = alpha_ANOVA
     kth_ANOVA$Group.Difference = kth_ANOVA$p.value < alpha_ANOVA
     return(kth_ANOVA)
   }) %>% setNames(Response_Vars)

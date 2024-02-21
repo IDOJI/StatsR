@@ -35,6 +35,27 @@ Test___MeanDiff = function(##############################
 
                            ...){
   #==================================================================================
+  # packages
+  #==================================================================================
+  install_packages = function(packages, load=TRUE) {
+    # load : load the packages after installation?
+    for(pkg in packages) {
+      if (!require(pkg, character.only = TRUE)) {
+        install.packages(pkg)
+      }
+
+      if(load){
+        library(pkg, character.only = TRUE)
+      }
+    }
+  }
+  install_packages(c("ggpubr", "ggplot2", "ggstatsplot"))
+
+
+
+
+
+  #==================================================================================
   # path
   #==================================================================================
   if(!is.null(path_save)){
@@ -81,9 +102,14 @@ Test___MeanDiff = function(##############################
 
 
 
+
+
+
+
   #==================================================================================
   # 3) ANOVA
   #==================================================================================
+  # Group var type
   Group_Var_Type = match.arg(Group_Var_Type)
   if(Response_Vars %>% length > 1){
     Results_ANOVA = Test___MeanDiff___Multi.Reponses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, is.Normal, is.Equal.Var, type)

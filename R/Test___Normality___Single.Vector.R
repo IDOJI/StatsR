@@ -19,11 +19,6 @@ Test___Normality___Single.Vector = function(x.vec, outlier_method, alpha=0.05){
   results.list$N_Obs = n
 
 
-
-
-
-  test =
-  results.list$`p-val`
   # 🟥Test Decision ############################################################################
   ## 🟧sample size : n < 4 ====================================================================
   if(n<4){
