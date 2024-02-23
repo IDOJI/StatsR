@@ -1,13 +1,9 @@
-Test___MeanDiff = function(##############################
-                           # data & variables
-                           ##############################
+Test___MeanDiff = function(# data & variables
                            Data,
                            Response_Vars,
                            Group_Var,
                            Group_Var_Type = c("Nominal", "Ordinal"),
-                           ##############################
                            # Significance level
-                           ##############################
                            alpha_Norm  = 0.05,
                            alpha_Equal.Var  = 0.05,
                            alpha_ANOVA = 0.05,
@@ -15,9 +11,7 @@ Test___MeanDiff = function(##############################
                            outlier_method = c("IQR"),
                            p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                            type = c("parametric", "nonparametric", "robust", "bayes"),
-                           ##############################
                            # Figure
-                           ##############################
                            label.as.p.val=F,
                            group.comparison=F,
                            lines.connecting.medians=F,
@@ -27,16 +21,11 @@ Test___MeanDiff = function(##############################
                            plot_units = "in",
                            plot_dpi = 200,
                            # results.subtitle=T,
-                           ##############################
                            # exporting
-                           ##############################
                            path_save = NULL,
                            export.separately=TRUE,
-
                            ...){
-  #==================================================================================
-  # packages
-  #==================================================================================
+  # 🟥 packages ===================================================================
   install_packages = function(packages, load=TRUE) {
     # load : load the packages after installation?
     for(pkg in packages) {
@@ -55,9 +44,7 @@ Test___MeanDiff = function(##############################
 
 
 
-  #==================================================================================
-  # path
-  #==================================================================================
+  # 🟥 path ===================================================================
   if(!is.null(path_save)){
     dir.create(path_save, showWarnings = F)
   }
@@ -68,19 +55,14 @@ Test___MeanDiff = function(##############################
 
 
 
-  #==================================================================================
-  # type
-  #==================================================================================
+  # 🟥 type ===================================================================
   type = match.arg(type)
 
 
 
 
 
-
-  #==================================================================================
-  # 1) Normality
-  #==================================================================================
+  # 🟥 1) Normality ===================================================================
   Results_Normality = Test___Normality(Data, Group_Var, Response_Vars, outlier_method, alpha = alpha_Norm)
   is.Normal = sapply(Results_Normality, function(x) x[[2]])
 
@@ -90,9 +72,7 @@ Test___MeanDiff = function(##############################
 
 
 
-  #==================================================================================
-  # 2) Homoscedasticity
-  #==================================================================================
+  # 🟥 2) Homoscedasticity ===========================================================
   Results_Homoscedasticity = Test___Equal.Var(Data, Group_Var, Response_Vars, is.Normal, outlier_method, alpha = alpha_Equal.Var)
   is.Equal.Var = sapply(Results_Homoscedasticity, function(x) x[,3])
 
@@ -103,12 +83,7 @@ Test___MeanDiff = function(##############################
 
 
 
-
-
-
-  #==================================================================================
-  # 3) ANOVA
-  #==================================================================================
+  # 🟥 3) ANOVA ===========================================================
   # Group var type
   Group_Var_Type = match.arg(Group_Var_Type)
   if(Response_Vars %>% length > 1){

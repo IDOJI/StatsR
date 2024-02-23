@@ -32,11 +32,11 @@ Test___Normality = function(Data,
 
     # Combined Group
     p1 = ggplot___histogram(df = Data,
-                           x = ith_Response,
-                           group_var = Group_Var,
-                           group_combined = T,
-                           density = T,
-                           path_Export = path_save)
+                            x = ith_Response,
+                            group_var = Group_Var,
+                            group_combined = T,
+                            density = T,
+                            path_Export = path_save)
 
     # Each group differently
     p2 = ggplot___histogram(df = Data,

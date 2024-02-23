@@ -15,9 +15,9 @@ ggplot___histogram___Nongroup = function(df,
 
   # 🟥 Histogram ################################################################
   p <- ggplot(df, aes(x = x_Var)) +
-    geom_histogram(aes(y = ..density..), fill = fill_color, color = "black", bins = 20) +  # 밀도 기준으로 높이 조정 및 랜덤 색상 설정
+    geom_histogram(aes(y = after_stat(density)), fill = fill_color, color = "black", bins = 20) +  # 밀도 기준으로 높이 조정 및 랜덤 색상 설정
     theme_minimal() +
-    labs(x = x, title = "Histogram with Density") +
+    labs(x = x, title = "Histogram") +
     theme(
       axis.title = element_text(size = 14, face = "bold"),  # 축 제목 설정
       plot.title = element_text(size = 16, face = "bold", hjust = 0.5)  # 플롯 타이틀 설정
@@ -25,10 +25,14 @@ ggplot___histogram___Nongroup = function(df,
 
 
 
+
   # 🟥 Density ################################################################
   if(density){
+
     # Random color
-    p = p + geom_density(alpha = 0.2, fill = sample(colors, 1))
+    p = p + geom_density(alpha = 0.2, fill = sample(colors, 1)) +
+      labs(x = x, title = "Histogram with Density")
+
   }
 
 
