@@ -3,80 +3,95 @@ Test___Normality = function(Data,
                             Response_Vars=NULL,
                             outlier_method,
                             alpha = 0.05){
+  # 🟥 Result list #############################################################################
+  results.list = list()
+
+
+
+
+
   # 🟥 Decision ############################################################################
-  ## 🟧Single vector ===============================================================
+
   if(is.null(Group_Var) && is.null(Response_Vars)){
 
-    Results = Test___Normality___Single.Vector(Data, outlier_method, alpha)
+    ## 🟧Single vector ===============================================================
+    results.list$Norm_Test_Results = Test___Normality___Single.Vector(Data, outlier_method, alpha) %>% list() %>% setNames(Response_Vars)
 
-  ## 🟧Data.frame with group var =============================================================================
+
   }else if(!is.null(Response_Vars)){
 
-    Results = lapply(Response_Vars, function(ith_Response, ...){
+    ## 🟧Data.frame with group var =============================================================================
+    results.list$Norm_Test_Results = lapply(Response_Vars, function(ith_Response, ...){
 
       Test___Normality___Data.Frame(Data = Data, Group_Var = Group_Var, Response_Var = ith_Response, outlier_method, alpha = alpha)
 
    })
-    names(Results) = Response_Vars
+    names(results.list$Norm_Test_Results) = Response_Vars
 
-  ## 🟧else ============================================================================
+
   }else{
+    ## 🟧else ============================================================================
     stop("Check input!")
   }
 
 
 
 
-  # 🟥Density function #############################################################################
-  for(ith_Response in Response_Vars){
+
+
+  # 🟥Histogram + Density + QQplot #############################################################################
+  results.list$Plots.list = lapply(Response_Vars, function(ith_Response){
+
+    ith_plots.list = list()
 
     # Combined Group
-    p1 = ggplot___histogram(df = Data,
-                            x = ith_Response,
-                            group_var = Group_Var,
-                            group_combined = T,
-                            density = T,
-                            path_Export = path_save)
+    ith_plots.list$Hist_Combined = ggplot___histogram(df = Data,
+                                                       x = ith_Response,
+                                                       group_var = Group_Var,
+                                                       group_combined = T,
+                                                       density = T,
+                                                       same_colors_density = F,
+                                                       path_Export = path_save)
 
     # Each group differently
-    p2 = ggplot___histogram(df = Data,
-                            x = ith_Response,
-                            group_var = Group_Var,
-                            group_combined = F,
-                            density = T,
-                            path_Export = path_save)
+    ith_plots.list$Hist_EachGroup = ggplot___histogram(df = Data,
+                                                       x = ith_Response,
+                                                       group_var = Group_Var,
+                                                       group_combined = F,
+                                                       same_colors_density = F,
+                                                       density = T,
+                                                       path_Export = path_save)
 
+
+
+    # QQ plot
+    ith_plots.list$QQplot = ggplot___QQplot(df = Data, x = ith_Response, group_var = Group_Var, path_Export = path_save)
+
+    return(ith_plots.list)
+  })
+
+
+
+
+
+
+  # 🟥 Combine results #############################################################################
+  Results.list = list()
+  for(k in 1:length(Response_Vars)){
+
+    Results.list[[k]] = list(Norm_Test_Result = results.list$Norm_Test_Results[[k]], Norm_Plots = results.list$Plots.list[[k]])
 
   }
+  names(Results.list) = Response_Vars
+
 
 
 
 
   cat("\n", crayon::green("Testing"), crayon::red("Normality"), crayon::green("is done!"),"\n")
-  return(Results)
+  return(Results.list)
 
 }
 
-library(ggplot2)
-library(ggpubr)  # ggplot2와 함께 사용할 수 있는 패키지
-
-# 예제 데이터 생성
-set.seed(123)
-data <- data.frame(value = rnorm(100))
-
-# 히스토그램과 QQ 플롯을 하나의 그림 위에 겹쳐서 그리는 함수
-plot_combined <- function(data, x_var) {
-  # 히스토그램과 QQ 플롯을 하나의 ggplot 객체에 추가
-  combined_plot <- ggplot(data, aes(x = !!sym(x_var))) +
-    geom_histogram(binwidth = 0.5, fill = "skyblue", color = "black", alpha = 0.7) +
-    labs(x = x_var, y = "Frequency", title = "Histogram with QQ Plot") +
-    geom_qq(aes(sample = !!sym(x_var)), color = "red") +
-    geom_qq_line(aes(sample = !!sym(x_var)), color = "red")
-
-  return(combined_plot)
-}
-
-# 함수를 사용하여 히스토그램과 QQ 플롯을 겹쳐서 그리기
-plot_combined(data, "value")
 
 

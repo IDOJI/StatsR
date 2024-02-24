@@ -53,6 +53,9 @@ Test___MeanDiff = function(# data & variables
 
 
 
+  # 🟥 Results list ===================================================================
+  Results.list = list()
+
 
 
   # 🟥 type ===================================================================
@@ -63,18 +66,18 @@ Test___MeanDiff = function(# data & variables
 
 
   # 🟥 1) Normality ===================================================================
-  Results_Normality = Test___Normality(Data, Group_Var, Response_Vars, outlier_method, alpha = alpha_Norm)
-  is.Normal = sapply(Results_Normality, function(x) x[[2]])
-
-
+  Results.list$Normality = Test___Normality(Data, Group_Var, Response_Vars, outlier_method, alpha = alpha_Norm)
+  is.Normal = sapply(Results.list$Normality, function(x){
+   x$Norm_Test_Result$is.normal
+  })
 
 
 
 
 
   # 🟥 2) Homoscedasticity ===========================================================
-  Results_Homoscedasticity = Test___Equal.Var(Data, Group_Var, Response_Vars, is.Normal, outlier_method, alpha = alpha_Equal.Var)
-  is.Equal.Var = sapply(Results_Homoscedasticity, function(x) x[,3])
+  Results.list$Homoscedasticity = Test___Equal.Var(Data, Group_Var, Response_Vars, is.Normal, outlier_method, alpha = alpha_Equal.Var)
+  is.Equal.Var = sapply(Results.list$Homoscedasticity, function(x) x[,3])
 
 
 
@@ -87,18 +90,18 @@ Test___MeanDiff = function(# data & variables
   # Group var type
   Group_Var_Type = match.arg(Group_Var_Type)
   if(Response_Vars %>% length > 1){
-    Results_ANOVA = Test___MeanDiff___Multi.Reponses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, is.Normal, is.Equal.Var, type)
+    Results.list$ANOVA = Test___MeanDiff___Multi.Reponses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, is.Normal, is.Equal.Var, type)
   }else{
-    Results_ANOVA = Test___MeanDiff___Single.Responses(Data,
-                                                       Response_Vars,
-                                                       Group_Var,
-                                                       Group_Var_Type,
-                                                       alpha_ANOVA,
-                                                       p.adjust.method,
-                                                       is.Normal,
-                                                       is.Equal.Var,
-                                                       type,
-                                                       plot_title="")
+    Results.list$ANOVA = Test___MeanDiff___Single.Responses(Data,
+                                                            Response_Vars,
+                                                            Group_Var,
+                                                            Group_Var_Type,
+                                                            alpha_ANOVA,
+                                                            p.adjust.method,
+                                                            is.Normal,
+                                                            is.Equal.Var,
+                                                            type,
+                                                            plot_title="")
   }
   cat("\n", crayon::green("Testing"), crayon::red("Mean Differece"), crayon::green("is done!"),"\n")
 
@@ -109,17 +112,17 @@ Test___MeanDiff = function(# data & variables
   #==================================================================================
   # 4) Combine results
   #==================================================================================
-  if(! 3 * length(Response_Vars) == length(Results_Normality) + length(Results_Homoscedasticity) + length(Results_ANOVA$Results)){
+  if(! 3 * length(Response_Vars) == length(Results.list$Normality) + length(Results.list$Homoscedasticity) + length(Results.list$ANOVA$Results)){
     stop("There is a variable which is not done yet")
   }
 
-  Combined_Results.list = list(Normality = Results_Normality,
-                               Homoscedasticity = Results_Homoscedasticity,
-                               ANOVA = Results_ANOVA)
 
-  Combined_Results.df = lapply(seq_along(Response_Vars), function(k){
-    ccbind(Results_Normality[[k]]$Norm_results, Results_Homoscedasticity[[k]]) %>%
-      ccbind(., Results_ANOVA$Results[[k]])
+
+  Results.df = lapply(seq_along(Response_Vars), function(k){
+
+    ccbind(Results.list$Normality[[k]]$Norm_Test_Result$Norm_results, Results.list$Homoscedasticity[[k]]) %>%
+      ccbind(., Results.list$ANOVA$Results[[k]])
+
   }) %>% setNames(Response_Vars) %>% as_tibble()
 
 
@@ -149,7 +152,7 @@ Test___MeanDiff = function(# data & variables
   # 5) Boxplot
   #==================================================================================
   if(!is.null(path_save)){
-    Result_Boxplots = Results_ANOVA$Boxplots
+    Result_Boxplots = Results.list$ANOVA$Boxplots
 
     for(b in 1:length(Result_Boxplots)){
 
@@ -226,7 +229,7 @@ Test___MeanDiff = function(# data & variables
   #                                                 path_save)
   # })
 
-  return(list(Combined_Results.df = Combined_Results.df, Combined_Results.list = Combined_Results.list))
+  return(list(Combined_Results.df = Results.df, Combined_Results.list = Results.list))
 }
 
 
