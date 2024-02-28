@@ -11,6 +11,7 @@ Test___MeanDiff = function(# data & variables
                            outlier_method = c("IQR"),
                            p.adjust.method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
                            type = c("parametric", "nonparametric", "robust", "bayes"),
+                           MANOVA = F,
                            # Figure
                            label.as.p.val=F,
                            group.comparison=F,
@@ -89,19 +90,32 @@ Test___MeanDiff = function(# data & variables
   # 🟥 3) ANOVA ===========================================================
   # Group var type
   Group_Var_Type = match.arg(Group_Var_Type)
-  if(Response_Vars %>% length > 1){
-    Results.list$ANOVA = Test___MeanDiff___Multi.Reponses(Data, Response_Vars, Group_Var, Group_Var_Type, alpha_ANOVA, is.Normal, is.Equal.Var, type)
+  if(MANOVA){
+    Results.list$ANOVA = Test___MeanDiff___Multi.Reponses(Data,
+                                                          Response_Vars,
+                                                          Group_Var,
+                                                          Group_Var_Type,
+                                                          alpha_ANOVA,
+                                                          p.adjust.method,
+                                                          is.Normal,
+                                                          is.Equal.Var,
+                                                          type,
+                                                          plot_title="")
   }else{
-    Results.list$ANOVA = Test___MeanDiff___Single.Responses(Data,
-                                                            Response_Vars,
-                                                            Group_Var,
-                                                            Group_Var_Type,
-                                                            alpha_ANOVA,
-                                                            p.adjust.method,
-                                                            is.Normal,
-                                                            is.Equal.Var,
-                                                            type,
-                                                            plot_title="")
+    Results.list$ANOVA = lapply(Response_Vars, function(ith_Response_Var){
+
+      Test___MeanDiff___Single.Responses(Data,
+                                         ith_Response_Var,
+                                         Group_Var,
+                                         Group_Var_Type,
+                                         alpha_ANOVA,
+                                         p.adjust.method,
+                                         is.Normal,
+                                         is.Equal.Var,
+                                         type,
+                                         plot_title="")
+    }) %>% setNames(Response_Vars)
+
   }
   cat("\n", crayon::green("Testing"), crayon::red("Mean Differece"), crayon::green("is done!"),"\n")
 
