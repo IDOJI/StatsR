@@ -21,7 +21,7 @@ ggplot___barplot <- function(input_vector, title = "Barplot", xlab = "Model", yl
 
   # 🟥 color palette #################################################################################
   palette = c("Pastel1", "Pastel2", "Set1", "Set2", "Set3")
-  fill_color = brewer.pal(n = 1, sample(palette, 1)) %>% suppressWarnings()
+  fill_color = brewer.pal(n = length(input_vector), sample(palette, 1)) %>% suppressWarnings()
 
 
 
