@@ -7,7 +7,7 @@ ggplot___scatterplot = function(df=NULL, x, y, method = "pearson",...){
 
 
   # 🟥 Pearson Correlation #####################################################
-  R = cor(df$x, df$y, method = method) %>% round(., 4)
+  R = cor(df[,x], df[,y], method = method) %>% round(., 4)
 
 
 
@@ -18,7 +18,7 @@ ggplot___scatterplot = function(df=NULL, x, y, method = "pearson",...){
     # stat_cor(method = method, label.x = 3, label.y = 10) +  # 상관 계수
     theme_minimal() +  # 최소한의 테마
     labs(title = "Scatter plot with linear regression",
-         subtitle = paste0("(Pearson correlation = ", R, ")"),
+         subtitle = paste0("(", method, " correlation = ", R, ")"),
          x = x,
          y = y) +  # 제목 및 축 레이블 추가
     theme(
