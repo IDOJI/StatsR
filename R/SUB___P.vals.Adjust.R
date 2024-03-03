@@ -1,165 +1,146 @@
-Test___Adjust.p.values = function(raw_p.vals,
-                                  method = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"),
-                                  alpha = 0.05,
-                                  na.rm = FALSE,
-                                  scientific = FALSE,
-                                  only.return.p.vals=TRUE){
-  #===========================================================================
-  # when p.val is matris or data.frame
-  #===========================================================================
-  Emptry___raw_p.vals = SUB___Empty.Structure(obj = raw_p.vals)
-  colnames(Emptry___raw_p.vals) = colnames(raw_p.vals)
-
-
-
-
-
-
-
-  #===========================================================================
-  # Defined function
-  #===========================================================================
-  m <- length(raw_p.vals)
-  if(na.rm){
-    mgood <- sum(!is.na(raw_p.vals))
+SUB___P.vals.Adjust = function(raw_p.vals,
+                               method = c("bonferroni", "holm", "hochberg", "hommel","BH", "fdr", "BY", "SidakSS", "SidakSD", "ABH","TSBH", "none"),
+                               alpha = 0.05,
+                               only.return.p.vals=TRUE, ...){
+  # 🟥 adjust ##############################################################################
+  method = tolower(method)
+  if(method %in% c("bonferroni", "holm", "hochberg", "hommel","bh", "fdr", "by", "none")){
+    Adj_p.vals = p.adjust(raw_p.vals, method)
   }else{
-    mgood <- m
+    stop("Check methods")
   }
-  n <- length(method)
-  a <- length(alpha)
-  index <- order(raw_p.vals)
-  h0.ABH <- NULL
-  h0.TSBH <- NULL
-  spval <- raw_p.vals[index]
-  adjp <- matrix(0, m, n + 1)
-  dimnames(adjp) <- list(NULL, c("raw_p.vals", method))
-  adjp[, 1] <- spval
+
+
+
+
+  # 🟥 Results ##############################################################################
+  Result.list = list()
+  Result.list$Method = rep(method, times = length(Adj_p.vals))
+  Result.list$Alpha = rep(alpha, times = length(Adj_p.vals))
+  Result.list$Raw_P.vals = raw_p.vals
+  Result.list$Adj_P.vals = Adj_p.vals
+  Result.list$Adj_P.vals_2 = Adj_p.vals %>% format(., scientific = FALSE)
+  Result.list$Significane = SUB___P.vals.Signif.Stars(Adj_p.vals, show.NS = T)
+
+  #  df
+  Result.df = Result.list %>% do.call(cbind, .) %>% as.data.frame()
+  Num_Vars = c("Alpha", "Raw_P.vals", "Adj_P.vals", "Adj_P.vals_2")
+  Result.df = change_class(df = Result.df, cols = Num_Vars, what_class = "numeric")
+  Result.df$Adj_P.vals_2 = Result.df$Adj_P.vals_2 %>% format(., scientific = FALSE)
+
+
+  return(Result.df)
+}
+
+
+
+# # 🟥 Before Defining functions ######################################################################
+# m <- length(raw_p.vals)
+# if(na.rm){
+#   mgood <- sum(!is.na(raw_p.vals))
+# }else{
+#   mgood <- m
+# }
+# n <- length(method)
+# a <- length(alpha)
+# index <- order(raw_p.vals)
+# h0.ABH <- NULL
+# h0.TSBH <- NULL
+# spval <- raw_p.vals[index]
+# adjp <- matrix(0, m, n + 1)
+# dimnames(adjp) <- list(NULL, c("raw_p.vals", method))
+# adjp[, 1] <- spval
 
 
 
 
 
-  #===========================================================================
-  # TSBH
-  #===========================================================================
-  if(is.element("TSBH", method)){
-    TS.spot <- which(method == "TSBH")
-    TSBHs <- paste("TSBH", alpha, sep = "_")
-    newprocs <- append(method, TSBHs, after = TS.spot)
-    newprocs <- newprocs[newprocs != "TSBH"]
-    adjp <- matrix(0, m, n + a)
-    dimnames(adjp) <- list(NULL, c("raw_p.vals", newprocs))
-    adjp[, 1] <- spval
-    tmp <- spval
-    for (i in (m - 1):1) {
-      tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
-                                    1, na.rm = TRUE), na.rm = TRUE)
-      if (is.na(spval[i]))
-        tmp[i] <- NA
-    }
-    h0.TSBH <- rep(0, length(alpha))
-    names(h0.TSBH) <- paste("h0.TSBH", alpha, sep = "_")
-    for (i in 1:length(alpha)) {
-      h0.TSBH[i] <- mgood - sum(tmp < alpha[i]/(1 + alpha[i]),
-                                na.rm = TRUE)
-      adjp[, TS.spot + i] <- tmp * h0.TSBH[i]/mgood
-    }
-  }
-  #===========================================================================
-  # Bonferroni
-  #===========================================================================
-  if (is.element("Bonferroni", method)) {
-    tmp <- mgood * spval
-    tmp[tmp > 1] <- 1
-    adjp[, "Bonferroni"] <- tmp
-  }
-  #===========================================================================
-  # Holm
-  #===========================================================================
-  if (is.element("Holm", method)) {
-    tmp <- spval
-    tmp[1] <- min(mgood * spval[1], 1)
-    for (i in 2:m) tmp[i] <- max(tmp[i - 1], min((mgood -
-                                                    i + 1) * spval[i], 1))
-    adjp[, "Holm"] <- tmp
-  }
-  #===========================================================================
-  # Hochberg
-  #===========================================================================
-  if (is.element("Hochberg", method)) {
-    tmp <- spval
-    for (i in (m - 1):1) {
-      tmp[i] <- min(tmp[i + 1], min((mgood - i + 1) * spval[i],
-                                    1, na.rm = TRUE), na.rm = TRUE)
-      if (is.na(spval[i]))
-        tmp[i] <- NA
-    }
-    adjp[, "Hochberg"] <- tmp
-  }
-  #===========================================================================
-  # SidakSS
-  #===========================================================================
-  if (is.element("SidakSS", method))
-    adjp[, "SidakSS"] <- 1 - (1 - spval)^mgood
-  if (is.element("SidakSD", method)) {
-    tmp <- spval
-    tmp[1] <- 1 - (1 - spval[1])^mgood
-    for (i in 2:m) tmp[i] <- max(tmp[i - 1], 1 - (1 - spval[i])^(mgood -
-                                                                   i + 1))
-    adjp[, "SidakSD"] <- tmp
-  }
-  #===========================================================================
-  # BH
-  #===========================================================================
-  if (is.element("BH", method)) {
-    tmp <- spval
-    for (i in (m - 1):1) {
-      tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
-                                    1, na.rm = TRUE), na.rm = TRUE)
-      if (is.na(spval[i]))
-        tmp[i] <- NA
-    }
-    adjp[, "BH"] <- tmp
-  }
-  #===========================================================================
-  # BY
-  #===========================================================================
-  if (is.element("BY", method)) {
-    tmp <- spval
-    a <- sum(1/(1:mgood))
-    tmp[m] <- min(a * spval[m], 1)
-    for (i in (m - 1):1) {
-      tmp[i] <- min(tmp[i + 1], min((mgood * a/i) * spval[i],
-                                    1, na.rm = TRUE), na.rm = TRUE)
-      if (is.na(spval[i]))
-        tmp[i] <- NA
-    }
-    adjp[, "BY"] <- tmp
-  }
-  #===========================================================================
-  # ABH
-  #===========================================================================
-  if(is.element("ABH", method)){
-    tmp <- spval
-    h0.m <- rep(0, mgood)
-    for (k in 1:mgood) {
-      h0.m[k] <- (mgood + 1 - k)/(1 - spval[k])
-    }
+#===========================================================================
+# TSBH
+#===========================================================================
+# if(is.element("TSBH", method)){
+#   TS.spot <- which(method == "TSBH")
+#   TSBHs <- paste("TSBH", alpha, sep = "_")
+#   newprocs <- append(method, TSBHs, after = TS.spot)
+#   newprocs <- newprocs[newprocs != "TSBH"]
+#   adjp <- matrix(0, m, n + a)
+#   dimnames(adjp) <- list(NULL, c("raw_p.vals", newprocs))
+#   adjp[, 1] <- spval
+#   tmp <- spval
+#   for (i in (m - 1):1) {
+#     tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
+#                                   1, na.rm = TRUE), na.rm = TRUE)
+#     if (is.na(spval[i]))
+#       tmp[i] <- NA
+#   }
+#   h0.TSBH <- rep(0, length(alpha))
+#   names(h0.TSBH) <- paste("h0.TSBH", alpha, sep = "_")
+#   for (i in 1:length(alpha)) {
+#     h0.TSBH[i] <- mgood - sum(tmp < alpha[i]/(1 + alpha[i]),
+#                               na.rm = TRUE)
+#     adjp[, TS.spot + i] <- tmp * h0.TSBH[i]/mgood
+#   }
+# }
+# #===========================================================================
+# # SidakSS
+# #===========================================================================
+# if (is.element("SidakSS", method))
+#   adjp[, "SidakSS"] <- 1 - (1 - spval)^mgood
+# if (is.element("SidakSD", method)) {
+#   tmp <- spval
+#   tmp[1] <- 1 - (1 - spval[1])^mgood
+#   for (i in 2:m) tmp[i] <- max(tmp[i - 1], 1 - (1 - spval[i])^(mgood -
+#                                                                  i + 1))
+#   adjp[, "SidakSD"] <- tmp
+# }
+# #===========================================================================
+# # ABH
+# #===========================================================================
+# if(is.element("ABH", method)){
+#   tmp <- spval
+#   h0.m <- rep(0, mgood)
+#   for (k in 1:mgood) {
+#     h0.m[k] <- (mgood + 1 - k)/(1 - spval[k])
+#   }
+#
+#   grab <- min(which(diff(h0.m, na.rm = TRUE) > 0), na.rm = TRUE)
+#   h0.ABH <- ceiling(min(h0.m[grab], mgood))
+#   for (i in (m - 1):1) {
+#     tmp[i] <- min(tmp[i + 1],
+#                   min((mgood/i) * spval[i], 1, na.rm = TRUE),
+#                   na.rm = TRUE)
+#
+#     if(is.na(spval[i])){
+#       tmp[i] <- NA
+#     }
+#
+#   }
+#   adjp[, "ABH"] <- tmp * h0.ABH/mgood
+# }
 
-    grab <- min(which(diff(h0.m, na.rm = TRUE) > 0), na.rm = TRUE)
-    h0.ABH <- ceiling(min(h0.m[grab], mgood))
-    for (i in (m - 1):1) {
-      tmp[i] <- min(tmp[i + 1],
-                    min((mgood/i) * spval[i], 1, na.rm = TRUE),
-                    na.rm = TRUE)
 
-      if(is.na(spval[i])){
-        tmp[i] <- NA
-      }
 
-    }
-    adjp[, "ABH"] <- tmp * h0.ABH/mgood
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -168,33 +149,31 @@ Test___Adjust.p.values = function(raw_p.vals,
   #===========================================================================
   # Results
   #===========================================================================
-  Results = list(adjp = adjp, index = index, h0.ABH = h0.ABH[1], h0.TSBH = h0.TSBH[1:length(alpha)])
-  p.vals.adjusted = Results$adjp[order(Results$index),2] %>% format(scientific = scientific)
-  p.vals.adjusted_Rounded = round(p.vals.adjusted %>% as.numeric, 4)
-
-  Significance = SUB___P.vals.Signif.Stars(p.vals.adjusted)
-  Result_2 = data.frame(p.adj.method = method,
-                        p.vals.adj = p.vals.adjusted,
-                        p.vals.adj.rounded = p.vals.adjusted_Rounded,
-                        Significance)
-
-
-
-
-
-
-
-  #===========================================================================
-  # Return results
-  #===========================================================================
-  if(only.return.p.vals){
-    Emptry___raw_p.vals[] = p.vals.adjusted %>% as.numeric
-    return(Emptry___raw_p.vals)
-  }else{
-    return(Result_2)
-  }
-
-}
+  # Results = list(adjp = adjp, index = index, h0.ABH = h0.ABH[1], h0.TSBH = h0.TSBH[1:length(alpha)])
+  # p.vals.adjusted = Results$adjp[order(Results$index),2] %>% format(scientific = scientific)
+  # p.vals.adjusted_Rounded = round(p.vals.adjusted %>% as.numeric, 4)
+  #
+  # Significance = SUB___P.vals.Signif.Stars(p.vals.adjusted)
+  # Result_2 = data.frame(p.adj.method = method,
+  #                       p.vals.adj = p.vals.adjusted,
+  #                       p.vals.adj.rounded = p.vals.adjusted_Rounded,
+  #                       Significance)
+  #
+  #
+  #
+  #
+  #
+  #
+  #
+  # #===========================================================================
+  # # Return results
+  # #===========================================================================
+  # if(only.return.p.vals){
+  #   Emptry___raw_p.vals[] = p.vals.adjusted %>% as.numeric
+  #   return(Emptry___raw_p.vals)
+  # }else{
+  #   return(Result_2)
+  # }
 
 
 

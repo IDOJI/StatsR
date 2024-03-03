@@ -29,7 +29,7 @@ ggplot___correlation = function(df=NULL, y=NULL, x=NULL, method = "pearson", p.a
 
 
   # 🟥 x vs y ############################################################################################################
-  if(!is.null(x) && !is.null(y)){
+  if(!is.null(x) && !is.null(y) && is.null(df)){
 
     p = ggplot___scatterplot(df, x, y, method = method) # only pearson
 
@@ -48,7 +48,7 @@ ggplot___correlation = function(df=NULL, y=NULL, x=NULL, method = "pearson", p.a
 
 
   # 🟥 one var vs the others ############################################################################################################
-  if(is.null(x) && !is.null(df) && !is.null(y)){
+  if(!is.null(x) && !is.null(df) && !is.null(y)){
 
     # Correlation matrix on whole variables
     cor.mat <- cor(df, use = "complete.obs", method = method)

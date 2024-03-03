@@ -1,4 +1,4 @@
-Test_Correlation = function(df, y, x=NULL, p.adj.method = "bonferroni") {
+Test_Correlation = function(df, y, x=NULL, alpha = 0.05, method = "pearson", outlier_method="IQR", p.adj.method = "bonferroni") {
   # 🟥Arguments ###################################################################################
   ## 🟨col_names ================================================================================
   if(!is.null(col_names)){
@@ -6,14 +6,36 @@ Test_Correlation = function(df, y, x=NULL, p.adj.method = "bonferroni") {
   }
 
 
-
   # 🟥Method ###################################################################################
-  # n >= 30 => limiting distribution
-  if
+  # Checking normality for Pearson correlation
+  N_obs = nrow(df)
+
+  # x normal?
+  if(!is.null(x)){
+    x_Norm = sapply(x, function(ith_x){
+      Test___Normality___Single.Vector(df[,ith_x], outlier_method, 0.05)$is.Normal
+    })
+
+    if(sum(x_Norm) != length(x)){
+      x_Norm = FALSE
+    }
+  }
+
+  # y normal?
+  y_Norm = Test___Normality___Single.Vector(df[,y], outlier_method, 0.05)
+  y_Norm = y_Norm$is.Normal
 
 
+  # n >= 30 => limiting distribution of MME (=MLE)
+  is_Limiting_Distribution_of_MME = N_obs >= 30
+  # joint pdf of x and y = Bivariate Normal => sampling distribution
+  is_Joint_Normal = x_Norm && y_Norm
 
+  if(!(is_Limiting_Distribution_of_MME || !is_Joint_Normal) && method == "pearson"){
 
+    warning("The sample size is small or These variables are not Normal distributed. Check if using Pearson is correct.")
+
+  }
 
 
 
@@ -26,9 +48,6 @@ Test_Correlation = function(df, y, x=NULL, p.adj.method = "bonferroni") {
 
 
 
-
-
-
   # 🟥Correlation Tests #########################################################################
   # corr tests
   Results.list$Correlation_Test = lapply(x, function(ith_x){
@@ -38,19 +57,26 @@ Test_Correlation = function(df, y, x=NULL, p.adj.method = "bonferroni") {
       as.data.frame() %>%
       t()
 
+    return(ith_result)
 
-    View(ith_result)
-    ith_result %>% unlist
-    ith_result$statistic
-    ith_result$parameter
-    ith_result$p.value
-    ith_result$estimate
-
-  }) %>% setNames(x)
+  }) %>% do.call(rbind, .) %>% as.data.frame()
 
 
+  # Add variables names
+  Results.list$Correlation_Test$Variables = x
 
-  # adjust p values
+  # adjust pvals
+  Adjust_P.vals = SUB___P.vals.Adjust(raw_p.vals = Results.list$Correlation_Test$p.value, method = p.adj.method, alpha)
+  Results.list$Correlation_Test = cbind(Results.list$Correlation_Test, Adjust_P.vals)
+
+  # remove rownames
+  rownames(Results.list$Correlation_Test) = NULL
+
+
+  # move cols
+  Results.list$Correlation_Test = Results.list$Correlation_Test %>%
+    dplyr::relocate("Variables") %>%
+    dplyr::select(-c("data.name"))
 
 
 
@@ -65,7 +91,7 @@ Test_Correlation = function(df, y, x=NULL, p.adj.method = "bonferroni") {
     ggplot___scatterplot(df, ith_x, y, method)
   }) %>% setNames(x)
 
-
+  Results.list$Plot$Scatter$hp
 
   # 🟥Arguments ###############################################################
   # 연속성 및 정규성 검사
@@ -82,87 +108,6 @@ Test_Correlation = function(df, y, x=NULL, p.adj.method = "bonferroni") {
               p_value = test_result$p.value,
               method = test_result$method))
 }
-
-# 함수 사용 예시
-# 예를 들어, data는 데이터 프레임이고, 'column1'과 'column2'는 분석하고자 하는 두 열의 이름입니다.
-result <- calculate_correlation(data, 'column1', 'column2')
-print(result)
-
-
-
-
-
-Test___Corr = function(Data,
-                       x_Vars = NULL,
-                       y_Vars = NULL,
-                       alpha=0.05,
-                       x_lab = "",
-                       y_lab = "",
-                       # cor.vars = NULL,
-                       # cor.vars.names = NULL,
-                       # matrix.type = "upper",
-                       type = "parametric",
-                       # tr = 0.2,
-                       # partial = FALSE,
-                       # k = 2L,
-                       # sig.level = 0.05,
-                       # conf.level = 0.95,
-                       # bf.prior = 0.707,
-                       p.adjust.method = "TSBH",
-                       # pch = "cross",
-                       # ggcorrplot.args = list(method = "square",
-                       #                        outline.color = "black",
-                       #                        pch.cex = 14),
-                       # package = "RColorBrewer",
-                       # palette = "Dark2",
-                       colors = c("#E69F00", "white", "#009E73"),
-                       # ggtheme = ggstatsplot::theme_ggstatsplot(),
-                       # ggplot.component = NULL,
-                       # title = NULL,
-                       # subtitle = NULL,
-                       # caption = NULL,
-                       save.path = NULL,
-                       ...)
-{
-  # colors = c("#E69F00", "white", "#009E73")
-  # colors = c("blue", "white", "red")
-  #=============================================================================
-  # save.path
-  #=============================================================================
-  if(!is.null(save.path)){
-    dir.create(save.path, F)
-  }
-?varmx.pca.fd
-
-
-
-
-
-
-  #=============================================================================
-  # Correlation  & plotting
-  #=============================================================================
-  # partial
-  if(!is.null(x_Vars) && !is.null(y_Vars)){
-    Corr.df = Test___Corr___Partial(Data, x_Vars, y_Vars, type, p.adjust.method, alpha, x_lab, y_lab, colors, save.path)
-  }else{
-    # Full
-    Corr.df = Test___Corr___Full(Data)
-  }
-
-
-
-
-
-
-
-  #=============================================================================
-  # Return
-  #=============================================================================
-  return(Corr.df)
-}
-
-
 
 
 

@@ -1,6 +1,6 @@
-Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var, outlier_method, alpha=0.05){
-  # 🟥Group var ############################################################
-  if(!is.null(Group_Var)){
+Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var=NULL, outlier_method = "IQR", alpha=0.05){
+  # 🟥Group var #####################################################################################################
+  if(!is.null(Group_Var) && !is.null(Response_Var)){
 
     Group = Data[,Group_Var] %>% unlist
 
@@ -8,12 +8,12 @@ Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var, out
 
     Results = tapply(X = Response, INDEX = Group, function(x){
 
-      Test___Normality___Single.Vector(x.vec = x, alpha)
+      Test___Normality___Single.Vector(x.vec = x, outlier_method, alpha)
 
     })
 
-  # 🟥Non-Group var ############################################################
-  }else{
+  # 🟥Non-Group var & Response Var ##################################################################################
+  }else if(is.null(Group_Var) && !is.null(Response_Var)){
 
     Response = Data %>% select(!!Response_Var) %>% unlist() %>% unname()
 
