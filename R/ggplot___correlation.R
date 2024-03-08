@@ -48,7 +48,11 @@ ggplot___correlation = function(df=NULL, y=NULL, x=NULL, method = "pearson", p.a
 
 
   # 🟥 one var vs the others ############################################################################################################
-  if(!is.null(x) && !is.null(df) && !is.null(y)){
+  if(!is.null(df) && !is.null(y)){
+
+    if(is.null(x)){
+      x = names(df)[names(df)!=y]
+    }
 
     # Correlation matrix on whole variables
     cor.mat <- cor(df, use = "complete.obs", method = method)
