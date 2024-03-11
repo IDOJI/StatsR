@@ -1,7 +1,5 @@
 FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Export=NULL, file.name=NULL){
-  #=============================================================================
-  # 0.Input
-  #=============================================================================
+  # 🟥0.Input ########################################################################
   # Bspline = list(y = y,
   #                x = x,
   #                range_vals = NULL,
@@ -11,9 +9,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   #                labmdas = NULL,
   #                m_int2Lfd = NULL,
   #                argvals = NULL)
-  #-------------------------------
-  # y & x
-  #-------------------------------
+  # 🟨 y & x ====================================================================
   y = Bspline$y
   x = Bspline$x
 

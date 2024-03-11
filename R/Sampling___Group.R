@@ -4,6 +4,7 @@ Sampling___Group = function(data,
                             proportion,
                             sample_size,
                             replace=TRUE,
+                            as.combined=F,
                             seed=1123){
   # 🟨Install and loading Packages ===============================================================
   install_packages = function(packages, load=TRUE) {
@@ -57,7 +58,7 @@ Sampling___Group = function(data,
 
   # 🟨Random sampling for each df by group ===============================================================
   set.seed(seed)
-  Sampled_Grouped_data.list = lapply(seq_along(each_group_sample_size), function(k){
+  Sampled_Grouped_data = lapply(seq_along(each_group_sample_size), function(k){
 
     Grouped_data.list[[k]] %>% sample_n(each_group_sample_size[k], replace = replace)
 
@@ -65,7 +66,25 @@ Sampling___Group = function(data,
 
 
 
-  Sampled_Grouped_data.list %>% return
+
+  # 🟨as.combined? ===============================================================
+  if(as.combined){
+    Sampled_Grouped_data = do.call(rbind, Sampled_Grouped_data)
+  }
+
+
+  return(Sampled_Grouped_data)
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
