@@ -9,7 +9,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   #                labmdas = NULL,
   #                m_int2Lfd = NULL,
   #                argvals = NULL)
-  # 🟨 y & x ====================================================================
+  ## 🟨 y & x ====================================================================
   y = Bspline$y
   x = Bspline$x
 
@@ -17,10 +17,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-  #-------------------------------
-  # range_vals
-  #-------------------------------
+  ## 🟨 range_vals ====================================================================
   range_vals = Bspline$range_vals
   if(is.null(range_vals)){
     range_vals = c(min(x), max(x))
@@ -28,23 +25,12 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   # rangeval = c(1,length(y))
 
 
-
-
-
-
-  #-------------------------------
-  # nbasis
-  #-------------------------------
+  ## 🟨 nbasis ====================================================================
   nbasis = Bspline$nbasis
 
 
 
-
-
-
-  #-------------------------------
-  # norder
-  #-------------------------------
+  ## 🟨 norder ====================================================================
   norder = Bspline$norder
   if(is.null(norder)){
     norder = 4
@@ -52,12 +38,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-
-
-  #-------------------------------
-  # breaks
-  #-------------------------------
+  ## 🟨 breaks ====================================================================
   # break 오류가 나면 중복값 있는지 확인
   # breaks = c(Bspline$breaks[1], seq(7,10, 0.1), Bspline$breaks[-1])
   breaks = Bspline$breaks
@@ -72,26 +53,14 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-
-
-  #-------------------------------
-  # lambdas
-  #-------------------------------
+  ## 🟨 lambdas ====================================================================
   lambdas = Bspline$labmdas
   if(is.null(lambdas)){
     lambdas = exp(-100:100)
   }
 
 
-
-
-
-
-
-  #-------------------------------
-  # m_int2Lfd
-  #-------------------------------
+  ## 🟨 m_int2Lfd ====================================================================
   m_int2Lfd = Bspline$m_int2Lfd
   if(is.null(m_int2Lfd)){
     m_int2Lfd = 2 # Curvature : the rate of change of slope
@@ -100,10 +69,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-  #-------------------------------
-  # argvals
-  #-------------------------------
+  ## 🟨 argvals ====================================================================
   argvals = Bspline$argvals
   if(is.null(argvals)){
     argvals = 1:(dim(y)[1])
@@ -113,12 +79,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-
-
-  #=============================================================================
-  # 1) Basis Object
-  #=============================================================================
+  # 🟥1) Basis Object ########################################################################
   basis_obj = fda::create.bspline.basis(rangeval = range_vals,
                                         # nbasis = nbasis,
                                         norder = norder,
@@ -135,14 +96,9 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-  #=============================================================================
-  # 2) Functional Data Object & Smoothing
-  #=============================================================================
+  # 🟥2) Functional Data Object & Smoothing ########################################################################
   if(is.null(m_int2Lfd)){
-    #---------------------------------
-    # non penalty
-    #---------------------------------
+    ## 🟨 non penalty ====================================================================
     fd_par_obj = fda::fdPar(fdobj = basis_obj)
 
     smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
@@ -150,9 +106,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
     best_lambda = NULL
 
   }else{
-    #---------------------------------
-    # mean gcv from all curves
-    #---------------------------------
+    ## 🟨 mean gcv from all curves ====================================================================
     gcv = sapply(lambdas, function(ith_lambda){
 
       tryCatch({
@@ -177,10 +131,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-    #---------------------------------
-    # Best Smoothing
-    #---------------------------------
+    ## 🟨 Best Smoothing ====================================================================
     best_ind = which.min(gcv)
 
     best_lambda = lambdas[best_ind]
@@ -203,24 +154,16 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-  #=============================================================================
-  # 3) Plotting & Exporting data
-  #=============================================================================
+  # 🟥3) Plotting & Exporting data ########################################################################
   if(!is.null(path_Export)){
-    #---------------------------------------
-    # dir
-    #---------------------------------------
+    ## 🟨 dir ====================================================================
     fs::dir_create(path_Export, recurse = T)
 
 
 
 
 
-
-    #---------------------------------------
-    # plot
-    #---------------------------------------
+    ## 🟨 plot ====================================================================
     png(filename = paste0(path_Export, "/", file.name, ".png"), bg = "white", width = 5000, height = 1000)
     par(mfrow=c(1,3))
 
@@ -237,12 +180,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
 
-
-
-
-    #---------------------------------------
-    # Data saving
-    #---------------------------------------
+    ## 🟨 Data Saving ====================================================================
     saveRDS(Results, file = paste0(path_Export, "/", file.name, ".rds"))
     cat("\n", crayon::red(file.name), crayon::green("is done!"), "\n")
   }
