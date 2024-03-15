@@ -1,7 +1,5 @@
-FDA___fPCA___Optimal.nharm.by.Threshold = function(fdobj, threshold=0.9, path_Export, file.name){
-  #=============================================================================
-  # Extract Sample ID
-  #=============================================================================
+FDA___fPCA___Optimal.nharm.by.Threshold = function(fdobj, threshold=0.9, path_Export, file.name, export_result=F){
+  # 🟥 Extract Sample ID ##########################################################
   ID = fdobj$coefs %>% colnames
 
 
@@ -9,9 +7,7 @@ FDA___fPCA___Optimal.nharm.by.Threshold = function(fdobj, threshold=0.9, path_Ex
 
 
 
-  #=============================================================================
-  # fPCA by threshold
-  #=============================================================================
+  # 🟥 fPCA by threshold ##########################################################
   # init values
   nharm = 0
   cumulative_var = 0
@@ -31,20 +27,19 @@ FDA___fPCA___Optimal.nharm.by.Threshold = function(fdobj, threshold=0.9, path_Ex
 
 
 
-  #=============================================================================
-  # Add ID
-  #=============================================================================
+  # 🟥 Add ID #####################################################################
   rownames(fPCA_results$scores) = ID
 
 
 
 
 
-  #=============================================================================
-  # Export rds data
-  #=============================================================================
-  saveRDS(fPCA_results, file = paste0(path_Export, "/", file.name, ".rds"))
-  cat("\n", paste0(crayon::green("Exported RDS of fPCA results :"), crayon::red(file.name)),"\n")
+  # 🟥 Export rds data #####################################################################
+  if(export_result){
+    saveRDS(fPCA_results, file = paste0(path_Export, "/", file.name, ".rds"))
+    cat("\n", paste0(crayon::green("Exported RDS of fPCA results :"), crayon::red(file.name)),"\n")
+
+  }
 
 
 
@@ -52,9 +47,7 @@ FDA___fPCA___Optimal.nharm.by.Threshold = function(fdobj, threshold=0.9, path_Ex
 
 
 
-  #=============================================================================
-  # Return
-  #=============================================================================
+  # 🟥 Return #####################################################################
   return(fPCA_results)
 }
 

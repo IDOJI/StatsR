@@ -1,4 +1,4 @@
-FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Export=NULL, file.name=NULL){
+FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Export=NULL, file.name=NULL, save_rds=T, save_plot=T){
   # 🟥0.Input ########################################################################
   # Bspline = list(y = y,
   #                x = x,
@@ -164,25 +164,32 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
     ## 🟨 plot ====================================================================
-    png(filename = paste0(path_Export, "/", file.name, ".png"), bg = "white", width = 5000, height = 1000)
-    par(mfrow=c(1,3))
+    if(save_plot){
+      png(filename = paste0(path_Export, "/", file.name, ".png"), bg = "white", width = 5000, height = 1000)
+      par(mfrow=c(1,3))
 
-    # gcv
-    plot(gcv, main = "gcv with best index")
-    abline(v=best_ind, col = 'red')
+      # gcv
+      plot(gcv, main = "gcv with best index")
+      abline(v=best_ind, col = 'red')
 
-    # matplot
-    matplot(x=x, y=y, type= "l", main = paste0("Raw Signals : ", file.name))
+      # matplot
+      matplot(x=x, y=y, type= "l", main = paste0("Raw Signals : ", file.name))
 
-    # smoothing
-    plot(smoothing, main = paste0("Smoothing : ", "lambda=", round(best_lambda, 4)))
-    dev.off()
+      # smoothing
+      plot(smoothing, main = paste0("Smoothing : ", "lambda=", round(best_lambda, 4)))
+      dev.off()
+    }
+
 
 
 
     ## 🟨 Data Saving ====================================================================
-    saveRDS(Results, file = paste0(path_Export, "/", file.name, ".rds"))
-    cat("\n", crayon::red(file.name), crayon::green("is done!"), "\n")
+    if(save_rds){
+      saveRDS(Results, file = paste0(path_Export, "/", file.name, ".rds"))
+      cat("\n", crayon::red(file.name), crayon::green("is done!"), "\n")
+    }
+
+
   }
 
 
