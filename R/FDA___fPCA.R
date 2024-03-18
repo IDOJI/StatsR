@@ -1,4 +1,4 @@
-FDA___fPCA = function(fdobj, threshold=0.9, path_Export, file.name, export_result=F,export_plot = T){
+FDA___fPCA = function(fdobj, threshold=0.9, path_Export, file.name, score.name = "FPC",export_result=F,export_plot = T){
   # 🟥 path ####################################################################
   fs::dir_create(path_Export, recurse = T)
 
@@ -16,11 +16,24 @@ FDA___fPCA = function(fdobj, threshold=0.9, path_Export, file.name, export_resul
   }
 
 
-  # 🟥 Results ####################################################################
-  fPCA_Results$scores
 
 
-  return(fPCA_Results)
+  # 🟥Scores ####################################################################
+  n_col = fPCA_Results$scores %>% as.data.frame %>% ncol
+  if(n_col < 10){
+    n_length = 2
+  }else if(n_col < 100){
+    n_length = 3
+  }
+  FPC_Scores = fPCA_Results$scores %>% as.data.frame()
+  names(FPC_Scores) = paste(score.name, fit_length(x.vec = 1:n_col, fit.num = n_length), sep = "_")
+
+
+
+  # 🟥Combined results####################################################################
+  FPCA_Results = list(fPCA_Results = fPCA_Results, FPC_Scores = FPC_Scores)
+
+  return(FPCA_Results)
 }
 
 
