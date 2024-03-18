@@ -1,4 +1,5 @@
-FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Export=NULL, file.name=NULL, save_rds=T, save_plot=T){
+FDA___Smoothing___Bspline = function(Bspline,
+                                     path_Export=NULL, file.name=NULL, save_rds=T, save_plot=T){
   # 🟥0.Input ########################################################################
   # Bspline = list(y = y,
   #                x = x,
@@ -7,6 +8,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
   #                norder = NULL,
   #                breaks = NULL,
   #                labmdas = NULL,
+  #                best_criterion = "gcv",
   #                m_int2Lfd = NULL,
   #                argvals = NULL)
   ## 🟨 y & x ====================================================================
@@ -54,7 +56,7 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
 
 
   ## 🟨 lambdas ====================================================================
-  lambdas = Bspline$labmdas
+  lambdas = Bspline$lambdas
   if(is.null(lambdas)){
     lambdas = exp(-100:100)
   }
@@ -84,9 +86,6 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
                                         # nbasis = nbasis,
                                         norder = norder,
                                         breaks = breaks %>% unname %>% as.numeric)
-
-
-
   # eval_basis = eval.basis(evalarg = seq(range_vals[1], range_vals[2], by = 0.01), basisobj = basis_obj)
   # matplot(x = seq(range_vals[1], range_vals[2], by = 0.01), y = eval_basis, type = "l")
 
@@ -106,45 +105,51 @@ FDA___Smoothing___Bspline = function(Bspline, best.criterion = "gcv", path_Expor
     best_lambda = NULL
 
   }else{
-    ## 🟨 mean gcv from all curves ====================================================================
-    gcv = sapply(lambdas, function(ith_lambda){
+    if(Bspline$best_criterion == "gcv"){
+      ## 🟨 mean gcv from all curves ====================================================================
+      gcv = sapply(lambdas, function(ith_lambda){
 
-      tryCatch({
-        fd_par_obj = fda:::fdPar(fdobj = basis_obj,
-                                 Lfdobj = int2Lfd(m_int2Lfd),
-                                 lambda = ith_lambda)
+        tryCatch({
+          fd_par_obj = fda:::fdPar(fdobj = basis_obj,
+                                   Lfdobj = int2Lfd(m_int2Lfd),
+                                   lambda = ith_lambda)
 
-        # smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
-        smoothing = fda::smooth.basis(argvals = argvals, y = y, fdParobj = fd_par_obj)
+          # smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
+          smoothing = fda::smooth.basis(argvals = argvals, y = y, fdParobj = fd_par_obj)
 
 
-        return(mean(smoothing$gcv)) # mean gcv
+          return(mean(smoothing$gcv)) # mean gcv
 
-      }, error = function(e) {
-        return(NA)
+        }, error = function(e) {
+          return(NA)
+        })
       })
-    })
-    if(is.na(gcv) %>% sum == length(gcv)){
-      stop("All lambdas are error!")
+      if(is.na(gcv) %>% sum == length(gcv)){
+        stop("All lambdas are error!")
+      }
+
+
+
+
+      ## 🟨 Best Smoothing ====================================================================
+      best_ind = which.min(gcv)
+
+      best_lambda = lambdas[best_ind]
+
+
+      fd_par_obj = fda::fdPar(fdobj = basis_obj,
+                              Lfdobj = int2Lfd(m_int2Lfd),
+                              lambda = best_lambda)
+
+      smoothing = fda::smooth.basis(argvals = argvals,
+                                    y = y,
+                                    fdParobj = fd_par_obj)
+      # plot(smoothing)
+    }else{
+
+      stop("Define other criteria rather than 'gcv'")
     }
 
-
-
-
-    ## 🟨 Best Smoothing ====================================================================
-    best_ind = which.min(gcv)
-
-    best_lambda = lambdas[best_ind]
-
-
-    fd_par_obj = fda::fdPar(fdobj = basis_obj,
-                            Lfdobj = int2Lfd(m_int2Lfd),
-                            lambda = best_lambda)
-
-    smoothing = fda::smooth.basis(argvals = argvals,
-                                  y = y,
-                                  fdParobj = fd_par_obj)
-    # plot(smoothing)
   }
 
   Results = list(smoothing = smoothing, best_lambda = best_lambda)

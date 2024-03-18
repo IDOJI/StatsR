@@ -1,4 +1,5 @@
 FDA___fPCA = function(fdobj, threshold=0.9, path_Export, file.name, score.name = "FPC",export_result=F,export_plot = T){
+  tictoc::tic()
   # 🟥 path ####################################################################
   fs::dir_create(path_Export, recurse = T)
 
@@ -32,6 +33,8 @@ FDA___fPCA = function(fdobj, threshold=0.9, path_Export, file.name, score.name =
 
   # 🟥Combined results####################################################################
   FPCA_Results = list(fPCA_Results = fPCA_Results, FPC_Scores = FPC_Scores)
+  tictoc::toc()
+  cat("\n", crayon::green("FPCA is done: "), crayon::bgMagenta(file.name),"\n")
 
   return(FPCA_Results)
 }
