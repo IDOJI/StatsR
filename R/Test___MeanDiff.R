@@ -87,7 +87,7 @@ Test___MeanDiff = function(# data & variables
 
 
 
-  # 🟥 3) ANOVA ===========================================================
+  # 🟥 3) ANOVA & Boxplot ===========================================================
   # Group var type
   Group_Var_Type = match.arg(Group_Var_Type)
   if(MANOVA){
@@ -102,8 +102,9 @@ Test___MeanDiff = function(# data & variables
                                                           type,
                                                           plot_title="")
   }else{
-    Results.list$ANOVA = lapply(Response_Vars, function(ith_Response_Var){
 
+    Results.list$ANOVA = lapply(Response_Vars, function(ith_Response_Var){
+      # Consider only one response variable for each ANOVA
       Test___MeanDiff___Single.Responses(Data,
                                          ith_Response_Var,
                                          Group_Var,
@@ -123,19 +124,15 @@ Test___MeanDiff = function(# data & variables
 
 
 
-  #==================================================================================
-  # 4) Combine results
-  #==================================================================================
-  if(! 3 * length(Response_Vars) == length(Results.list$Normality) + length(Results.list$Homoscedasticity) + length(Results.list$ANOVA$Results)){
+
+  # 🟥 4) Combine results ===========================================================
+  if(! 3 * length(Response_Vars) == length(Results.list$Normality) + length(Results.list$Homoscedasticity) + length(Results.list$ANOVA)){
     stop("There is a variable which is not done yet")
   }
 
-
-
-  Results.df = lapply(seq_along(Response_Vars), function(k){
-
+  Results_Summary.list = lapply(seq_along(Response_Vars), function(k){
     ccbind(Results.list$Normality[[k]]$Norm_Test_Result$Norm_results, Results.list$Homoscedasticity[[k]]) %>%
-      ccbind(., Results.list$ANOVA$Results[[k]])
+      ccbind(., Results.list$ANOVA[[k]]$Results[[k]])
 
   }) %>% setNames(Response_Vars) %>% as_tibble()
 
@@ -144,9 +141,7 @@ Test___MeanDiff = function(# data & variables
 
 
 
-  #==================================================================================
-  # 4) Export ANOVA Results as data frame
-  #==================================================================================
+  # 🟥 5) Export ANOVA Results as data frame ===========================================================
   if(!is.null(path_save)){
     file.name = paste0("[ANOVA] Results_", "`", Group_Var, "`")
 
@@ -161,90 +156,61 @@ Test___MeanDiff = function(# data & variables
 
 
 
-
-  #==================================================================================
-  # 5) Boxplot
-  #==================================================================================
-  if(!is.null(path_save)){
-    Result_Boxplots = Results.list$ANOVA$Boxplots
-
-    for(b in 1:length(Result_Boxplots)){
-
-      file.name = paste0("[Boxplot] Results_", "`", Group_Var, "`___", "`", Response_Vars[b], "`")
-
-
-      # plot_height, plot_width에 대한 옵션 넣어야 함
-      ggsave(plot = Result_Boxplots[[b]],
-             path = path_save,
-             filename = paste0(file.name, ".png"),
-             bg = "white",
-             width = plot_width,
-             height = plot_height,
-             units = plot_units,
-             dpi = plot_dpi)
-    }
-    cat("\n", crayon::green("Exporting"), crayon::red("Boxplots"), crayon::green("is done!"),"\n")
-  }
-
-
-
-
-  #==================================================================================
-  # 6) Save combined result
-  #==================================================================================
-  # if(!is.null(path_save)){
-  #   file.name = paste0("[ANOVA] Combined_Results_", "`", Group_Var, "`")
-  #
-  #   # save RDS file
-  #   saveRDS(object = Combined_Results.list, file = paste0(path_save, "/", file.name, ".rds"))
-  #
-  #   cat("\n", crayon::green("Exporting"), crayon::red("Combined Results"), crayon::green("is done!"),"\n")
-  # }
-
-
-  # # Combining tables for LaTeX
-  # Combined.list = lapply(list.files(path_save, pattern = "@_Combined Results for Latex Table", full.names=T), read.csv)
-  # First_Cols = Combined.list[[1]][,1:3]
-  # Second_Cols = lapply(Combined.list, function(x) x[,-c(1:3)])
-  # Combined_New.list = c(First_Cols, Second_Cols)
-  # Combined_New.df = do.call(cbind, Combined_New.list)
-  # Which_rows_to_highlight = apply(Combined_New.df, 1, function(x){
-  #   x = Combined_New.df[1,] %>% unlist
-  #   only_having_ns = sum(x[-c(1:3)] %in% c("none", "HNS", "NS")) == length(x)
-  #   return(!only_having_ns)
-  # }) %>% which
-  # Export___xlsx___Highlighting(Combined_New.df, colors.list = "red", which_cols.list = 1:ncol(Combined_New.df), coloring_index.list = Which_rows_to_highlight, path_save = path_save, file.name = "@@_Combined Results for Latex Table", sheet.name = "")
-  # write.csv(Combined_New.df, paste0(path_save, "/@@_Combined Results for Latex Table", ".csv"), row.names=F)
-  #
-
-
-
-
-  # Combining p.values
-  # Combined.list = lapply(list.files(path_save, pattern = "@_Only p.values Combined Results", full.names=T), read.csv)
-  # write.csv(do.call(rbind, Combined.list), paste0(path_save, "/@@_Only p.values Combined Results", ".csv"), row.names=F)
-
-
-
-
-
-
-
-
-  #==================================================================================
-  # 5) Boxplot
-  #==================================================================================
-  # Boxplot.list = lapply(Results_ANOVA, function(ith_Results){
-  #   Test___MeanDiff___Single.Responses___Box.Plot(Data,
-  #                                                 ith_Results,
-  #                                                 label.as.p.val,
-  #                                                 group.comparison,
-  #                                                 lines.connecting.medians,
-  #                                                 path_save)
-  # })
-
-  return(list(Combined_Results.df = Results.df, Combined_Results.list = Results.list))
+  # 🟥 7) Return ===========================================================
+  return(list(Results.list=Results.list, Results_Summary.list=Results_Summary.list))
 }
 
 
+#==================================================================================
+# 6) Save combined result
+#==================================================================================
+# if(!is.null(path_save)){
+#   file.name = paste0("[ANOVA] Combined_Results_", "`", Group_Var, "`")
+#
+#   # save RDS file
+#   saveRDS(object = Combined_Results.list, file = paste0(path_save, "/", file.name, ".rds"))
+#
+#   cat("\n", crayon::green("Exporting"), crayon::red("Combined Results"), crayon::green("is done!"),"\n")
+# }
 
+
+# # Combining tables for LaTeX
+# Combined.list = lapply(list.files(path_save, pattern = "@_Combined Results for Latex Table", full.names=T), read.csv)
+# First_Cols = Combined.list[[1]][,1:3]
+# Second_Cols = lapply(Combined.list, function(x) x[,-c(1:3)])
+# Combined_New.list = c(First_Cols, Second_Cols)
+# Combined_New.df = do.call(cbind, Combined_New.list)
+# Which_rows_to_highlight = apply(Combined_New.df, 1, function(x){
+#   x = Combined_New.df[1,] %>% unlist
+#   only_having_ns = sum(x[-c(1:3)] %in% c("none", "HNS", "NS")) == length(x)
+#   return(!only_having_ns)
+# }) %>% which
+# Export___xlsx___Highlighting(Combined_New.df, colors.list = "red", which_cols.list = 1:ncol(Combined_New.df), coloring_index.list = Which_rows_to_highlight, path_save = path_save, file.name = "@@_Combined Results for Latex Table", sheet.name = "")
+# write.csv(Combined_New.df, paste0(path_save, "/@@_Combined Results for Latex Table", ".csv"), row.names=F)
+#
+
+
+
+
+# Combining p.values
+# Combined.list = lapply(list.files(path_save, pattern = "@_Only p.values Combined Results", full.names=T), read.csv)
+# write.csv(do.call(rbind, Combined.list), paste0(path_save, "/@@_Only p.values Combined Results", ".csv"), row.names=F)
+
+
+
+
+
+
+
+
+#==================================================================================
+# 5) Boxplot
+#==================================================================================
+# Boxplot.list = lapply(Results_ANOVA, function(ith_Results){
+#   Test___MeanDiff___Single.Responses___Box.Plot(Data,
+#                                                 ith_Results,
+#                                                 label.as.p.val,
+#                                                 group.comparison,
+#                                                 lines.connecting.medians,
+#                                                 path_save)
+# })

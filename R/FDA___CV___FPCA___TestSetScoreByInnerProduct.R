@@ -37,13 +37,6 @@ FDA___CV___FPCA = function(FPCA.list, Smoothed_Train, Smoothed_Test, path_save){
 
 
   ## 🟨 Exporting fPCA scores for Test ==================================================================================
-  FDA___CV___FPCA___TestSetScoreByInnerProduct = function(FPCA_Train, Smoothed_Test){
-
-
-
-
-  }
-
   for(i in seq_along(FPCA_Train.list)){
     tictoc::tic()
     ith_FPCA_Train = FPCA_Train.list[[i]]

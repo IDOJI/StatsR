@@ -12,7 +12,7 @@ FDA___Smoothing___Bspline = function(Bspline,
   #                m_int2Lfd = NULL,
   #                argvals = NULL)
   ## 🟨 y & x ====================================================================
-  y = Bspline$y
+  y = Bspline$y %>% as.matrix
   x = Bspline$x
 
 
@@ -115,7 +115,7 @@ FDA___Smoothing___Bspline = function(Bspline,
                                    lambda = ith_lambda)
 
           # smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
-          smoothing = fda::smooth.basis(argvals = argvals, y = y, fdParobj = fd_par_obj)
+          smoothing = fda::smooth.basis(argvals = argvals, y = y %>% as.matrix, fdParobj = fd_par_obj)
 
 
           return(mean(smoothing$gcv)) # mean gcv
@@ -200,6 +200,7 @@ FDA___Smoothing___Bspline = function(Bspline,
 
   return(Results)
 }
+
 
 
 

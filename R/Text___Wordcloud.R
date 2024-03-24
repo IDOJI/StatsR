@@ -7,6 +7,7 @@ Text___Wordcloud <- function(text, path_save=NULL, filename=NULL) {
     }
   }
 
+
   # 텍스트 데이터를 Corpus 객체로 변환
   text = text %>% unlist
   docs <- Corpus(VectorSource(text))

@@ -8,10 +8,10 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
                                                                   # plot
                                                                   plot_title,
                                                                   outlier.tagging = FALSE,
-                                                                  tr=0.2){
-  #==================================================================================
-  # ggstats
-  #==================================================================================
+                                                                  tr=0.2,
+                                                                  filename = NULL,
+                                                                  path_save = NULL){
+  # 🟥 ggstats ###########################################################################
   type = match.arg(type)
   ggstats.list = lapply(seq_along(Response_Vars), function(k){
     Test___MeanDiff___Single.Responses___Nominal.Group.Var___ggstats(Data,
@@ -31,11 +31,11 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
-  #==================================================================================
-  # Extract Results
-  #==================================================================================
+
+  # 🟥 Extract Results ###########################################################################
   Extracted_Results.list = lapply(seq_along(ggstats.list), function(k){
-    kth_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(p = ggstats.list[[k]],
+
+    kth_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var___Results.Extractor(p = ggstats.list[[k]]$plot_with_results,
                                                                                            Data,
                                                                                            Group_Var,
                                                                                            Response_Var = Response_Vars[k])
@@ -47,14 +47,31 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
+  # 🟥 save boxplots ###########################################################################
+  if(!is.null(path_save)){
+
+    for(b in seq_along(Response_Vars)){
+
+      file.name = paste0("[Boxplot] Results_", "`", Group_Var, "`___", "`", Response_Vars[b], "`")
+
+      # plot_height, plot_width에 대한 옵션 넣어야 함
+      dir.create(paste0(path_save, "/Boxplot"),showWarnings = F)
+      ggsave(plot = ggstats.list[[b]]$plot_without_results,
+             path = paste0(path_save, "/Boxplot"),
+             filename = paste0(file.name, ".png"),
+             bg = "white",
+             width = plot_width,
+             height = plot_height,
+             units = plot_units,
+             dpi = plot_dpi)
+    }
+
+    cat("\n", crayon::green("Exporting"), crayon::red("Boxplots"), crayon::green("is done!"),"\n")
+  }
 
 
 
-
-
-  #==================================================================================
-  # return
-  #==================================================================================
+  # 🟥 return ###########################################################################
   list(Boxplots = ggstats.list, Results = Extracted_Results.list)
 }
 

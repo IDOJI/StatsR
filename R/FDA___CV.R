@@ -1,4 +1,4 @@
-FDA___CV = function(Demographics.df,
+  FDA___CV = function(Demographics.df,
                     Curves.list,
                     Fold_Arguments = list(Data.df = Demographics.df,
                                           Var_1 = "Group",
@@ -17,13 +17,15 @@ FDA___CV = function(Demographics.df,
                                          best_criterion = "gcv")
                                    }) %>% setNames(names(Curves.list)),
                     Fourier.list=NULL,
-                    FPCA=TRUE,
-                    FPCA.list = list(threshold = 0.9),
+                    FPCA.list = NULL,
                     path_save=NULL){
   # 🟥 TMP #################################################################
   # Demographics.df = Sampled_Data$Demographics
   # Curves.list = Sampled_Data$FC_Curves
   # Fold_Arguments = list(Data.df = Demographics.df, Var_1 = "DIAGNOSIS_NEW", Train_K_Folds = 3, Return_Validation = TRUE, seed = seed)
+  # FPCA.list = list(threshold = 0.9),
+
+
 
 
   # 🟥 Folding data #################################################################
@@ -33,6 +35,7 @@ FDA___CV = function(Demographics.df,
                                  Train_K_Folds = Fold_Arguments$Train_K_Folds,
                                  Return_Validation = Fold_Arguments$Return_Validation,
                                  seed = Fold_Arguments$seed)
+
 
 
 
@@ -56,11 +59,9 @@ FDA___CV = function(Demographics.df,
 
 
 
-
-
   # 🟥 Smoothing #################################################################
-  if(!is.null(Bspline) && is.null(Fourier.list)){
-    ## 🟨 Bspline ====================================================================
+  if(!is.null(Bspline.list) && is.null(Fourier.list)){
+    ## 🟨 Bspline ==================================================================== fix
     Smoothed_Train = FDA___CV___Smoothing___Bspline(Curves.list = Train_Curves.list,
                                                     Bspline.list = Bspline.list,
                                                     path_Export = path_Export)
@@ -82,10 +83,10 @@ FDA___CV = function(Demographics.df,
 
 
   # 🟥 FPCA #################################################################
-  if(FPCA){
+  if(!is.null(FPCA)){
 
     FPCA_Train = FDA___CV___FPCA(FPCA.list, Smoothed_Train, path_save)
-    FPCA_Test = FDA___CV___FPCA(FPCA.list, Smoothed_Test, path_saev)
+    FPCA_Test = FDA___CV___FPCA(FPCA.list, Smoothed_Test, path_save)
 
   }else{
 
