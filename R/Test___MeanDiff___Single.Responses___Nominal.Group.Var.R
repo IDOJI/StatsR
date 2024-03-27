@@ -47,6 +47,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
+
   # 🟥 save boxplots ###########################################################################
   if(!is.null(path_save)){
 
@@ -71,8 +72,23 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
 
 
+
+
+
+  # 🟥 Combine ###########################################################################
+  Variables = names(ggstats.list)
+
+  Combined_Results.list = lapply(seq_along(Variables), function(k){
+
+    list(Boxplot = ggstats.list[[k]], Result = Extracted_Results.list[[k]])
+
+  }) %>% setNames(Variables)
+
+
+
+
   # 🟥 return ###########################################################################
-  list(Boxplots = ggstats.list, Results = Extracted_Results.list)
+  Combined_Results.list %>% return
 }
 
 

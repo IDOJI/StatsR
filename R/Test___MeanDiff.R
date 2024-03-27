@@ -84,9 +84,6 @@ Test___MeanDiff = function(# data & variables
 
 
 
-
-
-
   # 🟥 3) ANOVA & Boxplot ===========================================================
   # Group var type
   Group_Var_Type = match.arg(Group_Var_Type)
@@ -115,6 +112,7 @@ Test___MeanDiff = function(# data & variables
                                          is.Equal.Var,
                                          type,
                                          plot_title="")
+
     }) %>% setNames(Response_Vars)
 
   }
@@ -130,11 +128,23 @@ Test___MeanDiff = function(# data & variables
     stop("There is a variable which is not done yet")
   }
 
-  Results_Summary.list = lapply(seq_along(Response_Vars), function(k){
-    ccbind(Results.list$Normality[[k]]$Norm_Test_Result$Norm_results, Results.list$Homoscedasticity[[k]]) %>%
-      ccbind(., Results.list$ANOVA[[k]]$Results[[k]])
+  # Combine by each variable for all results
+  Combined_Results.list = lapply(seq_along(Response_Vars), function(k){
 
-  }) %>% setNames(Response_Vars) %>% as_tibble()
+    kth_Norm = Results.list$Normality[[k]]
+    kth_Homo = Results.list$Homoscedasticity[[k]]
+    kth_ANOVA = Results.list$ANOVA[[k]][[1]]
+
+    kth_plots = list(Normality = kth_Norm$Norm_Plots, Boxplot = kth_ANOVA$Boxplot)
+    kth_results = ccbind(kth_Norm$Norm_Test_Result$Norm_results, kth_Homo) %>%
+      ccbind(., kth_ANOVA$Result) %>% as_tibble
+
+    list(plots = kth_plots, results = kth_results)
+
+  }) %>% setNames(Response_Vars)
+
+
+
 
 
 
@@ -142,22 +152,22 @@ Test___MeanDiff = function(# data & variables
 
 
   # 🟥 5) Export ANOVA Results as data frame ===========================================================
-  if(!is.null(path_save)){
-    file.name = paste0("[ANOVA] Results_", "`", Group_Var, "`")
-
-    # save a combined df
-    # Test___MeanDiff___Export.xlsx.Highlight(Combined_Results.df,
-    #                                         path_save,
-    #                                         file.name,
-    #                                         Group_Var_Type)
-    cat("\n", crayon::green("Exporting"), crayon::red("Mean Difference Results"), crayon::green("is done!"),"\n")
-  }
+  # if(!is.null(path_save)){
+  #   file.name = paste0("[ANOVA] Results_", "`", Group_Var, "`")
+  #
+  #   # save a combined df
+  #   # Test___MeanDiff___Export.xlsx.Highlight(Combined_Results.df,
+  #   #                                         path_save,
+  #   #                                         file.name,
+  #   #                                         Group_Var_Type)
+  #   cat("\n", crayon::green("Exporting"), crayon::red("Mean Difference Results"), crayon::green("is done!"),"\n")
+  # }
 
 
 
 
   # 🟥 7) Return ===========================================================
-  return(list(Results.list=Results.list, Results_Summary.list=Results_Summary.list))
+  return(Combined_Results.list)
 }
 
 

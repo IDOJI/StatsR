@@ -14,7 +14,7 @@ Test___MeanDiff___Single.Responses = function(Data,
   # 🟥 ANOVA #############################################################################
   if(Group_Var_Type %in% c("Nominal", "nominal")){
     # warning("check function p.adjustment code was changed because of 'Ordinal' method. They should be included in Nominal too. However I didn't change the code yet")
-    Results_ANOVA =  Test___MeanDiff___Single.Responses___Nominal.Group.Var(Data,
+    Results_ANOVA = Test___MeanDiff___Single.Responses___Nominal.Group.Var(Data,
                                                                             Response_Vars,
                                                                             Group_Var,
                                                                             alpha_ANOVA,

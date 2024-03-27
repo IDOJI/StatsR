@@ -46,12 +46,12 @@ Test___Normality = function(Data,
 
     # Combined Group
     ith_plots.list$Hist_Combined = ggplot___histogram(df = Data,
-                                                       x = ith_Response,
-                                                       group_var = Group_Var,
-                                                       group_combined = T,
-                                                       density = T,
-                                                       same_colors_density = F,
-                                                       path_Export = path_save)
+                                                      x = ith_Response,
+                                                      group_var = Group_Var,
+                                                      group_combined = T,
+                                                      density = T,
+                                                      same_colors_density = F,
+                                                      path_Export = path_save)
 
     # Each group differently
     ith_plots.list$Hist_EachGroup = ggplot___histogram(df = Data,
