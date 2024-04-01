@@ -8,10 +8,7 @@ Test___Normality = function(Data,
 
 
 
-
-
   # 🟥 Decision ############################################################################
-
   if(is.null(Group_Var) && is.null(Response_Vars)){
 
     ## 🟧Single vector ===============================================================
@@ -19,6 +16,9 @@ Test___Normality = function(Data,
 
 
   }else if(!is.null(Response_Vars)){
+    ## 🟧 Use all the other variables as responses
+    Response_Vars <- setdiff(names(Data), Group_Var)
+
 
     ## 🟧Data.frame with group var =============================================================================
     results.list$Norm_Test_Results = lapply(Response_Vars, function(ith_Response, ...){
@@ -29,12 +29,7 @@ Test___Normality = function(Data,
     names(results.list$Norm_Test_Results) = Response_Vars
 
 
-  }else{
-    ## 🟧else ============================================================================
-    stop("Check input!")
   }
-
-
 
 
 

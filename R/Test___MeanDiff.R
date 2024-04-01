@@ -135,17 +135,18 @@ Test___MeanDiff = function(# data & variables
     kth_Homo = Results.list$Homoscedasticity[[k]]
     kth_ANOVA = Results.list$ANOVA[[k]][[1]]
 
-    kth_plots = list(Normality = kth_Norm$Norm_Plots, Boxplot = kth_ANOVA$Boxplot)
-    kth_results = ccbind(kth_Norm$Norm_Test_Result$Norm_results, kth_Homo) %>%
-      ccbind(., kth_ANOVA$Result) %>% as_tibble
 
-    list(plots = kth_plots, results = kth_results)
+    kth_plots = list(Normality = kth_Norm$Norm_Plots, Boxplot = kth_ANOVA$Boxplot)
+    kth_results = ccbind(X = kth_Norm$Norm_Test_Result$Norm_results, Y = kth_Homo) %>%
+      ccbind(., kth_ANOVA$Result) %>%
+      ccbind(data.frame(Response_Var = Response_Vars[k], Group_Var = Group_Var), .)
+
+    kth_results_ReplaceNA = kth_results %>% dplyr::mutate_all(~ifelse(is.na(.), "", .))
+
+
+    list(plots = kth_plots, results = kth_results, results_kable = kth_results_ReplaceNA)
 
   }) %>% setNames(Response_Vars)
-
-
-
-
 
 
 
@@ -167,6 +168,7 @@ Test___MeanDiff = function(# data & variables
 
 
   # 🟥 7) Return ===========================================================
+  cat("\n", crayon::bgCyan("Analaysis is done!"),"\n")
   return(Combined_Results.list)
 }
 

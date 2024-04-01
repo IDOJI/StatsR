@@ -80,6 +80,7 @@ Test___MeanDiff___Single.Responses___Nominal.Group.Var = function(Data,
 
   Combined_Results.list = lapply(seq_along(Variables), function(k){
 
+
     list(Boxplot = ggstats.list[[k]], Result = Extracted_Results.list[[k]])
 
   }) %>% setNames(Variables)

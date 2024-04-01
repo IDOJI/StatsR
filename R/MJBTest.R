@@ -1,4 +1,4 @@
-Test___Normality___Single.Vector___MJBTest = function(data){
+MJBTest = function(vector){
   # the Modified Jarque-Bera
   # 🟥Install and load required packages ============================================
   if(!require('moments')){
@@ -9,7 +9,7 @@ Test___Normality___Single.Vector___MJBTest = function(data){
 
 
   # 🟥Compute MAD : $\phi^2$ =============================================
-  abs_median = abs(data - median(data)) %>% median
+  abs_median = abs(vector - median(vector)) %>% median
   phi = MAD = 1.4826 * abs_median
   phi_3 = phi^3
   phi_4 = phi^4
@@ -17,9 +17,9 @@ Test___Normality___Single.Vector___MJBTest = function(data){
 
 
   # 🟥Compute Moments ====================================================
-  n = length(data)
-  mu_3_hat = ( (1/n) * (data - mean(data))^3 ) %>% sum()
-  mu_4_hat = ( (1/n) * (data - mean(data))^4 ) %>% sum()
+  n = length(vector)
+  mu_3_hat = ( (1/n) * (vector - mean(vector))^3 ) %>% sum()
+  mu_4_hat = ( (1/n) * (vector - mean(vector))^4 ) %>% sum()
 
 
   # 🟥Compute MJB =========================================================
