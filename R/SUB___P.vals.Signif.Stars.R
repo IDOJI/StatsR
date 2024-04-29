@@ -1,4 +1,4 @@
-SUB___P.vals.Signif.Stars = function(p.vals, show.NS = TRUE){
+sub___p.vals.signif.stars = function(p.vals, show.NS = TRUE){
   p.vals = p.vals %>% as.numeric
 
   if(show.NS){

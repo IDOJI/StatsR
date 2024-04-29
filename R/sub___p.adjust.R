@@ -1,35 +1,59 @@
-SUB___P.vals.Adjust = function(raw_p.vals,
-                               method = c("bonferroni", "holm", "hochberg", "hommel","BH", "fdr", "BY", "SidakSS", "SidakSD", "ABH","TSBH", "none"),
-                               alpha = 0.05,
-                               only.return.p.vals=TRUE, ...){
+sub___p.adjust = function(p.values,
+                          method = c("bonferroni", "holm", "hochberg", "hommel","BH", "fdr", "BY", "SidakSS", "SidakSD", "ABH","TSBH", "none"),
+                          alpha = 0.05,
+                          only.return.p.vals=TRUE, ...){
   # 🟥 adjust ##############################################################################
   method = tolower(method)
   if(method %in% c("bonferroni", "holm", "hochberg", "hommel","bh", "fdr", "by", "none")){
-    Adj_p.vals = p.adjust(raw_p.vals, method)
+    ## 🟧 p.adjust 함수 =======================================================================
+    adj.p.values = p.adjust(p.values, method)
+  }else if(method == "tsbh"){
+    ## 🟧 TSBH =======================================================================
+    TS.spot <- which(method == "TSBH")
+    TSBHs <- paste("TSBH", alpha, sep = "_")
+    newprocs <- append(method, TSBHs, after = TS.spot)
+    newprocs <- newprocs[newprocs != "TSBH"]
+    adjp <- matrix(0, m, n + a)
+    dimnames(adjp) <- list(NULL, c("raw_p.vals", newprocs))
+    adjp[, 1] <- spval
+    tmp <- spval
+    for (i in (m - 1):1) {
+      tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
+                                    1, na.rm = TRUE), na.rm = TRUE)
+      if (is.na(spval[i]))
+        tmp[i] <- NA
+    }
+    h0.TSBH <- rep(0, length(alpha))
+    names(h0.TSBH) <- paste("h0.TSBH", alpha, sep = "_")
+    for (i in 1:length(alpha)) {
+      h0.TSBH[i] <- mgood - sum(tmp < alpha[i]/(1 + alpha[i]),
+                                na.rm = TRUE)
+      adjp[, TS.spot + i] <- tmp * h0.TSBH[i]/mgood
+    }
   }else{
     stop("Check methods")
   }
 
 
 
-
   # 🟥 Results ##############################################################################
-  Result.list = list()
-  Result.list$Method = rep(method, times = length(Adj_p.vals))
-  Result.list$Alpha = rep(alpha, times = length(Adj_p.vals))
-  Result.list$Raw_P.vals = raw_p.vals
-  Result.list$Adj_P.vals = Adj_p.vals
-  Result.list$Adj_P.vals_2 = Adj_p.vals %>% format(., scientific = FALSE)
-  Result.list$Significane = SUB___P.vals.Signif.Stars(Adj_p.vals, show.NS = T)
-
-  #  df
-  Result.df = Result.list %>% do.call(cbind, .) %>% as.data.frame()
-  Num_Vars = c("Alpha", "Raw_P.vals", "Adj_P.vals", "Adj_P.vals_2")
-  Result.df = change_class(df = Result.df, cols = Num_Vars, what_class = "numeric")
-  Result.df$Adj_P.vals_2 = Result.df$Adj_P.vals_2 %>% format(., scientific = FALSE)
+  result.df = adj.p.values %>%
+    cbind(adj.p.values = ., adj.p.values_2 = format(adj.p.values, scientific = FALSE)) %>%
+    cbind(., significance = sub___p.vals.signif.stars(adj.p.values, show.NS = T)) %>%
+    cbind(alpha, .) %>%
+    cbind(p.adj.method = method, .) %>%
+    cbind(p.values, .) %>%
+    as_tibble() %>%
+    mutate(adj.p.values = adj.p.values %>% as.numeric) %>%
+    mutate(p.values = p.values %>% as.numeric) %>%
+    mutate(alpha = alpha %>% as.numeric)
 
 
-  return(Result.df)
+  if(only.return.p.vals){
+    return(result.df$adj.p.values)
+  }else{
+    return(result.df)
+  }
 }
 
 
@@ -58,29 +82,7 @@ SUB___P.vals.Adjust = function(raw_p.vals,
 #===========================================================================
 # TSBH
 #===========================================================================
-# if(is.element("TSBH", method)){
-#   TS.spot <- which(method == "TSBH")
-#   TSBHs <- paste("TSBH", alpha, sep = "_")
-#   newprocs <- append(method, TSBHs, after = TS.spot)
-#   newprocs <- newprocs[newprocs != "TSBH"]
-#   adjp <- matrix(0, m, n + a)
-#   dimnames(adjp) <- list(NULL, c("raw_p.vals", newprocs))
-#   adjp[, 1] <- spval
-#   tmp <- spval
-#   for (i in (m - 1):1) {
-#     tmp[i] <- min(tmp[i + 1], min((mgood/i) * spval[i],
-#                                   1, na.rm = TRUE), na.rm = TRUE)
-#     if (is.na(spval[i]))
-#       tmp[i] <- NA
-#   }
-#   h0.TSBH <- rep(0, length(alpha))
-#   names(h0.TSBH) <- paste("h0.TSBH", alpha, sep = "_")
-#   for (i in 1:length(alpha)) {
-#     h0.TSBH[i] <- mgood - sum(tmp < alpha[i]/(1 + alpha[i]),
-#                               na.rm = TRUE)
-#     adjp[, TS.spot + i] <- tmp * h0.TSBH[i]/mgood
-#   }
-# }
+
 # #===========================================================================
 # # SidakSS
 # #===========================================================================

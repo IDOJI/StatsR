@@ -4,7 +4,7 @@ ggplot___histogram = function(df,
                               group_combined=T,
                               density = T,
                               same_colors_density = F,
-                              path_Export,
+                              path_save = NULL,
                               width = 20,
                               height = 5){
   # 🟥 packages #########################################################################
@@ -47,12 +47,12 @@ ggplot___histogram = function(df,
   # 🟥 Group #########################################################################
   if(is.null(group_var)){
     ## 🟨 Non Group ===================================================================
-    p = ggplot___histogram___Nongroup(df, x, density)
+    p = ggplot___histogram___nongroup(df, x, density)
 
 
   }else{
     ## 🟨 Group ===================================================================
-    p =  ggplot___histogram___Group(df, x, group_var, group_combined, density, same_colors_density)
+    p =  ggplot___histogram___group(df, x, group_var, group_combined, density, same_colors_density)
 
   }
 
@@ -61,7 +61,10 @@ ggplot___histogram = function(df,
 
 
   # 🟥 Save plot #########################################################################
-  ggsave(plot = p, filename = paste0(path_Export, "/", file.name, ".png"), width = 10, height = 7.5, units = "in", dpi = 200, bg = "white")
+  if(!is.null(path_save)){
+    ggsave(plot = p, filename = paste0(path_save, "/", file.name, ".png"), width = 10, height = 7.5, units = "in", dpi = 200, bg = "white")
+  }
+
 
 
 

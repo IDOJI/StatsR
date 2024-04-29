@@ -1,4 +1,4 @@
-ggplot___QQplot = function(df, x, group_var=NULL, path_Export = NULL){
+ggplot___QQplot = function(df, x, group_var=NULL, path_save = NULL){
   # 🟥 colnames =========================================================================
   df = change_colnames(df, x, "x_var")
   df = change_colnames(df, group_var, "group_var")
@@ -48,9 +48,9 @@ ggplot___QQplot = function(df, x, group_var=NULL, path_Export = NULL){
 
 
   # 🟥 Explort =========================================================================
-  if (!is.null(path_Export)) {
+  if (!is.null(path_save)) {
 
-    ggsave(plot = p, filename = paste0(path_Export, "/", filename, ".png"), width = 10, height = 7.5, units = "in", dpi = 200, bg = "white")
+    ggsave(plot = p, filename = paste0(path_save, "/", filename, ".png"), width = 10, height = 7.5, units = "in", dpi = 200, bg = "white")
 
   }
 

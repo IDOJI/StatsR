@@ -1,48 +1,44 @@
-Test___Normality___Data.Frame = function(Data, Group_Var=NULL, Response_Var=NULL, outlier_method = "IQR", alpha=0.05){
+test___normality___data.frame = function(df,
+                                         group_var=NULL,
+                                         response_var=NULL,
+                                         outlier_method = "IQR",
+                                         alpha=0.05,
+                                         p.adjust.method = "bonferroni"){
   # 🟥Group var #####################################################################################################
-  if(!is.null(Group_Var) && !is.null(Response_Var)){
+  if(!is.null(group_var) && !is.null(response_var)){
 
-    Group = Data[,Group_Var] %>% unlist
+    # 데이터 그룹화 및 각 그룹에 대해 정규성 검사 함수 적용
 
-    Response = Data[,Response_Var] %>% unlist
+    group_results <- df %>%
+      dplyr::group_by(!!sym(group_var)) %>%
+      dplyr::summarise(
+        result = list(test___normality___single.vector(!!sym(response_var))),
+        .groups = 'drop'
+      )
 
-    Results = tapply(X = Response, INDEX = Group, function(x){
+    result = group_results$result %>% setNames(group_results[[group_var]])
 
-      Test___Normality___Single.Vector(x.vec = x, outlier_method, alpha)
 
-    })
 
   # 🟥Non-Group var & Response Var ##################################################################################
-  }else if(is.null(Group_Var) && !is.null(Response_Var)){
+  }else if(is.null(group_var) && !is.null(response_var)){
 
-    Response = Data %>% select(!!Response_Var) %>% unlist() %>% unname()
-
-    Results = Test___Normality___Single.Vector(Response, outlier_method, alpha)
+    result = test___normality___single.vector(data %>% pull(!!response_var), outlier_method, alpha) %>% list(response_var = .)
 
   }
 
 
 
-   # 🟥Extract Results ##########################################################################
-   Results.df = Results %>% Test___Normality___Data.Frame___Extract.Results()
 
 
 
-   # 🟥CLT ##########################################################################
-   is_large_sample  = as.numeric(Results.df$Norm_results$N_Obs) >= 30
-   n_group = Results.df$Norm_results$N_Obs %>% length
+ # 🟥Extract Results ##########################################################################
+ results = result %>% test___normality___extract.results(., p.adjust.method)
 
-   if(sum(is_large_sample) == n_group){
-
-     Results.df$Norm_results$Norm_Tests = "The Central Limit Theorem"
-     Results.df$Norm_results$Norm_p.val = "NA"
-     Results.df$Norm_results$is.normal = "Asymptotic"
-     Results.df$is.normal = TRUE
-   }
 
 
  # 🟥Return results ##########################################################################
- return(Results.df)
+ return(results)
 }
 
 

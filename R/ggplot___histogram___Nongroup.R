@@ -1,4 +1,4 @@
-ggplot___histogram___Nongroup = function(df,
+ggplot___histogram___nongroup = function(df,
                                          x = NULL,
                                          density = T){
   # 🟥 Change colnames #########################################################
