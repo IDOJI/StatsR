@@ -51,7 +51,7 @@ test___mean.diff = function(df,
       }
     }
   }
-  install_packages(c("ggpubr", "ggplot2", "ggstatsplot", "dplyr", "rstatix"))
+  install_packages(c("ggpubr", "ggplot2", "conover.test", "ggstatsplot", "dplyr", "rstatix", "reshape2"))
 
 
 
@@ -69,6 +69,11 @@ test___mean.diff = function(df,
 
 
 
+
+
+
+
+
   ## 🟥 Decision ==================================================================================
   ### 🟧 is normal ===============================================
   normality = pretest$normality$test_result
@@ -79,7 +84,7 @@ test___mean.diff = function(df,
     is.normal = sum(normality$is.normal) == nrow(normality)
   }
   ### 🟧 is equal var ===============================================
-  is.var.equal = pretest$homoscedasticity$result.df$is.homoscedastic
+  is.equal.var = pretest$homoscedasticity$result.df$is.homoscedastic
   ### 🟧 is pair ===============================================
   is.paired = is.paired
   ### 🟧 is balanced ===============================================
@@ -91,6 +96,25 @@ test___mean.diff = function(df,
     length() == 1
   ### 🟧 n_groups ===============================================
   n_groups <- df %>% pull(group_var) %>% unique() %>% length()
+  ### 🟧 is skewed? ===============================================
+  is.skewed = FALSE
+  ### 🟧 is severely unequal ===============================================
+  # 그룹별 관측값 수 계산
+  group_observations <- df %>%
+    group_by(!!sym(group_var)) %>%
+    summarise(n_obs = n(), .groups = 'drop')
+  # 최대 관측값과 최소 관측값의 차이 계산
+  max_obs = max(group_observations$n_obs)
+  min_obs = min(group_observations$n_obs)
+  obs_difference = max_obs - min_obs
+  # 관측값 차이가 10 이상인지 확인
+  is.severely.unequal = obs_difference >= 10
+  ### 🟧 is min 6=======================================================================
+  is.min.6 = min_obs >= 6
+
+
+
+
 
 
 
@@ -113,11 +137,15 @@ test___mean.diff = function(df,
       } else {
         ##### 🟦3groups: ANOVA ===================================================================
         # oneway.test는 Welch의 ANOVA를 실행
-        is.balanced
-        test_result <- stats::oneway.test(sub___as.formula(y = response_var, x = group_var),
-                                          data = df,
-                                          var.equal = is.equal.var)
-
+        if(is.equal.var){
+          ###### 🟪 equal var ==========================================================
+          test_result = stats::aov(sub___as.formula(y = response_var, x = group_var), data = df)
+        }else{
+          ###### 🟪 unequal var ==========================================================
+          test_result <- stats::oneway.test(sub___as.formula(y = response_var, x = group_var),
+                                            data = df,
+                                            var.equal = is.equal.var)
+        }
       }
     } else {
       #### 🟩 Nonparametric =====================================================================================
@@ -211,91 +239,108 @@ test___mean.diff = function(df,
   ## 🟥 Post-hoc ===========================================================================
   # 참고 논문: Comparing multiple comparisons - practical guidance for choosing the best multiple comparisons test
   # -> 아직 안 추가한 방법론들 있으므로 나중에 참고
-
-
-
+  # 다른 분석을 할 때는 옵시디언 태그들 참조해서 다시 한 번 검토할 것
   if(is.normal){
-    ### 🟧 Parametric =========================================================================
+    ### 🟧 Parametric + Unplanned comparisons ==============================================================================
+    #### 🟨 pairwise t-test + p.val.adj =============================================================================================
+    ##### 🟦 test =====================================================================================
+    # t-test
+    pairwise_results = pairwise.t.test(x = df[[response_var]],
+                                        g = df[[group_var]],
+                                        pool.sd = is.equal.var,
+                                        paired = FALSE,
+                                        p.adjust.method = "none")  # 일단 보정하지 않고 원래의 p-value를 얻습니다.
+    # 데이터 프레임 생성
+    pairwise_df <- as.data.frame(pairwise_results$p.value)
+
+    # 데이터 프레임의 row names을 첫 번째 열로 변환
+    pairwise_df$Group1 <- row.names(pairwise_df)
+
+    # 긴 형식으로 데이터 프레임 변환
+    long_pairwise_df <- melt(pairwise_df, id.vars = "Group1", variable.name = "Group2", value.name = "p.value")
+
+    # NA 값을 포함하는 행 제거
+    long_pairwise_df <- na.omit(long_pairwise_df)
+
+    # add col
+    long_pairwise_df = long_pairwise_df %>%
+      mutate(pairwise_comparison = ifelse(is.equal.var, "t-test", "Welch's t-test")) %>%
+      relocate(pairwise_comparison)
 
 
 
+
+
+    ##### 🟦 Adjust p-values =====================================================================================
+    pairwise_results.list = list()
+    # t-test
+    pairwise_results.list[["pairwise-t.test"]] = long_pairwise_df %>%
+      mutate(significance = sub___p.vals.signif.stars(p.value))
+    # Bonferroni
+    pairwise_results.list[["Bonferroni"]] <- long_pairwise_df %>%
+      cbind(sub___p.adjust(long_pairwise_df$p.value, method = "bonferroni", only.return.p.vals = F)) %>%
+      dplyr::select(-p.value) %>%
+      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Bonferroni)", "Pairwise Welch's t-test (Bonferroni)"))
+    # Holm
+    pairwise_results.list[["Holm"]] <- long_pairwise_df %>%
+      cbind(sub___p.adjust(long_pairwise_df$p.value, method = "holm", only.return.p.vals = F)) %>%
+      dplyr::select(-p.value) %>%
+      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Holm)", "Pairwise Welch's t-test (Holm)"))
+    # Dunn-Sidak
+    pairwise_results.list[["Dunn-Sidak"]] <- long_pairwise_df %>%
+      cbind(sub___p.adjust(p.values = long_pairwise_df$p.value, method = "SidakSS", only.return.p.vals = F)) %>%
+      dplyr::select(-p.value) %>%
+      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Dunn-Sidak)", "Pairwise Welch's t-test (Dunn-Sidak)"))
+
+
+
+
+    if(is.equal.var){
+      #### 🟨 equal var =============================================================================================
+      ##### 🟩 !severely unequal =============================================================================================
+      if(!is.severely.unequal){
+        ###### 🟦 TukeyHSD =============================================================================================
+        pairwise_results.list[["TukeyHSD"]] <- TukeyHSD(test_result)
+      }
+
+
+    }else{
+      #### 🟨 not equal var =============================================================================================
+      if(is.min.6){
+        ##### 🟩 more than 6 obs? =============================================================================================
+        ###### 🟦 Games-Howell =============================================================================================
+        pairwise_results.list[["Games-Howell"]] = df %>%
+          rstatix::games_howell_test(sub___as.formula(response_var, group_var)) %>%
+          mutate(post.hoc_method = "Games-Howell") %>%
+          relocate(post.hoc_method)
+
+        pairwise_results.list[["Games-Howell"]]$p.adj.signif = sub___p.vals.signif.stars(pairwise_results.list[["Games-Howell"]]$p.adj)
+      }else{
+        ##### 🟩 less than 6 obs =============================================================================================
+        stop("less than 6 obs")
+      }
+    }
   }else{
     ### 🟧 Non-Parametric =========================================================================
-    # Games-Howelll
-
-    # Dunn procedure
-
-
-  }
-
-  method = test_result_df_2$method[1]
-
-  if(test_result_df_2$significance[1]){
-    ### 🟧 ANOVA ==============================================================
-
-  }
+    ##### 🟩 Dunn Procedure =============================================================================================
+    pairwise_results.list[["Dunn-test"]] = df %>%
+      rstatix::dunn_test(sub___as.formula(response_var, group_var), p.adjust.method = "none") %>%
+      mutate(post.hoc_method = "Dunn test") %>%
+      relocate(post.hoc_method) %>%
+      mutate(p.adj.signif = sub___p.vals.signif.stars(p.adj))
 
 
-  ## 🟧 Define the function ==============================================================
-  # Post hoc 분석을 위한 함수 정의
-  perform_posthoc <- function(test_result, df, response_var, group_var) {
-
-    if (test_result$method == "Wilcoxon rank sum test" || test_result$method == "Mann-Whitney-Wilcoxon test") {
-      rstatix::dunn_test()
-      # 🟧 Mann-Whitney post hoc 처리: pairwise 윌콕슨 테스트
-      posthoc_result <- df %>%
-        pairwise_wilcox_test(response_var ~ group_var, p.adjust.method = "BH")
-
-    } else if (test_result$method == "Kruskal-Wallis rank sum test") {
-
-      # 🟧 Kruskal-Wallis post hoc 처리: pairwise 크루스칼-월리스 테스트
-      posthoc_result <- df %>%
-        pairwise_kruskal_test(response_var ~ group_var, p.adjust.method = "BH")
-
-    } else if (test_result$method == "Friedman's rank sum test") {
-
-      # 🟧 Friedman post hoc 처리: Nemenyi test
-      posthoc_result <- friedman_posthoc_test(df, response_var, group_var, subject = "subject", p.adjust.method = "BH")
-
-    } else if (test_result$method == "One-way analysis of means (not assuming equal variances)") {
-      # ANOVA의 post hoc 처리: pairwise t-test (등분산 가정하지 않음)
-      posthoc_result <- df %>%
-        pairwise_t_test(response_var ~ group_var, p.adjust.method = "BH", pool.sd = FALSE)
-    } else {
-      # 기본 처리 (parametric paired or unpaired t-tests)
-      posthoc_result <- df %>%
-        pairwise_t_test(response_var ~ group_var, p.adjust.method = "BH", paired = is.paired)
-    }
-    return(posthoc_result)
-  }
-
-
-
-  # 함수 내에서 pairwise_t_test 함수 사용
-  posthoc_result <- df %>%
-    pairwise_t_test(sub___as.formula(y = response_var, x = group_var), p.adjust.method = "BH", paired =F)
-
-
-  # 함수 내에서 pairwise_t_test 함수 사용
-  posthoc_result <- df %>%
-    pairwise_t_test(response_var ~ group_var, p.adjust.method = "BH", paired = is.paired)
-  # 사용 예: Test 수행 후 Post Hoc 분석
-  # 비모수 예시: Kruskal-Wallis test
-  test_result <- kruskal.test(response_var ~ group_var, data = df)
-  total_result <- list(test_result = test_result)
-  total_result$combined_result <- data.frame(method = test_result$method, statistic = test_result$statistic, p.value = test_result$p.value)
-
-  # Post Hoc 수행
-  posthoc_results <- perform_posthoc(total_result$test_result, df, "response_var", "group_var")
-  print(posthoc_results)
-
-
-  posthoc.list = list()
-  for(k in 1:nrow(adj_pvlas_signif)){
-    if(adj_pvlas_signif[k]){
-
-
-    }
+    ##### 🟩 Conover-Iman-test =============================================================================================
+    # Dunn test보다 높은 검정력
+    # Kruskal-Wallis 검정이 유의한 경우만 유의
+    conover = conover.test::conover.test(x = df[[response_var]], g = df[[group_var]])
+    pairwise_results.list[["Conover-Iman test"]] = data.frame(post.hoc_method = "Conover-Iman test",
+               comparisons = conover$comparisons,
+               t.statistics = conover$`T`, # a vector of all _m_ of the Conover-Iman _t_ test statistics.
+               p.adjusted = conover$P.adjusted) %>%
+      ccbind(data.frame(chi2 = conover$chi2)) %>%  # a scalar of the Kruskal-Wallis test statistic adjusted for ties.,
+      mutate(significance = sub___p.vals.signif.stars(p.adjusted)) %>%
+      relocate(significance, .after = p.adjusted)
   }
 
 
@@ -303,67 +348,20 @@ test___mean.diff = function(df,
 
 
 
-  ## 🟥 Combine data #############################################################################
-  Combined_results.df = lapply(results.list, function(y){
-    y$combined_result
-  }) %>% do.call(rbind, .)
 
-  Combined_results.df %>% View
-
-
-
-  # 🟥CLT ##########################################################################
-  is_large_sample  = as.numeric(Results.df$Norm_results$N_Obs) >= 30
-  n_group = Results.df$Norm_results$N_Obs %>% length
-
-  if(sum(is_large_sample) == n_group){
-
-    Results.df$Norm_results$Norm_Tests = "The Central Limit Theorem"
-    Results.df$Norm_results$Norm_p.val = "NA"
-    Results.df$Norm_results$is.normal = "Asymptotic"
-    Results.df$is.normal = TRUE
-  }
-
-  # 🟥 4) Combine results ===========================================================
-  if(! 3 * length(Response_Vars) == length(Results.list$Normality) + length(Results.list$Homoscedasticity) + length(Results.list$ANOVA)){
-    stop("There is a variable which is not done yet")
-  }
-
-  # Combine by each variable for all results
-  Combined_Results.list = lapply(seq_along(Response_Vars), function(k){
-
-    kth_Norm = Results.list$Normality[[k]]
-    kth_Homo = Results.list$Homoscedasticity[[k]]
-    kth_ANOVA = Results.list$ANOVA[[k]][[1]]
-
-
-    kth_plots = list(Normality = kth_Norm$Norm_Plots, Boxplot = kth_ANOVA$Boxplot)
-    kth_results = ccbind(X = kth_Norm$Norm_Test_Result$Norm_results, Y = kth_Homo) %>%
-      ccbind(., kth_ANOVA$Result) %>%
-      ccbind(df.frame(Response_Var = Response_Vars[k], Group_Var = Group_Var), .)
-
-    kth_results_ReplaceNA = kth_results %>% dplyr::mutate_all(~ifelse(is.na(.), "", .))
-
-
-    list(plots = kth_plots, results = kth_results, results_kable = kth_results_ReplaceNA)
-
-  }) %>% setNames(Response_Vars)
+  ## 🟥 Select Post-hoc by recommendation ===========================================================================
 
 
 
 
 
-  # 🟥 5) Export ANOVA Results as df frame ===========================================================
-  # if(!is.null(path_save)){
-  #   file.name = paste0("[ANOVA] Results_", "`", Group_Var, "`")
-  #
-  #   # save a combined df
-  #   # Test___MeanDiff___Export.xlsx.Highlight(Combined_Results.df,
-  #   #                                         path_save,
-  #   #                                         file.name,
-  #   #                                         group_var_type)
-  #   cat("\n", crayon::green("Exporting"), crayon::red("Mean Difference Results"), crayon::green("is done!"),"\n")
-  # }
+
+  ## 🟥 Boxplots ===========================================================================
+
+
+
+
+
 
 
 
@@ -372,51 +370,6 @@ test___mean.diff = function(df,
   cat("\n", crayon::bgCyan("Analaysis is done!"),"\n")
   return(Combined_Results.list)
 }
-
-
-
-#==================================================================================
-# 6) Save combined result
-#==================================================================================
-# if(!is.null(path_save)){
-#   file.name = paste0("[ANOVA] Combined_Results_", "`", Group_Var, "`")
-#
-#   # save RDS file
-#   saveRDS(object = Combined_Results.list, file = paste0(path_save, "/", file.name, ".rds"))
-#
-#   cat("\n", crayon::green("Exporting"), crayon::red("Combined Results"), crayon::green("is done!"),"\n")
-# }
-
-
-# # Combining tables for LaTeX
-# Combined.list = lapply(list.files(path_save, pattern = "@_Combined Results for Latex Table", full.names=T), read.csv)
-# First_Cols = Combined.list[[1]][,1:3]
-# Second_Cols = lapply(Combined.list, function(x) x[,-c(1:3)])
-# Combined_New.list = c(First_Cols, Second_Cols)
-# Combined_New.df = do.call(cbind, Combined_New.list)
-# Which_rows_to_highlight = apply(Combined_New.df, 1, function(x){
-#   x = Combined_New.df[1,] %>% unlist
-#   only_having_ns = sum(x[-c(1:3)] %in% c("none", "HNS", "NS")) == length(x)
-#   return(!only_having_ns)
-# }) %>% which
-# Export___xlsx___Highlighting(Combined_New.df, colors.list = "red", which_cols.list = 1:ncol(Combined_New.df), coloring_index.list = Which_rows_to_highlight, path_save = path_save, file.name = "@@_Combined Results for Latex Table", sheet.name = "")
-# write.csv(Combined_New.df, paste0(path_save, "/@@_Combined Results for Latex Table", ".csv"), row.names=F)
-#
-
-
-
-
-# Combining p.values
-# Combined.list = lapply(list.files(path_save, pattern = "@_Only p.values Combined Results", full.names=T), read.csv)
-# write.csv(do.call(rbind, Combined.list), paste0(path_save, "/@@_Only p.values Combined Results", ".csv"), row.names=F)
-
-
-
-
-
-
-
-
 #==================================================================================
 # 5) Boxplot
 #==================================================================================
