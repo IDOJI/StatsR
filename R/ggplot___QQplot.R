@@ -36,7 +36,7 @@ ggplot___QQplot = function(df, x, group_var=NULL, path_save = NULL){
         legend.title = element_text(size = 14, face = "bold")
       )
 
-
+  }
 
 
   # 🟥 file name =========================================================================

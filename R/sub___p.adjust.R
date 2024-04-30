@@ -27,12 +27,16 @@ sub___p.adjust = function(p.values,
   # method = tolower(method)
   if(method %in% c("bonferroni", "holm", "hochberg", "hommel","bh", "fdr", "by", "none")){
 
-    adj.p.values = p.adjust(p.values, method)
+    p.adj = p.adjust(p.values, method)
 
-  }else if(method %in% c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY", "ABH", "TSBH")){
+  }else if(method %in% c("Bonferroni",
+                         "Holm",
+                         "Hochberg",
+                         "SidakSS",
+                         "SidakSD", "BH", "BY", "ABH", "TSBH")){
 
     result = multtest::mt.rawp2adjp(p.values, method)
-    adj.p.values = result$adjp[result$index,1]
+    p.adj = result$adjp[result$index,1]
 
   }else{
     stop("Check methods")
@@ -42,19 +46,19 @@ sub___p.adjust = function(p.values,
 
   # 🟥 Results ##############################################################################
   result.df = adj.p.values %>%
-    cbind(adj.p.values = ., adj.p.values_2 = format(adj.p.values, scientific = FALSE)) %>%
-    cbind(., significance = sub___p.vals.signif.stars(adj.p.values, show.NS = T)) %>%
+    cbind(p.adj = ., adj.p.values_2 = format(p.adj, scientific = FALSE)) %>%
+    cbind(., p.adj.signif = sub___p.vals.signif.stars(p.adj, show.NS = T)) %>%
     cbind(alpha, .) %>%
     cbind(p.adj.method = method, .) %>%
     cbind(p.values, .) %>%
     as_tibble() %>%
-    mutate(adj.p.values = adj.p.values %>% as.numeric) %>%
+    mutate(p.adj = p.adj %>% as.numeric) %>%
     mutate(p.values = p.values %>% as.numeric) %>%
     mutate(alpha = alpha %>% as.numeric)
 
 
   if(only.return.p.vals){
-    return(result.df$adj.p.values)
+    return(result.df$p.adj)
   }else{
     return(result.df)
   }
