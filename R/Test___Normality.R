@@ -106,14 +106,17 @@ test___normality___group = function(df,
 
   ## 🟧 adjust p-vals #############################################################################
   results_df_2 = results_df %>%
-    cbind(sub___p.adjust(p.values = results_df$p_value, method = p.adjust.method, alpha = alpha, only.return.p.vals = F)) %>%
+    cbind(sub___p.adjust(p.values = results_df$p_value,
+                         method = p.adjust.method,
+                         alpha = alpha,
+                         only.return.p.vals = F)) %>%
     as_tibble() %>%
     dplyr::select(-p_value, -is_normal)
 
 
 
   ## 🟧 is.normal #############################################################################
-  results_df_2$is.normal = results_df_2$adj.p.values > alpha
+  results_df_2$is.normal = results_df_2$p.adj > alpha
 
   return(results_df_2)
 }

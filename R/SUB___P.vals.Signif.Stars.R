@@ -1,4 +1,4 @@
-sub_p.vals.signif.stars <- function(p.vals, show.NS = TRUE){
+sub___p.vals.signif.stars <- function(p.vals, show.NS = TRUE){
   p.vals <- as.numeric(p.vals)  # p-values를 숫자로 변환
 
   if(show.NS){

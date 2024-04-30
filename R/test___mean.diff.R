@@ -6,22 +6,10 @@ test___mean.diff = function(df,
                             group_var,
                             group_var_type = c("nominal", "ordinal"),
                             response_var,
-                            is.paired.vec =FALSE,
+                            is.paired =FALSE,
                             alpha_anova = 0.05,
                             alpha_posthoc = 0.05,
                             p.adj.method_normality = "bonferroni",
-                            post.hoc_method = c("none",
-                                                "TukeyHSD",
-                                                "Holm",
-                                                "Hochberg",
-                                                "SidakSS",
-                                                "SidakSD",
-                                                "BH",
-                                                "BY",
-                                                "ABH",
-                                                "TSBH"),
-                            p.adjust.method = c("none",
-                                                "Bonferroni"),
                             ...){
   # Significance level
   # alpha_anova = 0.05,
@@ -126,14 +114,13 @@ test___mean.diff = function(df,
       #### 🟩 Parametric =====================================================================================
       if(n_groups == 2){
         ##### 🟦2groups: t-test ===================================================================
-        stop("check")
         test_result = stats::t.test(formula = sub___as.formula(y = response_var, x= group_var),
-                               data = df,
-                               alternative = c("two.sided"),
-                               mu = 0,
-                               paired = is.paired,
-                               var.equal = is.var.equal,
-                               conf.level = 1-alpha_anova)
+                                    data = df,
+                                    alternative = c("two.sided"),
+                                    mu = 0,
+                                    paired = is.paired,
+                                    var.equal = is.equal.var,
+                                    conf.level = 1-alpha_anova)
       } else {
         ##### 🟦3groups: ANOVA ===================================================================
         # oneway.test는 Welch의 ANOVA를 실행
@@ -240,6 +227,7 @@ test___mean.diff = function(df,
   # 참고 논문: Comparing multiple comparisons - practical guidance for choosing the best multiple comparisons test
   # -> 아직 안 추가한 방법론들 있으므로 나중에 참고
   # 다른 분석을 할 때는 옵시디언 태그들 참조해서 다시 한 번 검토할 것
+
   if(is.normal){
     ### 🟧 Parametric + Unplanned comparisons ==============================================================================
     #### 🟨 pairwise t-test + p.val.adj =============================================================================================
@@ -372,8 +360,6 @@ test___mean.diff = function(df,
 
 
 
-
-
   ## 🟥 Select Post-hoc by recommendation ===========================================================================
   # the smallest p-values
   summed_p_vals = sapply(post.hoc_results.list, function(y){
@@ -401,6 +387,7 @@ test___mean.diff = function(df,
 
   ## 🟥 combine results ===========================================================================
   final.list = list()
+  final.list[["pretest"]] = pretest
   final.list[["test result"]] = test_result
   final.list[["test result as data.frame"]] = test_result_df_2
   if(test_result_df_2$significance[1]){
@@ -523,7 +510,12 @@ ggplot___boxplot___mean.diff.test = function(df,
 
 
   # 🟥 p5 : Adding methods =============================================================================
-  p5 = p4 + ggtitle(paste0(test_result.df$method[1], "\n", post.hoc_result$post.hoc_method[1]))
+  if(nrow(test_result.df)>2){
+    p5 = p4 + ggtitle(paste0(test_result.df$method[1], "\n", post.hoc_result$post.hoc_method[1]))
+  }else{
+    p5 = p4 + ggtitle(paste0(test_result.df$method[1]))
+  }
+
 
 
 

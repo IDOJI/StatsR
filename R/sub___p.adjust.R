@@ -36,7 +36,7 @@ sub___p.adjust = function(p.values,
                          "SidakSD", "BH", "BY", "ABH", "TSBH")){
 
     result = multtest::mt.rawp2adjp(p.values, method)
-    p.adj = result$adjp[result$index,1]
+    p.adj = result[[1]][result$index,1]
 
   }else{
     stop("Check methods")
@@ -45,8 +45,7 @@ sub___p.adjust = function(p.values,
 
 
   # 🟥 Results ##############################################################################
-  result.df = adj.p.values %>%
-    cbind(p.adj = ., adj.p.values_2 = format(p.adj, scientific = FALSE)) %>%
+  result.df = cbind(p.adj = p.adj, adj.p.values_2 = format(p.adj, scientific = FALSE)) %>%
     cbind(., p.adj.signif = sub___p.vals.signif.stars(p.adj, show.NS = T)) %>%
     cbind(alpha, .) %>%
     cbind(p.adj.method = method, .) %>%
