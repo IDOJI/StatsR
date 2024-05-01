@@ -27,6 +27,10 @@ test___mean.diff = function(df,
   # plot_dpi = 200,
   # results.subtitle=T,
   # exporting
+  ## 🟥 path ===============================================================================
+  dir.create(path_save, F, recursive =  T)
+
+
   ## 🟥 packages ===================================================================
   install_packages = function(packages, load=TRUE) {
     # load : load the packages after installation?
@@ -340,11 +344,11 @@ test___mean.diff = function(df,
     ##### 🟩 Conover-Iman-test =============================================================================================
     # Dunn test보다 높은 검정력
     # Kruskal-Wallis 검정이 유의한 경우만 유의
-    conover = conover.test::conover.test(x = df[[response_var]], g = df[[group_var]]) %>% invisible
+    conover <- conover.test::conover.test(x = df[[response_var]], g = df[[group_var]])
     post.hoc_results.list[["Conover-Iman test"]] = data.frame(post.hoc_method = "Conover-Iman test",
-               comparisons = conover$comparisons,
-               t.statistics = conover$`T`, # a vector of all _m_ of the Conover-Iman _t_ test statistics.
-               p.adj = conover$P.adjusted) %>%
+                                                              comparisons = conover$comparisons,
+                                                              t.statistics = conover$`T`, # a vector of all _m_ of the Conover-Iman _t_ test statistics.
+                                                              p.adj = conover$P.adjusted) %>%
       ccbind(data.frame(chi2 = conover$chi2)) %>%  # a scalar of the Kruskal-Wallis test statistic adjusted for ties.,
       mutate(p.adj.signif = sub___p.vals.signif.stars(p.adj)) %>%
       relocate(p.adj.signif, .after = p.adj) %>%
@@ -559,7 +563,12 @@ ggplot___boxplot___mean.diff.test = function(df,
 
   # 🟥 Export =============================================================================
   if(!is.null(path_save)){
-    ggsave(filename = paste0(path_save, "/[Boxplot] ", group_var, " vs ", response_var, ".png"), plot = p5, device = "png", dpi = 300, bg = "white")
+    ggsave(filename = paste0(path_save, "/[Boxplot] ", group_var, " vs ", response_var, ".png"),
+           plot = p7,
+           device = "png",
+           dpi = 300,
+           bg = "white",
+           limitsize = FALSE)
   }
 
 
