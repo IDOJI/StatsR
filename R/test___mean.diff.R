@@ -10,6 +10,7 @@ test___mean.diff = function(df,
                             alpha_anova = 0.05,
                             alpha_posthoc = 0.05,
                             p.adj.method_normality = "bonferroni",
+                            path_save = NULL,
                             ...){
   # Significance level
   # alpha_anova = 0.05,
@@ -52,8 +53,6 @@ test___mean.diff = function(df,
                                     response_var = response_var,
                                     p.adjust.method_normality = p.adj.method_normality,
                                     path_save = path_save)
-
-
 
 
 
@@ -378,6 +377,7 @@ test___mean.diff = function(df,
                                         group_var,
                                         test_result.df = test_result_df_2,
                                         post.hoc_result = selected_post.hoc,
+                                        alpha_posthoc = alpha_posthoc,
                                         path_save = path_save)
 
 
@@ -411,6 +411,7 @@ ggplot___boxplot___mean.diff.test = function(df,
                                              add.violin = TRUE,
                                              connect.medians = FALSE,
                                              add.group.comparison = TRUE,
+                                             alpha_posthoc = 0.05,
                                              path_save = NULL){
   # 🟥 install.package ==============================================================================
   install_packages(c("EnvStats", "ggpubr", "gridExtra", "grid")) %>% invisible
@@ -527,17 +528,20 @@ ggplot___boxplot___mean.diff.test = function(df,
   if(add.group.comparison){
     # 필터링된 데이터에서 유의미한 결과만 사용
     significant_results <- post.hoc_result %>%
-      dplyr::filter(p.adj <= 0.05)
+      dplyr::filter(p.adj <= alpha_posthoc)
 
-
-    # ggpubr::stat_pvalue_manual을 사용하여 박스플롯에 유의성 표시 추가
-    p6 <- p5 + ggpubr::stat_pvalue_manual(
-      data = significant_results,
-      label = "p.adj.signif",  # 이 열이 별표("***", "**", "*") 유의성 표시를 포함하고 있다고 가정
-      y.position = 1.1 * max(df[[response_var]], na.rm = TRUE),  # 유의성 표시 위치
-      step.increase = 0.1,  # 선의 높이 조절
-      vjust = -0.5  # 세로 위치 조정
-    )
+    if(nrow(significant_results)==0){
+      p6 = p5
+    }else{
+      # ggpubr::stat_pvalue_manual을 사용하여 박스플롯에 유의성 표시 추가
+      p6 <- p5 + ggpubr::stat_pvalue_manual(
+        data = significant_results,
+        label = "p.adj.signif",  # 이 열이 별표("***", "**", "*") 유의성 표시를 포함하고 있다고 가정
+        y.position = 1.1 * max(df[[response_var]], na.rm = TRUE),  # 유의성 표시 위치
+        step.increase = 0.1,  # 선의 높이 조절
+        vjust = -0.5  # 세로 위치 조정
+      )
+    }
   }else{
 
     p6 = p5
