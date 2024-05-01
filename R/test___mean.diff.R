@@ -123,15 +123,9 @@ test___mean.diff = function(df,
       } else {
         ##### 🟦3groups: ANOVA ===================================================================
         # oneway.test는 Welch의 ANOVA를 실행
-        if(is.equal.var){
-          ###### 🟪 equal var ==========================================================
-          test_result = stats::aov(sub___as.formula(y = response_var, x = group_var), data = df)
-        }else{
-          ###### 🟪 unequal var ==========================================================
-          test_result <- stats::oneway.test(sub___as.formula(y = response_var, x = group_var),
-                                            data = df,
-                                            var.equal = is.equal.var)
-        }
+        test_result <- stats::oneway.test(sub___as.formula(y = response_var, x = group_var),
+                                          data = df,
+                                          var.equal = is.equal.var)
       }
     } else {
       #### 🟩 Nonparametric =====================================================================================
@@ -300,7 +294,7 @@ test___mean.diff = function(df,
       if(!is.severely.unequal){
         ###### 🟦 TukeyHSD =============================================================================================
         # TukeyHSD 결과
-        post.hoc_results.list[["Tukey HSD"]] <- TukeyHSD(test_result)[[1]] %>%
+        post.hoc_results.list[["Tukey HSD"]] <- TukeyHSD(stats::aov(sub___as.formula(y = response_var, x = group_var), data = df))[[1]] %>%
           as.data.frame() %>%
           rownames_to_column(var = "comparison") %>%
           mutate(
@@ -346,14 +340,17 @@ test___mean.diff = function(df,
     ##### 🟩 Conover-Iman-test =============================================================================================
     # Dunn test보다 높은 검정력
     # Kruskal-Wallis 검정이 유의한 경우만 유의
-    conover = conover.test::conover.test(x = df[[response_var]], g = df[[group_var]])
+    conover = conover.test::conover.test(x = df[[response_var]], g = df[[group_var]]) %>% invisible
     post.hoc_results.list[["Conover-Iman test"]] = data.frame(post.hoc_method = "Conover-Iman test",
                comparisons = conover$comparisons,
                t.statistics = conover$`T`, # a vector of all _m_ of the Conover-Iman _t_ test statistics.
                p.adj = conover$P.adjusted) %>%
       ccbind(data.frame(chi2 = conover$chi2)) %>%  # a scalar of the Kruskal-Wallis test statistic adjusted for ties.,
       mutate(p.adj.signif = sub___p.vals.signif.stars(p.adj)) %>%
-      relocate(significance, .after = p.adjusted)
+      relocate(p.adj.signif, .after = p.adj) %>%
+      separate(comparisons, into = c("group1", "group2"), sep = " - ")
+
+
   }
 
 
@@ -379,7 +376,6 @@ test___mean.diff = function(df,
                                         post.hoc_result = selected_post.hoc,
                                         alpha_posthoc = alpha_posthoc,
                                         path_save = path_save)
-
 
 
 
@@ -530,6 +526,7 @@ ggplot___boxplot___mean.diff.test = function(df,
     significant_results <- post.hoc_result %>%
       dplyr::filter(p.adj <= alpha_posthoc)
 
+
     if(nrow(significant_results)==0){
       p6 = p5
     }else{
@@ -562,7 +559,7 @@ ggplot___boxplot___mean.diff.test = function(df,
 
   # 🟥 Export =============================================================================
   if(!is.null(path_save)){
-    ggsave(filename = paste0(path_save, "/[Boxplot] ", group_var, " vs ", response_var, ".png"), plot = p5, device = "png", dpi = 300)
+    ggsave(filename = paste0(path_save, "/[Boxplot] ", group_var, " vs ", response_var, ".png"), plot = p5, device = "png", dpi = 300, bg = "white")
   }
 
 
