@@ -190,10 +190,10 @@ test___normality___single.vector = function(x.vec, outlier_method = "IQR", alpha
 mjb.test = function(vector){
   # the Modified Jarque-Bera
   ## 🟧 Install and load required packages ============================================
-  if(!require('moments')){
-    install.packages('moments')
-  }
-  library(moments)
+  # if(!require('moments')){
+  #   install.packages('moments')
+  # }
+  # library(moments)
 
 
 
