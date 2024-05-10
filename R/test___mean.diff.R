@@ -28,7 +28,11 @@ test___mean.diff = function(df,
   # results.subtitle=T,
   # exporting
   ## 🟥 path ===============================================================================
-  dir.create(path_save, F, recursive =  T)
+  if(!is.null(path_save)){
+    dir.create(path_save, F, recursive =  T)
+  }
+
+
 
 
   ## 🟥 packages ===================================================================
