@@ -27,6 +27,42 @@ test___mean.diff = function(df,
   # plot_dpi = 200,
   # results.subtitle=T,
   # exporting
+  ## 🟥 Results.list ===============================================================================
+  Final_Results.list = list()
+
+
+  ## 🟥 Exclude NA ===============================================================================
+  which_na = which(is.na(df[[group_var]]) | is.na(df[[response_var]]))
+  if(length(which_na) > 0){
+    Final_Results.list$NA_rows = df[which_na, ]
+    df = df[-which_na, ]
+  }
+
+
+
+  ## 🟥 Descriptive statistics ===============================================================================
+  Stats___byGroup <- function(df, group_var, numeric_var, na.rm=TRUE) {
+
+    # 그룹 별 통계량 계산
+    stats <- df %>%
+      dplyr::group_by(!!sym(group_var)) %>%
+      dplyr::summarise(
+        sample_count = n(),
+        sample_proportion = n() / nrow(df),
+        sample_mean = mean(!!sym(numeric_var), na.rm = na.rm),
+        sample_sd = sd(!!sym(numeric_var), na.rm = na.rm)
+      ) %>%
+      dplyr::ungroup()
+
+    return(stats)
+  }
+  Final_Results.list$descriptive_summary = Stats___byGroup(df = df,
+                                                           group_var = group_var,
+                                                           numeric_var = response_var,
+                                                           na.rm = T)
+
+
+
   ## 🟥 path ===============================================================================
   if(!is.null(path_save)){
     dir.create(path_save, F, recursive =  T)
@@ -56,14 +92,11 @@ test___mean.diff = function(df,
 
 
   ## 🟥 Normality & Homoscedasticity ===========================================================
-  pretest = test___homoscedasticity(df = df,
-                                    group_var = group_var,
-                                    response_var = response_var,
-                                    p.adjust.method_normality = p.adj.method_normality,
-                                    path_save = path_save)
-
-
-
+  pretest = Final_Results.list$pretest = test___homoscedasticity(df = df,
+                                                                 group_var = group_var,
+                                                                 response_var = response_var,
+                                                                  p.adjust.method_normality = p.adj.method_normality,
+                                                                  path_save = path_save)
 
 
 
@@ -116,18 +149,38 @@ test___mean.diff = function(df,
 
   ## 🟥 Mean Difference Test ===========================================================
   ### 🟧 Nominal =====================================================================================
-  if(group_var_type == "nominal"){
+  if(tolower(group_var_type) == "nominal"){
     if (is.normal) {
       #### 🟩 Parametric =====================================================================================
       if(n_groups == 2){
         ##### 🟦2groups: t-test ===================================================================
-        test_result = stats::t.test(formula = sub___as.formula(y = response_var, x= group_var),
-                                    data = df,
-                                    alternative = c("two.sided"),
-                                    mu = 0,
-                                    paired = is.paired,
-                                    var.equal = is.equal.var,
-                                    conf.level = 1-alpha_anova)
+        # test_result = stats::t.test(formula = sub___as.formula(y = response_var, x= group_var),
+        #                             data = df,
+        #                             alternative = c("two.sided"),
+        #                             mu = 0,
+        #                             paired = is.paired,
+        #                             var.equal = is.equal.var,
+        #                             conf.level = 1-alpha_anova)
+        # 유니크한 그룹 이름 동적 식별
+        unique_groups <- unique(df[[group_var]])
+
+        # 첫 번째 그룹과 두 번째 그룹에 대한 데이터 추출
+        # 유니크 그룹이 2개 이상 있는 경우에만 작동
+        if(length(unique_groups) >= 2) {
+          group1_data <- df %>% filter(.data[[group_var]] == unique_groups[1]) %>% pull(response_var)
+          group2_data <- df %>% filter(.data[[group_var]] == unique_groups[2]) %>% pull(response_var)
+        } else {
+          stop("There must be at least two groups in the data frame.")
+        }
+
+        # 변수 이름을 활용해 t-test 수행 (예시)
+        test_result <- t.test(x = group1_data,
+                              y = group2_data,
+                              alternative = "two.sided",
+                              mu = 0,
+                              paired = is.paired,
+                              var.equal = is.equal.var,
+                              conf.level = 1 - alpha_anova)
       } else {
         ##### 🟦3groups: ANOVA ===================================================================
         # oneway.test는 Welch의 ANOVA를 실행
@@ -139,10 +192,25 @@ test___mean.diff = function(df,
       #### 🟩 Nonparametric =====================================================================================
       if (n_groups == 2) {
         ##### 🟦2groups =====================================================================================
-        stop("nonpara 2 groups")
-        test_result = stats::wilcox.test(sub___as.formula(y = response_var, x = group_var),
-                                         data = df,
-                                         paired = is.paired)
+        # 유니크한 그룹 이름 동적 식별
+        unique_groups <- unique(df[[group_var]])
+
+
+        # 첫 번째 그룹과 두 번째 그룹에 대한 데이터 추출
+        # 유니크 그룹이 2개 이상 있는 경우에만 작동
+        if(length(unique_groups) >= 2) {
+          group1_data <- df %>% filter(.data[[group_var]] == unique_groups[1]) %>% pull(response_var)
+          group2_data <- df %>% filter(.data[[group_var]] == unique_groups[2]) %>% pull(response_var)
+        } else {
+          stop("There must be at least two groups in the data frame.")
+        }
+
+
+        test_result = stats::wilcox.test(x = group1_data,
+                                         y = group2_data,
+                                         paired = is.paired,
+                                         conf.level = 1 - alpha_anova)
+
 
       } else {
         ##### 🟦3groups =====================================================================================
@@ -228,7 +296,7 @@ test___mean.diff = function(df,
   # 참고 논문: Comparing multiple comparisons - practical guidance for choosing the best multiple comparisons test
   # -> 아직 안 추가한 방법론들 있으므로 나중에 참고
   # 다른 분석을 할 때는 옵시디언 태그들 참조해서 다시 한 번 검토할 것
-
+  post.hoc_results.list = list()
   if(is.normal){
     ### 🟧 Parametric + Unplanned comparisons ==============================================================================
     #### 🟨 pairwise t-test + p.val.adj =============================================================================================
@@ -261,7 +329,6 @@ test___mean.diff = function(df,
 
 
     ##### 🟦 Adjust p-values =====================================================================================
-    post.hoc_results.list = list()
     # t-test
     # post.hoc_results.list[["pairwise-t.test"]] = long_pairwise_df %>%
     #   mutate(p.adj = p.value) %>%
@@ -390,19 +457,18 @@ test___mean.diff = function(df,
 
 
   ## 🟥 combine results ===========================================================================
-  final.list = list()
-  final.list[["pretest"]] = pretest
-  final.list[["test result"]] = test_result
-  final.list[["test result as data.frame"]] = test_result_df_2
+  Final_Results.list[["test result"]] = test_result
+  Final_Results.list[["test result as data.frame"]] = test_result_df_2
   if(test_result_df_2$significance[1]){
-    final.list[["post hoc with the smallest adj p-values"]] = selected_post.hoc
+    Final_Results.list[["post hoc with the smallest adj p-values"]] = selected_post.hoc
   }
-  final.list[["box plots"]] = p
+  Final_Results.list[["box plots"]] = p
+
 
 
   # 🟥 7) Return ===========================================================
   cat("\n", crayon::bgCyan("Analaysis is done!"),"\n")
-  return(final.list)
+  return(Final_Results.list)
 }
 
 

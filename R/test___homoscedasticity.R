@@ -6,6 +6,18 @@ test___homoscedasticity = function(df,
                                    outlier_method = "IQR",
                                    p.adjust.method_normality = "bonferroni",
                                    path_save){
+  ## 🟧 Exclude NA =================================================================================
+  # NA가 있는 행 제거
+  which_na = which(is.na(df[[group_var]]) | is.na(df[[response_var]]))
+  if(length(which_na)>0){
+    df_NA = df[which_na, ]
+    df = df[-which_na, ]
+  }else{
+    df_NA = NULL
+  }
+
+
+
   ## 🟧 Normality ======================================================================================
   # Results
   normality.list = test___normality(df = df,
@@ -52,7 +64,11 @@ test___homoscedasticity = function(df,
 
   ## 🟧 Combine data ======================================================================================
   combined.list = list(normality = normality.list,
-                       homoscedasticity = result.list)
+                       homoscedasticity = result.list,
+                       NA_rows = df_NA)
+
+
+
 
 
 
@@ -124,13 +140,14 @@ test___homoscedasticity___when.norm.true = function(df, group_var, response_var,
                                  conf.level = 1-alpha)
     results.list[[2]] = "F.test"
     results.list[[3]] = results.list[[1]]$p.value
-  }else if(length(data.list)>=3){
-    results.list[[1]] = bartlett.test(sub___as.formula(response_var, group_var), Data)
+  }else if(length(data.list)>2){
+    results.list[[1]] = bartlett.test(sub___as.formula(response_var, group_var), df)
     results.list[[2]] = "Bartlett"
     results.list[[3]] = results.list[[1]]$p.value
   }
 
   results.list[[4]] = results.list[[3]] > alpha
+
   return(results.list)
 }
 

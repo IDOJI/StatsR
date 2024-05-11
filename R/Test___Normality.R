@@ -6,6 +6,18 @@ test___normality = function(df,
                             alpha = 0.05,
                             p.adjust.method = c("bonferroni", "holm", "hochberg", "hommel","BH", "fdr", "BY", "SidakSS", "SidakSD", "ABH","TSBH", "none"),
                             path_save){
+  ## 🟧 Exclude NA =================================================================================
+  # NA가 있는 행 제거
+  which_na = which(is.na(df[[group_var]]) | is.na(df[[response_var]]))
+  if(length(which_na) > 0){
+    df_NA = df[which_na, ]
+    df = df[-which_na, ]
+  }else{
+    df_NA = NULL
+  }
+
+
+
   ## 🟧 Test =================================================================================
   if(is.null(group_var)){
 
@@ -53,7 +65,7 @@ test___normality = function(df,
 
 
   ## 🟧 Combine results #######################################################################################################
-  combined.list = list(test_result = result, plot = plots.list)
+  combined.list = list(test_result = result, plot = plots.list, df_NA = df_NA)
 
 
 
@@ -65,61 +77,6 @@ test___normality = function(df,
 
 
 
-# 🟥 test___normality___group #############################################################################
-test___normality___group = function(df,
-                                    group_var,
-                                    response_var,
-                                    outlier_method,
-                                    alpha,
-                                    p.adjust.method){
-  ## 🟧 Test for groups #############################################################################
-  # 데이터를 group_var로 그룹화하고 response_var에 대해 함수 적용, 결과를 리스트로 만들기
-  results_list <- df %>%
-    group_by(!!sym(group_var)) %>%
-    summarise(
-      NormalityTest = list(test___normality___single.vector(!!sym(response_var))),
-      .groups = 'drop'
-    ) %>%
-    deframe()  # 데이터 프레임의 열을 리스트로 변환
-
-
-
-  ## 🟧 Combine results #############################################################################
-  # results_list를 데이터 프레임으로 변환
-  results_df <- map_df(names(results_list), function(group_name) {
-    data <- results_list[[group_name]]
-    tibble(
-      Group = group_name,
-      n_obs = data$n_obs,
-      # W = data$test_result$W,
-      p_value = data$`p-value`,
-      what_test = data$what_test,
-      is_normal = data$is.normal
-    )
-  }, .id = "Group") %>%
-    ccbind(data.frame(group = group_var), .) %>%
-    ccbind(data.frame(response = response_var), .) %>%
-    mutate(Group = names(results_list)) %>%
-    as_tibble()
-
-
-
-  ## 🟧 adjust p-vals #############################################################################
-  results_df_2 = results_df %>%
-    cbind(sub___p.adjust(p.values = results_df$p_value,
-                         method = p.adjust.method,
-                         alpha = alpha,
-                         only.return.p.vals = F)) %>%
-    as_tibble() %>%
-    dplyr::select(-p_value, -is_normal)
-
-
-
-  ## 🟧 is.normal #############################################################################
-  results_df_2$is.normal = results_df_2$p.adj > alpha
-
-  return(results_df_2)
-}
 
 
 # 🟥 test___normality___single.vector #############################################################################
@@ -186,6 +143,7 @@ test___normality___single.vector = function(x.vec, outlier_method = "IQR", alpha
   return(results.list)
 }
 
+
 # 🟥 mjb.test #############################################################################
 mjb.test = function(vector){
   # the Modified Jarque-Bera
@@ -250,5 +208,63 @@ mjb.test = function(vector){
 
 
 
+# 🟥 test___normality___group #############################################################################
+test___normality___group = function(df,
+                                    group_var,
+                                    response_var,
+                                    outlier_method,
+                                    alpha,
+                                    p.adjust.method){
+  ## 🟧 Test for groups #############################################################################
+  # 데이터를 group_var로 그룹화하고 response_var에 대해 함수 적용, 결과를 리스트로 만들기
+  results_list <- df %>%
+    group_by(!!sym(group_var)) %>%
+    summarise(
+      NormalityTest = list(test___normality___single.vector(!!sym(response_var))),
+      .groups = 'drop'
+    ) %>%
+    deframe()  # 데이터 프레임의 열을 리스트로 변환
 
+
+
+  ## 🟧 Combine results #############################################################################
+  # results_list를 데이터 프레임으로 변환
+  results_df <- map_df(names(results_list), function(group_name) {
+    data <- results_list[[group_name]]
+
+    tibble(
+      Group = group_name,
+      n_obs = data$n_obs,
+      # W = data$test_result$W,
+      p_value = data$`p-value`,
+      what_test = data$what_test,
+      is_normal = data$is.normal
+    )
+  }, .id = "Group") %>%
+    ccbind(data.frame(group = group_var), .) %>%
+    ccbind(data.frame(response = response_var), .) %>%
+    mutate(Group = names(results_list)) %>%
+    as_tibble()
+
+
+
+
+
+
+  ## 🟧 adjust p-vals #############################################################################
+  results_df_2 = results_df %>%
+    cbind(sub___p.adjust(p.values = results_df$p_value,
+                         method = p.adjust.method,
+                         alpha = alpha,
+                         only.return.p.vals = F)) %>%
+    as_tibble() %>%
+    dplyr::select(-p_value, -is_normal)
+
+
+
+  ## 🟧 is.normal #############################################################################
+  results_df_2$is.normal = results_df_2$p.adj > alpha
+
+  return(results_df_2)
+}
 
