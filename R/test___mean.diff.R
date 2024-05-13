@@ -261,6 +261,7 @@ test___mean.diff = function(df,
       sample_median = median(!!sym(response_var), na.rm = TRUE), # 중앙값
       .groups = 'drop' # 그룹화 해제
     )
+  names(summary_df)[1] = "each_group_name"
   test_result_df_2 = data.frame(response = response_var) %>%
     cbind(data.frame(group = group_var)) %>%
     ccbind(summary_df) %>%
@@ -459,9 +460,7 @@ test___mean.diff = function(df,
   ## 🟥 combine results ===========================================================================
   Final_Results.list[["test result"]] = test_result
   Final_Results.list[["test result as data.frame"]] = test_result_df_2
-  if(test_result_df_2$significance[1]){
-    Final_Results.list[["post hoc with the smallest adj p-values"]] = selected_post.hoc
-  }
+  Final_Results.list[["post hoc with the smallest adj p-values"]] = selected_post.hoc
   Final_Results.list[["box plots"]] = p
 
 
