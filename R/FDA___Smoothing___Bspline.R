@@ -1,17 +1,17 @@
 FDA___Smoothing___Bspline = function(Bspline,
                                      path_Export=NULL, file.name=NULL, save_rds=T, save_plot=T){
-  # 🟥0.Input ########################################################################
+  # 🟥0.Input ##############################################################################################
   # Bspline = list(y = y,
   #                x = x,
   #                range_vals = NULL,
   #                nbasis = NULL,
   #                norder = NULL,
   #                breaks = NULL,
-  #                labmdas = NULL,
+  #                lambdas = NULL,
   #                best_criterion = "gcv",
   #                m_int2Lfd = NULL,
   #                argvals = NULL)
-  ## 🟨 y & x ====================================================================
+  ## 🟨 y & x ==============================================================================================
   y = Bspline$y %>% as.matrix
   x = Bspline$x
 
@@ -41,7 +41,7 @@ FDA___Smoothing___Bspline = function(Bspline,
 
 
   ## 🟨 breaks ====================================================================
-  # break 오류가 나면 중복값 있는지 확인
+  # breaks 오류가 나면 중복값 있는지 확인
   # breaks = c(Bspline$breaks[1], seq(7,10, 0.1), Bspline$breaks[-1])
   breaks = Bspline$breaks
   if(is.null(breaks)){
@@ -86,12 +86,9 @@ FDA___Smoothing___Bspline = function(Bspline,
                                         # nbasis = nbasis,
                                         norder = norder,
                                         breaks = breaks %>% unname %>% as.numeric)
+
   # eval_basis = eval.basis(evalarg = seq(range_vals[1], range_vals[2], by = 0.01), basisobj = basis_obj)
   # matplot(x = seq(range_vals[1], range_vals[2], by = 0.01), y = eval_basis, type = "l")
-
-
-
-
 
 
 
@@ -110,20 +107,25 @@ FDA___Smoothing___Bspline = function(Bspline,
       gcv = sapply(lambdas, function(ith_lambda){
 
         tryCatch({
+
           fd_par_obj = fda:::fdPar(fdobj = basis_obj,
                                    Lfdobj = int2Lfd(m_int2Lfd),
                                    lambda = ith_lambda)
 
           # smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
-          smoothing = fda::smooth.basis(argvals = argvals, y = y %>% as.matrix, fdParobj = fd_par_obj)
-
+          # y의 각 열은 한 사람의 관측 시그널
+          # 여러 사람에 대해 동시에 smoothing하는 코드
+          smoothing = fda::smooth.basis(argvals = x, y = y %>% as.matrix, fdParobj = fd_par_obj)
 
           return(mean(smoothing$gcv)) # mean gcv
 
         }, error = function(e) {
+
           return(NA)
+
         })
       })
+
       if(is.na(gcv) %>% sum == length(gcv)){
         stop("All lambdas are error!")
       }
@@ -148,6 +150,7 @@ FDA___Smoothing___Bspline = function(Bspline,
     }else{
 
       stop("Define other criteria rather than 'gcv'")
+
     }
 
   }
@@ -163,9 +166,6 @@ FDA___Smoothing___Bspline = function(Bspline,
   if(!is.null(path_Export)){
     ## 🟨 dir ====================================================================
     fs::dir_create(path_Export, recurse = T)
-
-
-
 
 
     ## 🟨 plot ====================================================================

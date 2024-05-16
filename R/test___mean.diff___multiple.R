@@ -3,7 +3,7 @@ test___mean.diff___multiple = function(df,
                                        group_var_type = "nomial",
                                        response_vars,
                                        is.paired = FALSE,
-                                       alpah_anova = 0.05,
+                                       alpha_anova = 0.05,
                                        alpha_posthoc = 0.05,
                                        path_save = NULL,
                                        combine_by = c("group_vars", "response_vars")){
@@ -118,6 +118,50 @@ test___mean.diff___multiple = function(df,
     results.list[[i]] = ith_results_new.list
   }
   names(combined_results.list) = names(results.list)
+
+
+
+
+  ## 🟧 modify plots  =========================================================
+
+
+  lapply(results.list, function(y){
+    # y = results.list[[1]]
+
+    y = lapply(y, function(x){
+      # x = y[[1]]
+      n_groups = x$`test result as data.frame` %>% nrow
+      if(n_groups!=2){
+        return(x)
+      }else{
+        x$`box plots` = x$`box plots` +
+      }
+       =
+
+        # 필터링된 데이터에서 유의미한 결과만 사용
+        significant_results <- post.hoc_result %>%
+        dplyr::filter(p.adj <= alpha_posthoc)
+
+
+      if(nrow(significant_results)==0){
+        p6 = p5
+      }else{
+        # ggpubr::stat_pvalue_manual을 사용하여 박스플롯에 유의성 표시 추가
+        p6 <- p5 + ggpubr::stat_pvalue_manual(
+          data = significant_results,
+          label = "p.adj.signif",  # 이 열이 별표("***", "**", "*") 유의성 표시를 포함하고 있다고 가정
+          y.position = 1.1 * max(df[[response_var]], na.rm = TRUE),  # 유의성 표시 위치
+          step.increase = 0.1,  # 선의 높이 조절
+          vjust = -0.5  # 세로 위치 조정
+        )
+      }
+
+    })
+
+
+  })
+
+
 
 
 

@@ -304,10 +304,13 @@ test___mean.diff = function(df,
     ##### 🟦 test =====================================================================================
     # t-test
     pairwise_results = pairwise.t.test(x = df[[response_var]],
-                                        g = df[[group_var]],
-                                        pool.sd = is.equal.var,
-                                        paired = FALSE,
-                                        p.adjust.method = "none")  # 일단 보정하지 않고 원래의 p-value를 얻습니다.
+                                       g = df[[group_var]],
+                                       pool.sd = is.equal.var,
+                                       paired = FALSE,
+                                       p.adjust.method = "none")  # 일단 보정하지 않고 원래의 p-value를 얻습니다.
+
+
+
     # 데이터 프레임 생성
     pairwise_df <- as.data.frame(pairwise_results$p.value)
 
@@ -322,9 +325,13 @@ test___mean.diff = function(df,
 
     # add col
     long_pairwise_df = long_pairwise_df %>%
-      mutate(pairwise_comparison = ifelse(is.equal.var, "t-test", "Welch's t-test")) %>%
-      relocate(pairwise_comparison)
+      mutate(pairwise_comparison = ifelse(is.equal.var, "t-test (equal variance)", "Welch's t-test")) %>%
+      relocate(pairwise_comparison) %>%
+      rename(group1 := Group1) %>%
+      rename(group2 := Group2)
 
+
+    post.hoc_results.list[["Non-adjustment"]] = long_pairwise_df
 
 
 
@@ -342,24 +349,18 @@ test___mean.diff = function(df,
       post.hoc_results.list[["Bonferroni"]] <- long_pairwise_df %>%
         cbind(sub___p.adjust(p.values = long_pairwise_df$p.value, method = "bonferroni", only.return.p.vals = F)) %>%
         dplyr::select(-p.value) %>%
-        mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Bonferroni)", "Pairwise Welch's t-test (Bonferroni)")) %>%
-        rename(group1 := Group1) %>%
-        rename(group2 := Group2)
+        mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Bonferroni)", "Pairwise Welch's t-test (Bonferroni)"))
     }
     # Holm
     post.hoc_results.list[["Holm"]] <- long_pairwise_df %>%
       cbind(sub___p.adjust(long_pairwise_df$p.value, method = "holm", only.return.p.vals = F)) %>%
       dplyr::select(-p.value) %>%
-      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Holm)", "Pairwise Welch's t-test (Holm)")) %>%
-      rename(group1 := Group1) %>%
-      rename(group2 := Group2)
+      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Holm)", "Pairwise Welch's t-test (Holm)"))
     # Dunn-Sidak
     post.hoc_results.list[["Dunn-Sidak"]] <- long_pairwise_df %>%
       cbind(sub___p.adjust(p.values = long_pairwise_df$p.value, method = "SidakSS", only.return.p.vals = F)) %>%
       dplyr::select(-p.value) %>%
-      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Dunn-Sidak)", "Pairwise Welch's t-test (Dunn-Sidak)")) %>%
-      rename(group1 := Group1) %>%
-      rename(group2 := Group2)
+      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Dunn-Sidak)", "Pairwise Welch's t-test (Dunn-Sidak)"))
 
 
 
@@ -394,8 +395,8 @@ test___mean.diff = function(df,
           mutate(post.hoc_method = "Games-Howell test") %>%
           relocate(post.hoc_method) %>%
           mutate(p.adj.signif = sub___p.vals.signif.stars(p.adj))
-          # rename(Group1:=group1) %>%
-          # rename(Group2:=group2)
+        # rename(Group1:=group1) %>%
+        # rename(Group2:=group2)
 
 
       }else{
@@ -432,12 +433,22 @@ test___mean.diff = function(df,
 
 
 
+
+
+
   ## 🟥 Select Post-hoc by recommendation ===========================================================================
   # the smallest p-values
-  summed_p_vals = sapply(post.hoc_results.list, function(y){
-    y[["p.adj"]] %>% sum
-  })
-  selected_post.hoc = post.hoc_results.list[[which.min(summed_p_vals)]]
+  if(n_groups > 2){
+    post.hoc_results.list$`Non-adjustment` = NULL
+    summed_p_vals = sapply(post.hoc_results.list, function(y){
+      y[["p.adj"]] %>% sum
+    })
+
+    selected_post.hoc = post.hoc_results.list[[which.min(summed_p_vals)]]
+  }else{
+    selected_post.hoc = post.hoc_results.list$Bonferroni
+  }
+
 
 
 
@@ -596,8 +607,11 @@ ggplot___boxplot___mean.diff.test = function(df,
   # 두 그룹 사이의 비교 옵션 넣기
   if(add.group.comparison){
     # 필터링된 데이터에서 유의미한 결과만 사용
-    significant_results <- post.hoc_result %>%
-      dplyr::filter(p.adj <= alpha_posthoc)
+    # n_groups > 2
+    n_group = test_result.df
+    if()
+    significant_results <- post.hoc_result %>% dplyr::filter(p.adj <= alpha_posthoc)
+
 
 
     if(nrow(significant_results)==0){
