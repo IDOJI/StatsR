@@ -11,9 +11,13 @@ test___mean.diff___multiple = function(df,
   if(combine_by == "group_vars"){
 
     results.list = list()
+
     for(j in seq_along(response_vars)){
+
       jth_results.list = list()
+
       for(i in seq_along(group_vars)){
+
         jth_results.list[[i]] = test___mean.diff(df = df,
                                                  group_var = group_vars[i],
                                                  group_var_type = group_var_type,
@@ -22,12 +26,15 @@ test___mean.diff___multiple = function(df,
                                                  alpha_anova = alpha_anova,
                                                  alpha_posthoc = alpha_posthoc,
                                                  path_save = path_save)
+
       }
+
       names(jth_results.list) = group_vars
+
       results.list[[j]] = jth_results.list
+
     }
     names(results.list) = response_vars
-
 
   }else if(combine_by == "response_vars"){
     results.list = rep(NA, times = length(group_vars)) %>% as.list
@@ -56,9 +63,9 @@ test___mean.diff___multiple = function(df,
 
 
 
-
   ## 🟧 Combine results =========================================================
   combined_results.list = list()
+  results_old.list = results.list
   for(i in seq_along(results.list)){
     ith_results.list = results.list[[i]]
     # ith_results.list에서 각 요소를 추출하여 하나의 데이터 프레임으로 결합
@@ -90,8 +97,6 @@ test___mean.diff___multiple = function(df,
     combined_results.list[[i]] = selected_results.df
 
 
-
-
     ### 🟨 각 x의 데이터 프레임을 업데이트 =====================================================
     ith_results_new.list <- lapply(ith_results.list, function(x) {
       # x = ith_results.list[[1]]
@@ -108,9 +113,12 @@ test___mean.diff___multiple = function(df,
 
       combined_df$group_var = NULL
 
-
       # 업데이트된 데이터 프레임을 x에 다시 할당
       x$`test result as data.frame` <- combined_df
+
+      # n_group==2이면 posthoc 수정
+      x$`post hoc with the smallest adj p-values`$p.adj = x$`test result as data.frame`$adj.p.values[1]
+      x$`post hoc with the smallest adj p-values`$p.adj.signif = sub___p.vals.signif.stars(x$`test result as data.frame`$adj.p.values[1])
 
       return(x)
     }) %>% setNames(names(ith_results.list))
@@ -122,32 +130,70 @@ test___mean.diff___multiple = function(df,
 
 
 
-  ## 🟧 modify plots  =========================================================
 
+  ## 🟧 modify plots  ==============================================================================================
+  ### 🟩 특정 조건을 만족하는 레이어를 제거하는 함수 ===============================================================
+  remove_layer_if_exists <- function(plot, geom_name, stat_name) {
+    # 레이어 인덱스 목록을 초기화
+    layer_indices_to_remove <- c()
 
-  lapply(results.list, function(y){
-    # y = results.list[[1]]
-
-    y = lapply(y, function(x){
-      # x = y[[1]]
-      n_groups = x$`test result as data.frame` %>% nrow
-      if(n_groups!=2){
-        return(x)
-      }else{
-        x$`box plots` = x$`box plots` +
+    # 각 레이어를 검사하여 조건에 맞는 레이어 인덱스를 수집
+    for (i in seq_along(plot$layers)) {
+      layer <- plot$layers[[i]]
+      if (inherits(layer$geom, geom_name) && inherits(layer$stat, stat_name)) {
+        layer_indices_to_remove <- c(layer_indices_to_remove, i)
       }
-       =
+    }
 
-        # 필터링된 데이터에서 유의미한 결과만 사용
-        significant_results <- post.hoc_result %>%
-        dplyr::filter(p.adj <= alpha_posthoc)
+    # 조건에 맞는 레이어가 있으면 해당 레이어 제거
+    if (length(layer_indices_to_remove) > 0) {
+      plot$layers <- plot$layers[-layer_indices_to_remove]
+    }
+
+    return(plot)
+  }
 
 
-      if(nrow(significant_results)==0){
-        p6 = p5
-      }else{
+
+
+  ### 🟩 루프를 통해 결과 리스트 처리 =============================================================================
+  for(j in seq_along(results_old.list)){
+    jth_results_old <- results_old.list[[j]]
+    jth_results_new <- results.list[[j]]
+
+    for (k in seq_along(jth_results_old)){
+      kth_variable_results_old <- jth_results_old[[k]]
+      kth_variable_results_new <- jth_results_new[[k]]
+
+      kth_posthoc_old <- kth_variable_results_old$`post hoc with the smallest adj p-values`
+      kth_posthoc_new <- kth_variable_results_new$`post hoc with the smallest adj p-values`
+
+      ### 🟩 N_groups ===============================================================================================
+      n_groups <- nrow(kth_variable_results_new$`test result as data.frame`)
+      # Check difference of p-values
+      if (n_groups == 2) {
+        if (round(kth_posthoc_new$p.adj, 4) != round(kth_variable_results_new$`test result as data.frame`$adj.p.values[1], 4)) {
+          stop("Check the difference of p-values!")
+        }
+      }
+
+      ### 🟩 check plots ===============================================================================================
+      p_old <- kth_variable_results_old$`box plots` # 이전엔 유의했지만, 이번엔 유의하지 않은 경우?
+      p_new <- kth_variable_results_new$`box plots`
+
+      # p_old 객체에서 geom_bracket과 stat_bracket을 포함하는 레이어 제거 (boplots의 comparison bar 제거)
+      p_new <- remove_layer_if_exists(p_new, "GeomBracket", "StatBracket")
+
+      #### 🟦 유의한 경우 선 추가 =========================================================================
+      signif <- kth_variable_results_new$`post hoc with the smallest adj p-values`$p.adj.signif %>% unique()
+
+      if (any(signif %in% c("*", "**", "***", "****"))) {
+        response_var <- kth_variable_results_new$`test result as data.frame`$response[1]
+
+        significant_results <- kth_variable_results_new$`post hoc with the smallest adj p-values` %>% dplyr::filter(p.adj <= alpha_posthoc)
+
         # ggpubr::stat_pvalue_manual을 사용하여 박스플롯에 유의성 표시 추가
-        p6 <- p5 + ggpubr::stat_pvalue_manual(
+        p_new <- p_new + ggpubr::stat_pvalue_manual(
           data = significant_results,
           label = "p.adj.signif",  # 이 열이 별표("***", "**", "*") 유의성 표시를 포함하고 있다고 가정
           y.position = 1.1 * max(df[[response_var]], na.rm = TRUE),  # 유의성 표시 위치
@@ -156,13 +202,11 @@ test___mean.diff___multiple = function(df,
         )
       }
 
-    })
-
-
-  })
-
-
-
+      kth_variable_results_new$`box plots` <- p_new
+      jth_results_new[[k]] <- kth_variable_results_new
+    }
+    results.list[[j]] <- jth_results_new
+  }
 
 
   ## 🟧 return final  =========================================================

@@ -31,12 +31,19 @@ test___mean.diff = function(df,
   Final_Results.list = list()
 
 
+
+
+
   ## 🟥 Exclude NA ===============================================================================
   which_na = which(is.na(df[[group_var]]) | is.na(df[[response_var]]))
   if(length(which_na) > 0){
     Final_Results.list$NA_rows = df[which_na, ]
     df = df[-which_na, ]
   }
+
+
+
+
 
 
 
@@ -60,6 +67,8 @@ test___mean.diff = function(df,
                                                            group_var = group_var,
                                                            numeric_var = response_var,
                                                            na.rm = T)
+
+
 
 
 
@@ -91,12 +100,16 @@ test___mean.diff = function(df,
 
 
 
+
+
   ## 🟥 Normality & Homoscedasticity ===========================================================
   pretest = Final_Results.list$pretest = test___homoscedasticity(df = df,
                                                                  group_var = group_var,
                                                                  response_var = response_var,
                                                                   p.adjust.method_normality = p.adj.method_normality,
                                                                   path_save = path_save)
+
+
 
 
 
@@ -269,7 +282,6 @@ test___mean.diff = function(df,
     ccbind(data.frame(alpha = alpha_anova))
 
 
-
   ### 🟧 significance =============================================================
   pval = test_result_df_2$p.value[1]
   test_result_df_2 = test_result_df_2 %>%
@@ -277,10 +289,7 @@ test___mean.diff = function(df,
     ccbind(data.frame(significance_2 = sub___p.vals.signif.stars(pval)))
 
 
-
-
-
-  ### 🟧 combine pretest =============================================================
+  ### 🟧 combine pretest ==========================================================================================
   # combined.df = pretest$normality$test_result %>%
   #   ccbind(pretest$homoscedasticity$result.df) %>%
   #   ccbind(test_result_df)
@@ -293,7 +302,7 @@ test___mean.diff = function(df,
 
 
 
-  ## 🟥 Post-hoc ===========================================================================
+  ## 🟥 Post-hoc ===================================================================================================
   # 참고 논문: Comparing multiple comparisons - practical guidance for choosing the best multiple comparisons test
   # -> 아직 안 추가한 방법론들 있으므로 나중에 참고
   # 다른 분석을 할 때는 옵시디언 태그들 참조해서 다시 한 번 검토할 것
@@ -301,7 +310,7 @@ test___mean.diff = function(df,
   if(is.normal){
     ### 🟧 Parametric + Unplanned comparisons ==============================================================================
     #### 🟨 pairwise t-test + p.val.adj =============================================================================================
-    ##### 🟦 test =====================================================================================
+    ##### 🟦 test ====================================================================================================
     # t-test
     pairwise_results = pairwise.t.test(x = df[[response_var]],
                                        g = df[[group_var]],
@@ -438,15 +447,17 @@ test___mean.diff = function(df,
 
   ## 🟥 Select Post-hoc by recommendation ===========================================================================
   # the smallest p-values
-  if(n_groups > 2){
+  if(n_groups == 2 && is.normal){
+
+    selected_post.hoc = post.hoc_results.list$Bonferroni
+
+  }else{
     post.hoc_results.list$`Non-adjustment` = NULL
     summed_p_vals = sapply(post.hoc_results.list, function(y){
       y[["p.adj"]] %>% sum
     })
 
     selected_post.hoc = post.hoc_results.list[[which.min(summed_p_vals)]]
-  }else{
-    selected_post.hoc = post.hoc_results.list$Bonferroni
   }
 
 
@@ -463,9 +474,6 @@ test___mean.diff = function(df,
                                         post.hoc_result = selected_post.hoc,
                                         alpha_posthoc = alpha_posthoc,
                                         path_save = path_save)
-
-
-
 
 
   ## 🟥 combine results ===========================================================================
@@ -539,7 +547,8 @@ ggplot___boxplot___mean.diff.test = function(df,
           axis.title.y = element_text(size = 15, face = "bold")) +
     theme(legend.text = element_text(size = 12),
           legend.title = element_text(size = 15, face = "bold")) +
-    theme(text = element_text(size = 10)) # change text size of theme components
+    theme(text = element_text(size = 10)) + # change text size of theme components
+    guides(color = "none")  # 범례에서 color 항목 숨기기
   # Label angle
   # p1 = p1 + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
   # Label bold
@@ -608,8 +617,6 @@ ggplot___boxplot___mean.diff.test = function(df,
   if(add.group.comparison){
     # 필터링된 데이터에서 유의미한 결과만 사용
     # n_groups > 2
-    n_group = test_result.df
-    if()
     significant_results <- post.hoc_result %>% dplyr::filter(p.adj <= alpha_posthoc)
 
 

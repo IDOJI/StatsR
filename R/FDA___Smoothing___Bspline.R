@@ -1,16 +1,16 @@
-FDA___Smoothing___Bspline = function(Bspline,
+fda___smoothing___bspline = function(Bspline,
                                      path_Export=NULL, file.name=NULL, save_rds=T, save_plot=T){
   # 🟥0.Input ##############################################################################################
   # Bspline = list(y = y,
   #                x = x,
-  #                range_vals = NULL,
+  #                range_vals = c(min(x), max(x)),
   #                nbasis = NULL,
   #                norder = NULL,
-  #                breaks = NULL,
+  #                breaks = x,
   #                lambdas = NULL,
   #                best_criterion = "gcv",
   #                m_int2Lfd = NULL,
-  #                argvals = NULL)
+  #                argvals = x)
   ## 🟨 y & x ==============================================================================================
   y = Bspline$y %>% as.matrix
   x = Bspline$x
@@ -115,7 +115,7 @@ FDA___Smoothing___Bspline = function(Bspline,
           # smoothing = fda::smooth.basis(argvals = breaks, y = y, fdParobj = fd_par_obj)
           # y의 각 열은 한 사람의 관측 시그널
           # 여러 사람에 대해 동시에 smoothing하는 코드
-          smoothing = fda::smooth.basis(argvals = x, y = y %>% as.matrix, fdParobj = fd_par_obj)
+          smoothing = fda::smooth.basis(argvals = argvals, y = y %>% as.matrix, fdParobj = fd_par_obj)
 
           return(mean(smoothing$gcv)) # mean gcv
 
@@ -156,7 +156,6 @@ FDA___Smoothing___Bspline = function(Bspline,
   }
 
   Results = list(smoothing = smoothing, best_lambda = best_lambda)
-
 
 
 
