@@ -366,10 +366,10 @@ test___mean.diff = function(df,
       dplyr::select(-p.value) %>%
       mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Holm)", "Pairwise Welch's t-test (Holm)"))
     # Dunn-Sidak
-    post.hoc_results.list[["Dunn-Sidak"]] <- long_pairwise_df %>%
-      cbind(sub___p.adjust(p.values = long_pairwise_df$p.value, method = "SidakSS", only.return.p.vals = F)) %>%
-      dplyr::select(-p.value) %>%
-      mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Dunn-Sidak)", "Pairwise Welch's t-test (Dunn-Sidak)"))
+    # post.hoc_results.list[["Dunn-Sidak"]] <- long_pairwise_df %>%
+    #   cbind(sub___p.adjust(p.values = long_pairwise_df$p.value, method = "SidakSS", only.return.p.vals = F)) %>%
+    #   dplyr::select(-p.value) %>%
+    #   mutate(post.hoc_method = ifelse(is.equal.var, "Pairwise t-test (Dunn-Sidak)", "Pairwise Welch's t-test (Dunn-Sidak)"))
 
 
 
